@@ -23,7 +23,7 @@ qualquer CNC caseira.
 | Etapa | Ferramenta | Observação |
 |---|---|---|
 | Isolação | V-bit 20–30° com ponta de 0,1–0,2 mm, ou fresa reta de 0,4–0,6 mm | Acima de 0,6 mm não passa entre ilhas vizinhas. Com 0,4 mm, faça 2 passadas. |
-| Furos finos | broca **1,0 mm** de metal duro | **120 furos**: R, C, DIP, LED, soquetes, KK, headers, JP1, C10 |
+| Furos finos | broca **1,0 mm** de metal duro | **120 furos**: R, C, DIP, LED, soquetes, JST XH, headers, JP1, C10 |
 | Furos grossos | broca **1,6 mm** | **8 furos**: D1, D2 e os 6 pinos dos bornes J5/J6 |
 | Contorno e M3 | fresa reta de 1,5–2,0 mm | Contorno em 3–4 passadas. Os 4 furos de 3,2 mm saem com essa fresa (mill holes). |
 

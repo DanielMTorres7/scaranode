@@ -4,6 +4,7 @@ Projetista: **Daniel M. Torres**.
 
 | Rev. | Data | Resumo |
 |---|---|---|
+| v15 | 25/09/2026 | Conectores de sinal passam a JST XH 2,5 mm (as peças reais); 74ACT245 soldado direto; borne da 24 V verde e do motor azul |
 | v14 | 25/09/2026 | ENA do DM556 no GP8 (J4 passa a 4 vias); pull-ups de 10k R13/R14 nos fins de curso. Manual e repositório publicados. |
 | v13 | 25/09/2026 | Só duas brocas (1,0 e 1,6 mm) + M3 |
 | v12 | 25/09/2026 | C10 = 470 µF 35 V; placa passa a 75,8 × 64 mm |
@@ -11,6 +12,17 @@ Projetista: **Daniel M. Torres**.
 | v10 | 24/09/2026 | LED D3 na borda; trilha de retorno de GND do borne |
 | v9 | 24/09/2026 | Anel dos conectores KK corrigido (0,40 mm); primeiros Gerbers |
 | v1–v8 | 24/09/2026 | Layout inicial, regras de fresa, pinagem do RP2040 |
+
+## v15 — conectores JST XH
+
+- J1, J2, J3, J4 e J7 trocam o footprint Molex KK (2,54 mm) pelo **JST XH** (B2B/B4B-XH-A, 2,5 mm), que é o
+  conector usado de fato. As ilhas continuam ovais de 1,8 × 2,4 mm com furo de 1,0 mm.
+- J4: as trilhas do 74ACT245 (passo 2,54) fazem um desvio curto até os pinos do XH (passo 2,5).
+- O corpo do XH é mais largo que o do KK. Exceções de courtyard aceitas, com as medidas do F.Fab:
+  J1/J2/J3 × R2/R3/R8 (plástico a ~0,2 mm da perna do resistor, sem cobre no meio) e J7 × H1/D2 (~1 mm da
+  cabeça do M3, ~1,5 mm da perna do D2). Afastar a coluna para a esquerda violaria a isolação da trilha de 5 V.
+- U2 soldado direto (sem soquete DIP). Borne J5 verde (24 V), J6 azul (motor).
+- Validado: 128 pinos, 0 violações de cobre, 0 ligações faltando. Furação igual: 120 × 1,0 · 8 × 1,6 · 4 × 3,2.
 
 ## v14 — ENA do DM556 e pull-ups dos fins de curso
 

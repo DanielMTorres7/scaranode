@@ -7,9 +7,9 @@ externo **DM556** (NEMA 23). Face única, 75,8 × 64 mm, feita para fresar em ca
 
 | Projetista | Revisão | Data | Estado |
 |---|---|---|---|
-| Daniel M. Torres | v14 | 25/09/2026 | Validada: 128 pinos, DRC sem erro |
+| Daniel M. Torres | v15 | 25/09/2026 | Validada: 128 pinos, DRC sem erro |
 
-📘 **[Manual completo](docs/README.md)** · 📄 **[PDF](docs/ScaraNode-Manual-v14.pdf)** ·
+📘 **[Manual completo](docs/README.md)** · 📄 **[PDF](docs/ScaraNode-Manual-v15.pdf)** ·
 🧾 **[Lista de materiais](docs/02-lista-de-materiais.md)** · 🔧 **[Montagem](docs/04-montagem.md)** ·
 ⚙️ **[Klipper](docs/07-firmware-klipper.md)**
 

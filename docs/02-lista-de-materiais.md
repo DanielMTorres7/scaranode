@@ -1,10 +1,11 @@
 # 2. Lista de materiais
 
-A lista de compras oficial é [`production/BOM.csv`](../production/BOM.csv), gerada direto da placa. Este capítulo mostra **cada item** com uma foto de referência, o modelo 3D usado no
-KiCad e o lugar exato na placa (vista de cima, peça em laranja).
+A lista de compras oficial é [`production/BOM.csv`](../production/BOM.csv), gerada direto da placa. Este
+capítulo mostra **cada item** com uma imagem de referência, o modelo 3D usado no KiCad e o lugar exato na placa
+(vista de cima, peça em laranja).
 
-> Fotos marcadas como *ilustrativa* mostram uma peça do mesmo tipo, mas não o modelo exato (ex.: LED de
-> 5 mm no lugar do de 3 mm). O que vale é a coluna **Comprar**. Créditos e licenças das fotos:
+> Foto só aparece quando mostra a peça certa. Onde não há foto livre da peça exata, a referência é o modelo 3D
+> ou um desenho gerado da própria placa (faixas de cor dos resistores, pinagem dos módulos). Créditos das fotos:
 > [`img/componentes/CREDITOS.md`](img/componentes/CREDITOS.md).
 
 ## Resumo
@@ -13,39 +14,36 @@ KiCad e o lugar exato na placa (vista de cima, peça em laranja).
 |---|---|---|
 | 1 | Waveshare RP2040-Zero | U1 |
 | 1 | Módulo TMC2209 StepStick (só nós NEMA 17) | U4 |
-| 1 | SN74ACT245N DIP-20 | U2 |
+| 1 | SN74ACT245N DIP-20 (soldado direto) | U2 |
 | 1 | Schottky 1N5822 | D1 |
 | 1 | TVS P6KE30A | D2 |
 | 1 | LED 3 mm | D3 |
 | 1 | Eletrolítico 470 µF 35 V | C10 |
-| 4 | Cerâmico 100 nF | C1 C2 C3 C6 |
-| 2 | Cerâmico 10 nF | C4 C5 |
+| 4 | Cerâmico 100 nF (104) | C1 C2 C3 C6 |
+| 2 | Cerâmico 10 nF (103) | C4 C5 |
 | 6 | Resistor 10k 1/4 W | R4 R5 R6 R7 R11 R12 |
 | 2 | Resistor 10k 1/8 W | R13 R14 |
 | 2 | Resistor 1k 1/4 W | R2 R8 |
 | 1 | Resistor 100k 1/4 W | R3 |
 | 1 | Resistor 47k 1/4 W | R9 |
 | 1 | Resistor 5k6 1/4 W | R10 |
-| 1 | Borne 2 vias 5,08 mm | J5 |
-| 1 | Borne 4 vias 5,08 mm | J6 |
-| 1 | KF2510 4 vias | J4 |
-| 4 | KF2510 2 vias | J1 J2 J3 J7 |
+| 1 | Borne 2 vias 5,08 mm **verde** | J5 |
+| 1 | Borne 4 vias 5,08 mm **azul** | J6 |
+| 1 | JST XH 4 vias | J4 |
+| 4 | JST XH 2 vias | J1 J2 J3 J7 |
 | 1 | Barra macho 2x3 + 3 jumpers | ZM |
 | 1 | Barra macho 1x2 + 1 jumper | JU |
 | 2 | Barra fêmea 1x9 | soquete do U1 |
 | 2 | Barra fêmea 1x8 | soquete do U4 |
-| 1 | Soquete DIP-20 (opcional) | U2 |
 | 4 | Parafuso M3 + espaçador | H1–H4 |
 | — | Fio rígido | JP1 |
 
-**Fora da placa:** NTC 100k B3950 com fio (J3), duas chaves fim de curso NA ou NF (J1/J2), ventoinha
-24 V (J7), cabo USB-C, fonte de 24 V. Nos nós J1 e Z: driver DM556 e motor NEMA 23.
+**Fora da placa:** NTC 100k B3950 com fio (J3), duas chaves fim de curso NA ou NF (J1/J2), ventoinha 24 V (J7),
+cabo USB-C, fonte de 24 V. Nos nós J1 e Z: driver DM556 e motor NEMA 23.
 
 <table><tr>
-<td align="center"><img src="img/componentes/ntc.jpg" height="140"><br><sub>NTC 100k (ilustrativa)</sub></td>
+<td align="center"><img src="img/componentes/barra-femea.jpg" height="140"><br><sub>Barra fêmea (soquetes do RP e do TMC)</sub></td>
 <td align="center"><img src="img/componentes/fim-de-curso.jpg" height="140"><br><sub>Chave fim de curso</sub></td>
-<td align="center"><img src="img/componentes/barra-femea.jpg" height="140"><br><sub>Barra fêmea (soquetes)</sub></td>
-<td align="center"><img src="img/componentes/soquete-dip.jpg" height="140"><br><sub>Soquete DIP (ilustrativa)</sub></td>
 </tr></table>
 
 ## Item por item
@@ -58,9 +56,9 @@ KiCad e o lugar exato na placa (vista de cima, peça em laranja).
 |---|---|---|---|
 | 1 | U1 | RP2040-Zero | Waveshare RP2040-Zero + 2 barras fêmea 1x9 2,54 mm |
 
-<table><tr><td align="center"><img src="img/componentes/rp2040-zero.jpg" height="170"><br><sub>Foto (ilustrativa)</sub></td><td align="center"><img src="img/3d/peca/u1-rp2040.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/u1-rp2040.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/componentes/rp2040-zero.png" height="170"><br><sub>Pinagem</sub></td><td align="center"><img src="img/3d/peca/u1-rp2040.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/u1-rp2040.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Vai em soquete (barra fêmea), nunca soldado direto. USB-C para **cima**, na borda superior. A foto é de um Raspberry Pi Pico (mesmo chip RP2040); o RP2040-Zero é bem menor.
+Vai em soquete (barra fêmea), nunca soldado direto. USB-C para **cima**, na borda superior. O desenho mostra a rede de cada pino na placa; os pinos em cinza ficam livres.
 
 </div>
 
@@ -72,9 +70,9 @@ Vai em soquete (barra fêmea), nunca soldado direto. USB-C para **cima**, na bor
 |---|---|---|---|
 | 1 | U4 | TMC2209 | Módulo TMC2209 StepStick + 2 barras fêmea 1x8 2,54 mm |
 
-<table><tr><td align="center"><img src="img/componentes/tmc2209.jpg" height="170"><br><sub>Foto (ilustrativa)</sub></td><td align="center"><img src="img/3d/peca/u4-tmc2209.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/u4-tmc2209.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/componentes/tmc2209.png" height="170"><br><sub>Pinagem</sub></td><td align="center"><img src="img/3d/peca/u4-tmc2209.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/u4-tmc2209.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Só nos nós com NEMA 17. Pino **EN** no canto marcado EN (ao lado do GP0 do RP), **VM** no canto marcado VM. Módulo usado no projeto: chip embaixo, trimpot em cima, RSENSE 0,11 Ω. A foto mostra um StepStick A4988 (mesmo formato).
+Só nos nós com NEMA 17. Pino **EN** no canto marcado EN (ao lado do GP0 do RP), **VM** no canto marcado VM. Módulo do projeto: chip embaixo, trimpot e área do dissipador em cima, RSENSE R110 (0,11 Ω).
 
 </div>
 
@@ -84,11 +82,11 @@ Só nos nós com NEMA 17. Pino **EN** no canto marcado EN (ao lado do GP0 do RP)
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | U2 | 74ACT245 | SN74ACT245N DIP-20 (74HCT245N também serve) + soquete DIP-20 opcional |
+| 1 | U2 | 74ACT245 | SN74ACT245N DIP-20, soldado direto (74HCT245N também serve) |
 
-<table><tr><td align="center"><img src="img/componentes/ci-dip20.jpg" height="170"><br><sub>Foto (ilustrativa)</sub></td><td align="center"><img src="img/3d/peca/u2-74act245.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/u2-74act245.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/3d/peca/u2-74act245.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/u2-74act245.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Chanfro/pino 1 para a **esquerda** (pino 1 = ilha quadrada, fileira de baixo). **Não** use 74HC245 (sem o T): com 5 V ele não reconhece os 3,3 V do RP como nível alto. A foto é de um 74LS244, que tem o mesmo encapsulamento.
+Soldado **direto na placa**, sem soquete. Chanfro/ponto do pino 1 para a **esquerda** (pino 1 = ilha quadrada, fileira de baixo). **Não** use 74HC245 (sem o T): em 5 V ele não reconhece os 3,3 V do RP como nível alto.
 
 </div>
 
@@ -100,9 +98,9 @@ Chanfro/pino 1 para a **esquerda** (pino 1 = ilha quadrada, fileira de baixo). *
 |---|---|---|---|
 | 1 | D1 | 1N5822 | Schottky 3 A 40 V, DO-201AD |
 
-<table><tr><td align="center"><img src="img/componentes/diodo-schottky.jpg" height="170"><br><sub>Foto (ilustrativa)</sub></td><td align="center"><img src="img/3d/peca/d1-1n5822.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/d1-1n5822.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/3d/peca/d1-1n5822.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/d1-1n5822.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-⚠️ Faixa do catodo para a **esquerda** (ilha quadrada). Invertido, a placa não liga. Perna grossa: furo de 1,6 mm. A foto mostra Schottky DO-41 (menores); o DO-201AD tem o corpo de ~5 mm.
+⚠️ Faixa do catodo para a **esquerda** (ilha quadrada). Invertido, a placa não liga. Perna grossa: furo de 1,6 mm.
 
 </div>
 
@@ -114,9 +112,9 @@ Chanfro/pino 1 para a **esquerda** (pino 1 = ilha quadrada, fileira de baixo). *
 |---|---|---|---|
 | 1 | D2 | P6KE30A | TVS 600 W unidirecional, DO-15 |
 
-<table><tr><td align="center"><img src="img/componentes/diodo-tvs.jpg" height="170"><br><sub>Foto (ilustrativa)</sub></td><td align="center"><img src="img/3d/peca/d2-p6ke30a.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/d2-p6ke30a.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/3d/peca/d2-p6ke30a.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/d2-p6ke30a.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-⚠️ Faixa do catodo para a **esquerda** (ilha quadrada, lado do 24 V). Invertido, o TVS fica em curto com a 24 V. A foto é de um 1.5KE (DO-201), maior que o DO-15.
+⚠️ Faixa do catodo para a **esquerda** (ilha quadrada, lado do 24 V). Invertido, o TVS fica em curto com a 24 V.
 
 </div>
 
@@ -128,9 +126,9 @@ Chanfro/pino 1 para a **esquerda** (pino 1 = ilha quadrada, fileira de baixo). *
 |---|---|---|---|
 | 1 | D3 | LED 3 mm | LED comum 3 mm, qualquer cor |
 
-<table><tr><td align="center"><img src="img/componentes/led-3mm.jpg" height="170"><br><sub>Foto (ilustrativa)</sub></td><td align="center"><img src="img/3d/peca/d3-led.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/d3-led.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/3d/peca/d3-led.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/d3-led.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Perna curta (catodo, lado chato) na ilha **quadrada**, à direita. A foto mostra um LED de 5 mm.
+Perna curta (catodo, lado chato) na ilha **quadrada**, à direita.
 
 </div>
 
@@ -144,7 +142,7 @@ Perna curta (catodo, lado chato) na ilha **quadrada**, à direita. A foto mostra
 
 <table><tr><td align="center"><img src="img/componentes/capacitor-eletrolitico.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/c10-470uf.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/c10-470uf.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-⚠️ Perna longa (+) na ilha **quadrada**, à esquerda. Faixa branca (−) para o lado do H2. Encaixa entre o borne J5 e o furo H2, sem folga para inclinar.
+⚠️ Perna longa (+) na ilha **quadrada**, à esquerda. Faixa (−) para o lado do H2. Encaixa entre o borne J5 e o furo H2, sem folga para inclinar.
 
 </div>
 
@@ -154,11 +152,11 @@ Perna curta (catodo, lado chato) na ilha **quadrada**, à direita. A foto mostra
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 4 | C1 C2 C3 C6 | 100 nF | Cerâmico 100 nF 50 V, passo 2,5 mm |
+| 4 | C1 C2 C3 C6 | 100 nF | Cerâmico 100 nF 50 V, passo 2,5 mm (marcação 104) |
 
 <table><tr><td align="center"><img src="img/componentes/capacitor-ceramico.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/c-100nf.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/c-100nf.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Sem polaridade. C3 fica junto ao VMOT do TMC; C6 fica embaixo do plugue USB (use peça baixa).
+Sem polaridade. Marcação no corpo: **104**. C3 fica junto ao VMOT do TMC; C6 fica embaixo do plugue USB (use peça baixa).
 
 </div>
 
@@ -168,11 +166,11 @@ Sem polaridade. C3 fica junto ao VMOT do TMC; C6 fica embaixo do plugue USB (use
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 2 | C4 C5 | 10 nF | Cerâmico 10 nF 50 V, passo 2,5 mm |
+| 2 | C4 C5 | 10 nF | Cerâmico 10 nF 50 V, passo 2,5 mm (marcação 103) |
 
 <table><tr><td align="center"><img src="img/componentes/capacitor-ceramico.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/c-10nf.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/c-10nf.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Sem polaridade. Filtro dos fins de curso.
+Sem polaridade. Marcação no corpo: **103**. Filtro dos fins de curso.
 
 </div>
 
@@ -184,9 +182,9 @@ Sem polaridade. Filtro dos fins de curso.
 |---|---|---|---|
 | 6 | R4 R5 R6 R7 R11 R12 | 10k | Resistor 1/4 W 5%, furos a 10,16 mm |
 
-<table><tr><td align="center"><img src="img/componentes/resistor.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/r-10k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r-10k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/componentes/resistor-10k.png" height="170"><br><sub>Faixas de cor</sub></td><td align="center"><img src="img/3d/peca/r-10k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r-10k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Sem polaridade, todos deitados. R6 e R11 ficam na vertical do desenho. R12 limita o LED; 4k7 dá mais brilho.
+4 faixas (5%, corpo bege): **marrom, preto, laranja, dourado**. Em 5 faixas (1%, corpo geralmente azul): **marrom, preto, preto, vermelho, marrom**. Confira com o multímetro antes de soldar: marrom e vermelho se confundem com pouca luz. Todos deitados; R6 e R11 ficam na vertical do desenho. R12 limita o LED (4k7 dá mais brilho).
 
 </div>
 
@@ -198,9 +196,9 @@ Sem polaridade, todos deitados. R6 e R11 ficam na vertical do desenho. R12 limit
 |---|---|---|---|
 | 2 | R13 R14 | 10k | Resistor 1/8 W 5% (corpo 3,6 × 1,6 mm), furos a 7,62 mm |
 
-<table><tr><td align="center"><img src="img/componentes/resistor.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/r13-r14-10k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r13-r14-10k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/componentes/resistor-10k.png" height="170"><br><sub>Faixas de cor</sub></td><td align="center"><img src="img/3d/peca/r13-r14-10k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r13-r14-10k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-⚠️ Tem que ser **1/8 W**: o de 1/4 W não cabe (encosta no soquete do RP). Ficam embaixo do RP2040-Zero, então solde **antes** da barra fêmea. R14 vai inclinado 60°.
+4 faixas (5%, corpo bege): **marrom, preto, laranja, dourado**. Em 5 faixas (1%, corpo geralmente azul): **marrom, preto, preto, vermelho, marrom**. Confira com o multímetro antes de soldar: marrom e vermelho se confundem com pouca luz. ⚠️ Tem que ser **1/8 W** (corpo pequeno): o de 1/4 W encosta no soquete do RP. Ficam embaixo do RP2040-Zero, então solde **antes** da barra fêmea. R14 vai inclinado 60°.
 
 </div>
 
@@ -212,9 +210,9 @@ Sem polaridade, todos deitados. R6 e R11 ficam na vertical do desenho. R12 limit
 |---|---|---|---|
 | 2 | R2 R8 | 1k | Resistor 1/4 W 5%, furos a 10,16 mm |
 
-<table><tr><td align="center"><img src="img/componentes/resistor.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/r-1k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r-1k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/componentes/resistor-1k.png" height="170"><br><sub>Faixas de cor</sub></td><td align="center"><img src="img/3d/peca/r-1k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r-1k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Série dos fins de curso.
+4 faixas (5%, corpo bege): **marrom, preto, vermelho, dourado**. Em 5 faixas (1%, corpo geralmente azul): **marrom, preto, preto, marrom, marrom**. Confira com o multímetro antes de soldar: marrom e vermelho se confundem com pouca luz. Série dos fins de curso.
 
 </div>
 
@@ -226,9 +224,9 @@ Série dos fins de curso.
 |---|---|---|---|
 | 1 | R3 | 100k | Resistor 1/4 W 5%, furos a 10,16 mm |
 
-<table><tr><td align="center"><img src="img/componentes/resistor.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/r3-100k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r3-100k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/componentes/resistor-100k.png" height="170"><br><sub>Faixas de cor</sub></td><td align="center"><img src="img/3d/peca/r3-100k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r3-100k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Pull-up do NTC. Tem que ser 100k (é o `pullup_resistor` do cfg).
+4 faixas (5%, corpo bege): **marrom, preto, amarelo, dourado**. Em 5 faixas (1%, corpo geralmente azul): **marrom, preto, preto, laranja, marrom**. Confira com o multímetro antes de soldar: marrom e vermelho se confundem com pouca luz. Pull-up do NTC: tem que ser 100k (é o `pullup_resistor` do cfg).
 
 </div>
 
@@ -240,9 +238,9 @@ Pull-up do NTC. Tem que ser 100k (é o `pullup_resistor` do cfg).
 |---|---|---|---|
 | 1 | R9 | 47k | Resistor 1/4 W 5%, furos a 10,16 mm |
 
-<table><tr><td align="center"><img src="img/componentes/resistor.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/r9-47k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r9-47k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/componentes/resistor-47k.png" height="170"><br><sub>Faixas de cor</sub></td><td align="center"><img src="img/3d/peca/r9-47k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r9-47k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Parte de cima do divisor da 24 V.
+4 faixas (5%, corpo bege): **amarelo, violeta, laranja, dourado**. Em 5 faixas (1%, corpo geralmente azul): **amarelo, violeta, preto, vermelho, marrom**. Confira com o multímetro antes de soldar: marrom e vermelho se confundem com pouca luz. Parte de cima do divisor da 24 V.
 
 </div>
 
@@ -254,37 +252,37 @@ Parte de cima do divisor da 24 V.
 |---|---|---|---|
 | 1 | R10 | 5k6 | Resistor 1/4 W 5%, furos a 10,16 mm |
 
-<table><tr><td align="center"><img src="img/componentes/resistor.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/r10-5k6.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r10-5k6.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/componentes/resistor-5k6.png" height="170"><br><sub>Faixas de cor</sub></td><td align="center"><img src="img/3d/peca/r10-5k6.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r10-5k6.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Parte de baixo do divisor. Fica embaixo do plugue USB.
-
-</div>
-
-<div class="card" markdown="1">
-
-### Borne 24 V (J5)
-
-| Qtd | Referências | Valor | Comprar |
-|---|---|---|---|
-| 1 | J5 | 24V | Borne de parafuso 2 vias, passo 5,08 mm (KF301-2P / MKDS 1,5) |
-
-<table><tr><td align="center"><img src="img/componentes/borne-parafuso.jpg" height="170"><br><sub>Foto (ilustrativa)</sub></td><td align="center"><img src="img/3d/peca/j5-24v.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j5-24v.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
-
-Entrada do fio para **cima**. +24 V à esquerda, GND à direita. A foto é de um borne de 3,5 mm; o de 5,08 mm é maior.
+4 faixas (5%, corpo bege): **verde, azul, vermelho, dourado**. Em 5 faixas (1%, corpo geralmente azul): **verde, azul, preto, marrom, marrom**. Confira com o multímetro antes de soldar: marrom e vermelho se confundem com pouca luz. Parte de baixo do divisor; fica embaixo do plugue USB.
 
 </div>
 
 <div class="card" markdown="1">
 
-### Borne do motor (J6)
+### Borne 24 V (J5) — verde
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | J6 | MOTOR | Borne de parafuso 4 vias, passo 5,08 mm (KF301-4P ou 2 × KF301-2P) |
+| 1 | J5 | 24V | Borne de parafuso 2 vias, passo 5,08 mm, **verde** (KF301-2P / MKDS 1,5) |
 
-<table><tr><td align="center"><img src="img/componentes/borne-parafuso.jpg" height="170"><br><sub>Foto (ilustrativa)</sub></td><td align="center"><img src="img/3d/peca/j6-motor.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j6-motor.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/3d/peca/j5-24v.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j5-24v.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Entrada do fio para a **direita**. De cima para baixo: 2B, 2A, 1A, 1B.
+**Verde = potência 24 V.** Entrada do fio para **cima**. +24 V à esquerda, GND à direita.
+
+</div>
+
+<div class="card" markdown="1">
+
+### Borne do motor (J6) — azul
+
+| Qtd | Referências | Valor | Comprar |
+|---|---|---|---|
+| 1 | J6 | MOTOR | Borne de parafuso 4 vias, passo 5,08 mm, **azul** (KF301-4P ou 2 × KF301-2P) |
+
+<table><tr><td align="center"><img src="img/3d/peca/j6-motor.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j6-motor.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+
+**Azul = motor**, para não confundir com a 24 V. Entrada do fio para a **direita**. De cima para baixo: 2B, 2A, 1A, 1B.
 
 </div>
 
@@ -294,11 +292,11 @@ Entrada do fio para a **direita**. De cima para baixo: 2B, 2A, 1A, 1B.
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | J4 | DM556 | KF2510 4 vias 2,54 mm (macho de placa + fêmea + 4 terminais) |
+| 1 | J4 | DM556 | JST XH 4 vias 2,5 mm vertical (B4B-XH-A + fêmea XHP-4 + 4 terminais) |
 
-<table><tr><td align="center"><img src="img/componentes/conector-kk.jpg" height="170"><br><sub>Foto (ilustrativa)</sub></td><td align="center"><img src="img/3d/peca/j4-dm556.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j4-dm556.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/componentes/conector-xh.jpg" height="170"><br><sub>Foto (JST XH)</sub></td><td align="center"><img src="img/3d/peca/j4-dm556.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j4-dm556.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Da esquerda para a direita: 5V, PUL−, DIR−, ENA−. Trava para o lado da serigrafia. A foto mostra conectores JST XH, compatíveis com o KF2510.
+Da esquerda para a direita: 5V, PUL−, DIR−, ENA−. Encaixe o corpo no contorno da serigrafia.
 
 </div>
 
@@ -308,9 +306,9 @@ Da esquerda para a direita: 5V, PUL−, DIR−, ENA−. Trava para o lado da ser
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | J3 | NTC | KF2510 2 vias 2,54 mm |
+| 1 | J3 | NTC | JST XH 2 vias 2,5 mm vertical (B2B-XH-A + XHP-2 + 2 terminais) |
 
-<table><tr><td align="center"><img src="img/componentes/conector-kk.jpg" height="170"><br><sub>Foto (ilustrativa)</sub></td><td align="center"><img src="img/3d/peca/j3-ntc.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j3-ntc.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/componentes/conector-xh.jpg" height="170"><br><sub>Foto (JST XH)</sub></td><td align="center"><img src="img/3d/peca/j3-ntc.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j3-ntc.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
 Sinal à direita, GND à esquerda. O NTC não tem polaridade.
 
@@ -322,11 +320,11 @@ Sinal à direita, GND à esquerda. O NTC não tem polaridade.
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 2 | J1 J2 | FIM1, FIM2 | KF2510 2 vias 2,54 mm |
+| 2 | J1 J2 | FIM1, FIM2 | JST XH 2 vias 2,5 mm vertical (B2B-XH-A + XHP-2 + 2 terminais) |
 
-<table><tr><td align="center"><img src="img/componentes/conector-kk.jpg" height="170"><br><sub>Foto (ilustrativa)</sub></td><td align="center"><img src="img/3d/peca/j1-j2-fim.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j1-j2-fim.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/componentes/conector-xh.jpg" height="170"><br><sub>Foto (JST XH)</sub></td><td align="center"><img src="img/3d/peca/j1-j2-fim.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j1-j2-fim.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Sinal à direita, GND à esquerda. A chave fecha o pino para o GND.
+Sinal à direita, GND à esquerda. A chave fecha o pino para o GND. O corpo do XH fica a ~0,2 mm da perna de R2/R3/R8: solde os resistores antes e deixe as pernas retas.
 
 </div>
 
@@ -336,9 +334,9 @@ Sinal à direita, GND à esquerda. A chave fecha o pino para o GND.
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | J7 | FAN 24V | KF2510 2 vias 2,54 mm |
+| 1 | J7 | FAN 24V | JST XH 2 vias 2,5 mm vertical (B2B-XH-A + XHP-2 + 2 terminais) |
 
-<table><tr><td align="center"><img src="img/componentes/conector-kk.jpg" height="170"><br><sub>Foto (ilustrativa)</sub></td><td align="center"><img src="img/3d/peca/j7-fan.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j7-fan.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
+<table><tr><td align="center"><img src="img/componentes/conector-xh.jpg" height="170"><br><sub>Foto (JST XH)</sub></td><td align="center"><img src="img/3d/peca/j7-fan.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j7-fan.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
 +24 V à esquerda, GND à direita. Sempre ligada.
 

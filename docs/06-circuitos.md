@@ -2,7 +2,7 @@
 
 A placa não tem esquema no editor de esquemas do KiCad: foi gerada por uma ferramenta própria em Python
 (não publicada), que também guarda um esquema de referência escrito pino a pino, pela função de cada
-pino no datasheet. Um validador compara esse esquema com cada ilha da placa: na v14 são **128 pinos conferidos, 0
+pino no datasheet. Um validador compara esse esquema com cada ilha da placa: na v15 são **128 pinos conferidos, 0
 divergências**. Os trechos abaixo seguem esse esquema.
 
 ## Entrada 24 V
