@@ -1,0 +1,15 @@
+# saidas temporarias dos scripts (drc.json, placas de render, manual.html)
+build/
+# versoes antigas e renders de trabalho: ficam so localmente
+archive/
+# KiCad: estado local da interface, backups e caches
+*.kicad_prl
+*-backups/
+fp-info-cache
+~*.lck
+_autosave-*
+# Python
+__pycache__/
+
+# ferramenta de geracao: repositorio privado proprio (scripts/.git)
+scripts/
