@@ -67,6 +67,6 @@ flowchart TB
 | Driver TMC2209 | U4, R6, C3, J6 | Módulo StepStick. R6 deixa o driver desligado até o Klipper assumir. C3 desacopla o VMOT. J6 é o borne do motor. |
 | Micropasso / UART | R4, R5, R7, ZM, JU | Pull-ups de 10k em MS1/MS2/MS3, com o jumper ZM para aterrar. JU fechado liga o GP5 ao PDN_UART. |
 | Saída DM556 | U2, C2, J4 | Buffer de 3,3 para 5 V. As saídas afundam PUL−, DIR− e ENA− do DM556 (ânodo comum no 5 V). |
-| NTC e fins de curso | J1, J2, J3, R2, R3, R8, R13, R14, C1, C4, C5, JP1 | NTC com pull-up de 100k no ADC. Chaves para GND com pull-up de 10k e filtro RC. JP1 é o fio que leva o GND para esta coluna. |
+| NTC e fins de curso | J1, J2, J3, R2, R3, R8, R13, R14, C1, C4, C5 | NTC com pull-up de 100k no ADC. Chaves para GND com pull-up de 10k e filtro RC. |
 
 Detalhes e contas no capítulo [6. Circuitos](06-circuitos.md).

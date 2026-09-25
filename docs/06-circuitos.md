@@ -1,9 +1,15 @@
 # 6. Circuitos e cálculos
 
-A placa não tem esquema no editor de esquemas do KiCad: foi gerada por uma ferramenta própria em Python
-(não publicada), que também guarda um esquema de referência escrito pino a pino, pela função de cada
-pino no datasheet. Um validador compara esse esquema com cada ilha da placa: na v16 são **128 pinos conferidos, 0
-divergências**. Os trechos abaixo seguem esse esquema.
+O esquema completo está em `hardware/ScaraNode.kicad_sch` (KiCad 10) e em
+[PDF, folha A3](ScaraNode-Esquematico-v17.pdf). Ele é desenhado por blocos, com rótulos na ponta de cada pino no
+lugar de fios: pinos com o mesmo rótulo estão ligados.
+
+<p align="center"><img src="img/esquematico.svg" width="900" alt="Esquemático da ScaraNode"></p>
+
+Na v17 a placa confere com o esquemático: **126 pinos**, ERC sem erro nem aviso e paridade placa × esquemático
+sem divergência (valor, footprint e rede de cada pino). Esquemático e conferência da placa saem da mesma descrição
+do circuito: o ERC e a paridade conferem tipos de pino e a placa, não a concepção do circuito. Os trechos abaixo
+seguem esse esquema.
 
 ## Entrada 24 V
 

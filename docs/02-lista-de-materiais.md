@@ -22,8 +22,7 @@ capítulo mostra **cada item** com uma imagem de referência, o modelo 3D usado 
 | 1 | Eletrolítico 470 µF 35 V | C10 |
 | 4 | Cerâmico 100 nF (104) | C1 C2 C3 C6 |
 | 2 | Cerâmico 10 nF (103) | C4 C5 |
-| 6 | Resistor 10k 1/4 W | R4 R5 R6 R7 R11 R12 |
-| 2 | Resistor 10k 1/8 W | R13 R14 |
+| 8 | Resistor 10k 1/4 W | R4 R5 R6 R7 R11 R12 R13 R14 |
 | 2 | Resistor 1k 1/4 W | R2 R8 |
 | 1 | Resistor 100k 1/4 W | R3 |
 | 1 | Resistor 47k 1/4 W | R9 |
@@ -37,7 +36,6 @@ capítulo mostra **cada item** com uma imagem de referência, o modelo 3D usado 
 | 2 | Barra fêmea 1x9 | soquete do U1 |
 | 2 | Barra fêmea 1x8 | soquete do U4 |
 | 4 | Parafuso M3 + espaçador | H1–H4 |
-| — | Fio rígido | JP1 |
 
 **Fora da placa:** NTC 100k B3950 com fio (J3), duas chaves fim de curso NA ou NF (J1/J2), ventoinha 24 V (J7),
 cabo USB-C, fonte de 24 V. Nos nós J1 e Z: driver DM556 e motor NEMA 23.
@@ -181,25 +179,11 @@ Sem polaridade. Marcação no corpo: **103**. Filtro dos fins de curso.
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 6 | R4 R5 R6 R7 R11 R12 | 10k | Resistor 1/4 W 5%, furos a 10,16 mm |
+| 8 | R4 R5 R6 R7 R11 R12 R13 R14 | 10k | Resistor 1/4 W 5%, furos a 10,16 mm |
 
 <table><tr><td align="center"><img src="img/componentes/resistor-10k.png" height="170"><br><sub>Faixas de cor</sub></td><td align="center"><img src="img/3d/peca/r-10k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r-10k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-4 faixas (5%, corpo bege): **marrom, preto, laranja, dourado**. Em 5 faixas (1%, corpo geralmente azul): **marrom, preto, preto, vermelho, marrom**. Confira com o multímetro antes de soldar: marrom e vermelho se confundem com pouca luz. Todos deitados; R6 e R11 ficam na vertical do desenho. R12 limita o LED (4k7 dá mais brilho).
-
-</div>
-
-<div class="card" markdown="1">
-
-### Resistores 10 kΩ (1/8 W)
-
-| Qtd | Referências | Valor | Comprar |
-|---|---|---|---|
-| 2 | R13 R14 | 10k | Resistor 1/8 W 5% (corpo 3,6 × 1,6 mm), furos a 7,62 mm |
-
-<table><tr><td align="center"><img src="img/componentes/resistor-10k.png" height="170"><br><sub>Faixas de cor</sub></td><td align="center"><img src="img/3d/peca/r13-r14-10k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r13-r14-10k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
-
-4 faixas (5%, corpo bege): **marrom, preto, laranja, dourado**. Em 5 faixas (1%, corpo geralmente azul): **marrom, preto, preto, vermelho, marrom**. Confira com o multímetro antes de soldar: marrom e vermelho se confundem com pouca luz. ⚠️ Tem que ser **1/8 W** (corpo pequeno): o de 1/4 W encosta no soquete do RP. Ficam embaixo do RP2040-Zero, então solde **antes** da barra fêmea. R14 vai inclinado 60°.
+4 faixas (5%, corpo bege): **marrom, preto, laranja, dourado**. Em 5 faixas (1%, corpo geralmente azul): **marrom, preto, preto, vermelho, marrom**. Confira com o multímetro antes de soldar: marrom e vermelho se confundem com pouca luz. Todos deitados; R6 e R11 ficam na vertical do desenho e R13 e R14 inclinados 50°, paralelos. R6, R13 e R14 ficam embaixo do RP2040-Zero: solde **antes** da barra fêmea. R12 limita o LED (4k7 dá mais brilho).
 
 </div>
 
@@ -325,7 +309,7 @@ Sinal à direita, GND à esquerda. O NTC não tem polaridade.
 
 <table><tr><td align="center"><img src="img/componentes/conector-xh.jpg" height="170"><br><sub>Foto (JST XH)</sub></td><td align="center"><img src="img/3d/peca/j1-j2-fim.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j1-j2-fim.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Sinal à direita, GND à esquerda. A chave fecha o pino para o GND. O corpo do XH fica a ~0,2 mm da perna de R2/R3/R8: solde os resistores antes e deixe as pernas retas.
+Sinal à direita, GND à esquerda. A chave fecha o pino para o GND. O corpo do XH fica a ~0,9 mm da perna de R2/R3/R8.
 
 </div>
 
@@ -373,20 +357,6 @@ Aberto na primeira ligação. Fechado = UART do TMC2209 no GP5 (ver [capítulo 5
 
 <div class="card" markdown="1">
 
-### Jumper de fio de GND (JP1)
-
-| Qtd | Referências | Valor | Comprar |
-|---|---|---|---|
-| 1 | JP1 | fio | Pedaço de fio rígido (perna de resistor cortada serve) |
-
-<table><tr><td align="center"><img src="img/local/jp1-fio.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
-
-⚠️ **Obrigatório.** Fio reto entre os dois furos (5,08 mm), do lado das peças. Leva o GND à coluna do NTC e dos fins de curso, por cima da trilha de 5 V. Sem ele, NTC e chaves ficam sem terra.
-
-</div>
-
-<div class="card" markdown="1">
-
 ### Fixação (H1–H4)
 
 | Qtd | Referências | Valor | Comprar |
@@ -395,6 +365,6 @@ Aberto na primeira ligação. Fechado = UART do TMC2209 no GP5 (ver [capítulo 5
 
 <table><tr><td align="center"><img src="img/componentes/parafuso-espacador.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/local/h-m3.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Furos de 3,2 mm nos cantos. A cabeça do parafuso do H2 fica a ~1 mm do C10.
+Furos de 3,2 mm nos cantos. A cabeça do parafuso do H2 fica a ~0,8 mm do C10.
 
 </div>

@@ -29,8 +29,8 @@ Faça na ordem. Cada passo só começa se o anterior deu o resultado esperado. A
 | Motor não segura (TMC) | EN em alto: Klipper não habilitou, ou R6 em curto | `enable_pin: !gpio0` |
 | Motor vibra mas não gira | Um par de bobinas trocado no J6 | Meça a resistência: pares de ~1–3 Ω |
 | Motor gira ao contrário | Sentido da bobina | `!` no `dir_pin` ou inverta um par |
-| Fim de curso sempre acionado | JP1 faltando (sem GND) ou chave NF sem `!` ajustado | Continuidade GND J1 × J5 |
-| NTC marca −273 °C ou valor absurdo | NTC aberto, sem JP1, ou `pullup_resistor` errado | J3, JP1 |
+| Fim de curso sempre acionado | Chave NF sem `!` ajustado, ou pino de GND do conector sem solda | Continuidade GND J1 × J5 |
+| NTC marca −273 °C ou valor absurdo | NTC aberto, pino de GND do J3 sem solda, ou `pullup_resistor` errado | J3; continuidade GND J3 × J5 |
 | TMC desarma depois de minutos | Corrente acima de ~1,2 A RMS ou sem ventoinha | Trimpot / `run_current`, J7 |
 | `DUMP_TMC` sem resposta | JU aberto, pino 5 do módulo não é PDN_UART, ou MS3 fechado | [Jumpers](05-conectores-e-jumpers.md#jumpers) |
 | DM556 não se move | J4 invertido, ou ENA desabilitando | Ordem 5V, PUL−, DIR−, ENA−; `enable_pin: gpio8` |

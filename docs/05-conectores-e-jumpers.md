@@ -91,8 +91,3 @@ Serigrafia: `MS3 MS2 MS1`, "jumper = 0".
   é ignorado, o micropasso vem do cfg, e MS1/MS2 viram o endereço da UART: os dois abertos = endereço 3,
   os dois fechados = 0. Sem a seção no cfg, o driver continua em standalone mesmo com o JU fechado.
 - UART de 1 fio (half-duplex), sem resistor: o Klipper alterna a direção do GP5.
-
-### JP1 — fio de GND
-
-⚠️ **Não é opcional.** Pedaço de fio rígido soldado nos dois furos (5,08 mm), do lado das peças. Ele leva o
-GND dos conectores da esquerda por cima da trilha de 5 V. Sem ele, NTC e fins de curso ficam sem terra.

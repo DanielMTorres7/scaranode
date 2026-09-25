@@ -4,6 +4,7 @@ Projetista: **Daniel M. Torres**.
 
 | Rev. | Data | Resumo |
 |---|---|---|
+| v17 | 25/09/2026 | Esquemático KiCad publicado (ERC e paridade com a placa); 13 resistores iguais de 1/4 W; R13 e R14 inclinados a 50° com o GND do RP ligado direto ao plano; coluna da esquerda com folgas iguais; GND contínuo sem o jumper de fio JP1; faixas de cor nos renders |
 | v16 | 25/09/2026 | Placa 76 × 64 mm com furos M3 alinhados + DXF mecânico; U2 em soquete DIP-20; borne do motor KF128 azul; NTC separado dos fins de curso; LED de 5 mm |
 | v15 | 25/09/2026 | Conectores de sinal passam a JST XH 2,5 mm (as peças reais); 74ACT245 soldado direto; borne da 24 V verde e do motor azul |
 | v14 | 25/09/2026 | ENA do DM556 no GP8 (J4 passa a 4 vias); pull-ups de 10k R13/R14 nos fins de curso. Manual e repositório publicados. |
@@ -13,6 +14,36 @@ Projetista: **Daniel M. Torres**.
 | v10 | 24/09/2026 | LED D3 na borda; trilha de retorno de GND do borne |
 | v9 | 24/09/2026 | Anel dos conectores KK corrigido (0,40 mm); primeiros Gerbers |
 | v1–v8 | 24/09/2026 | Layout inicial, regras de fresa, pinagem do RP2040 |
+
+## v17 — esquemático e resistores iguais
+
+- **Esquemático** em `hardware/ScaraNode.kicad_sch` e em [PDF](ScaraNode-Esquematico-v17.pdf): uma folha, blocos
+  por função, rótulos na ponta dos pinos. ERC sem erro nem aviso; paridade placa × esquemático sem divergência.
+  Símbolos próprios em `hardware/ScaraNode.kicad_sym`, footprints próprios em `hardware/ScaraNode.pretty`.
+- Pinos livres ganham na placa a rede `unconnected-(…)` que o esquemático gera; o cobre não muda.
+- **R13 e R14 passam a 1/4 W, furos a 10,16 mm** (antes 1/8 W a 7,62): os 13 resistores são iguais. Continuam
+  embaixo do RP2040-Zero.
+- Coluna da esquerda (XH, R2/R3/R8, C1/C4/C5, barra fêmea do RP) com folgas iguais entre corpos: ~0,9 mm do XH à
+  perna do R e da perna do R ao capacitor (medidas com perna de 0,8 mm, acima da real), ~1,0 mm do capacitor à
+  barra fêmea. O capacitor para no limite da isolação de 0,6 mm com as ilhas livres do RP.
+- As exceções de courtyard deixam de ser uma lista fixa: onde os courtyards se sobrepõem ou os corpos ficam a menos
+  de 2 mm, a folga real entre os corpos (desenho de fabricação, pernas pelo furo) tem que ser ≥ 0,10 mm. Menor
+  folga: 0,30 mm (J7 × cabeça do M3 do H1). O DRC do KiCad continua marcando 13 sobreposições de courtyard como
+  erro; são essas, conferidas pela folga real.
+- **Sem jumper de fio**: o U2 (74ACT245), o C2 e a trilha de 5 V que chega a eles descem 1 mm; o J4 fica onde
+  estava. O plano de GND passa a chegar à coluna da esquerda (NTC e fins de curso) entre o último pino do
+  RP2040-Zero e a trilha de 5 V, e o JP1 (fio de GND por cima da trilha de 5 V) sai da placa, da lista de
+  materiais e da montagem. O J4 fica a
+  ~0,5 mm do soquete do U2; o U2 se afasta do RP (~1,7 mm).
+- **R13 e R14 inclinados a 50°, paralelos**: a ilha do fim de curso fica na altura do GP27/GP15 (trilhas retas) e a
+  ilha de 3V3 dos dois cai na mesma trilha de 3V3, que agora desce a ~9,4 mm da fileira esquerda do RP (antes
+  descia a 3,2 mm). Com isso o **GND do RP2040-Zero liga direto ao plano de GND de cima** por um canal de
+  ~6 mm. O R6 passa um pouco para a direita (1,3 mm) e o EN chega a ele em L, sem ilha de cobre solta a mais.
+  Folgas: R13 × R14, R13 × R6 e R14 × R6 ~0,8 mm; R13/R14 a ~1,2 mm da barra fêmea; R6 a ~0,9 mm da barra da
+  direita.
+- Renders com as faixas de cor de cada resistor.
+- Validado: 126 pinos, ERC 0, paridade 0, 0 violações de cobre, 0 ligações faltando. Furação: 118 × 1,0 ·
+  8 × 1,6 · 4 × 3,2.
 
 ## v16 — dimensões redondas, soquete DIP e DXF
 

@@ -7,16 +7,16 @@ externo **DM556** (NEMA 23). Face única, 76 × 64 mm, feita para fresar em casa
 
 | Projetista | Revisão | Data | Estado |
 |---|---|---|---|
-| Daniel M. Torres | v16 | 25/09/2026 | Validada: 128 pinos, DRC sem erro |
+| Daniel M. Torres | v17 | 25/09/2026 | Validada: 126 pinos, ERC e paridade 0, DRC de cobre sem erro |
 
-📘 **[Manual completo](docs/README.md)** · 📄 **[PDF](docs/ScaraNode-Manual-v16.pdf)** ·
+📘 **[Manual completo](docs/README.md)** · 📄 **[PDF](docs/ScaraNode-Manual-v17.pdf)** ·
 🧾 **[Lista de materiais](docs/02-lista-de-materiais.md)** · 🔧 **[Montagem](docs/04-montagem.md)** ·
 ⚙️ **[Klipper](docs/07-firmware-klipper.md)**
 
 ## Estrutura
 
 ```
-hardware/     placa KiCad (ScaraNode.kicad_pcb / .kicad_pro), a fonte editável
+hardware/     placa e esquemático KiCad (ScaraNode.kicad_pro / .kicad_pcb / .kicad_sch + bibliotecas do projeto)
 production/   arquivos para fabricar: gerber/, furação, BOM.csv
 firmware/     configuração Klipper de referência
 docs/         manual (Markdown + PDF), imagens, histórico de revisões
@@ -24,12 +24,15 @@ docs/         manual (Markdown + PDF), imagens, histórico de revisões
 
 ## Editar a placa
 
-Abra `hardware/ScaraNode.kicad_pro` no **KiCad 10**. Ela usa só footprints da biblioteca padrão, além de
-três footprints próprios embutidos no arquivo (soquetes do RP2040-Zero e do StepStick, jumper de fio).
-Os comandos para regerar Gerber e furação estão em [docs/03-fabricacao.md](docs/03-fabricacao.md#arquivos-de-produção).
+Abra `hardware/ScaraNode.kicad_pro` no **KiCad 10**: esquemático (`ScaraNode.kicad_sch`) e placa
+(`ScaraNode.kicad_pcb`). As tabelas de biblioteca do projeto (`sym-lib-table`, `fp-lib-table`) apontam para as
+bibliotecas padrão do KiCad 10 e para as próprias: `ScaraNode.kicad_sym` (RP2040-Zero, StepStick, 74ACT245, diodos)
+e `ScaraNode.pretty` (soquetes do RP2040-Zero e do StepStick). Os comandos para
+regerar Gerber e furação estão em [docs/03-fabricacao.md](docs/03-fabricacao.md#arquivos-de-produção).
 
-A placa original foi gerada e validada por uma ferramenta própria em Python, que não faz parte deste
-repositório. O arquivo KiCad é completo e editável sem ela.
+Placa e esquemático foram gerados e conferidos por uma ferramenta própria em Python, que não faz parte deste
+repositório (a paridade placa × esquemático é verificada pelo `kicad-cli`; a sincronização pela interface —
+"Atualizar placa a partir do esquemático" — não foi testada). Os arquivos KiCad são completos e editáveis sem ela.
 
 ## Licença
 
