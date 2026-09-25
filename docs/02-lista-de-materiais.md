@@ -14,10 +14,11 @@ capítulo mostra **cada item** com uma imagem de referência, o modelo 3D usado 
 |---|---|---|
 | 1 | Waveshare RP2040-Zero | U1 |
 | 1 | Módulo TMC2209 StepStick (só nós NEMA 17) | U4 |
-| 1 | SN74ACT245N DIP-20 (soldado direto) | U2 |
+| 1 | SN74ACT245N DIP-20 | U2 |
+| 1 | Soquete DIP-20 300 mil | U2 |
 | 1 | Schottky 1N5822 | D1 |
 | 1 | TVS P6KE30A | D2 |
-| 1 | LED 3 mm | D3 |
+| 1 | LED 5 mm | D3 |
 | 1 | Eletrolítico 470 µF 35 V | C10 |
 | 4 | Cerâmico 100 nF (104) | C1 C2 C3 C6 |
 | 2 | Cerâmico 10 nF (103) | C4 C5 |
@@ -28,7 +29,7 @@ capítulo mostra **cada item** com uma imagem de referência, o modelo 3D usado 
 | 1 | Resistor 47k 1/4 W | R9 |
 | 1 | Resistor 5k6 1/4 W | R10 |
 | 1 | Borne 2 vias 5,08 mm **verde** | J5 |
-| 1 | Borne 4 vias 5,08 mm **azul** | J6 |
+| 1 | Borne KF128 4 vias **azul** (2 × 2 vias) | J6 |
 | 1 | JST XH 4 vias | J4 |
 | 4 | JST XH 2 vias | J1 J2 J3 J7 |
 | 1 | Barra macho 2x3 + 3 jumpers | ZM |
@@ -82,11 +83,11 @@ Só nos nós com NEMA 17. Pino **EN** no canto marcado EN (ao lado do GP0 do RP)
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | U2 | 74ACT245 | SN74ACT245N DIP-20, soldado direto (74HCT245N também serve) |
+| 1 | U2 | 74ACT245 | SN74ACT245N DIP-20 (74HCT245N também serve) + soquete DIP-20 300 mil |
 
 <table><tr><td align="center"><img src="img/3d/peca/u2-74act245.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/u2-74act245.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Soldado **direto na placa**, sem soquete. Chanfro/ponto do pino 1 para a **esquerda** (pino 1 = ilha quadrada, fileira de baixo). **Não** use 74HC245 (sem o T): em 5 V ele não reconhece os 3,3 V do RP como nível alto.
+Vai em **soquete DIP-20**: o soquete é soldado e o CI encaixa depois. Chanfro/ponto do pino 1 para a **esquerda** (pino 1 = ilha quadrada, fileira de baixo). **Não** use 74HC245 (sem o T): em 5 V ele não reconhece os 3,3 V do RP como nível alto.
 
 </div>
 
@@ -124,7 +125,7 @@ Soldado **direto na placa**, sem soquete. Chanfro/ponto do pino 1 para a **esque
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | D3 | LED 3 mm | LED comum 3 mm, qualquer cor |
+| 1 | D3 | LED 5 mm | LED comum 5 mm, qualquer cor (o de 3 mm usa os mesmos furos) |
 
 <table><tr><td align="center"><img src="img/3d/peca/d3-led.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/d3-led.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
@@ -278,11 +279,11 @@ Sem polaridade. Marcação no corpo: **103**. Filtro dos fins de curso.
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | J6 | MOTOR | Borne de parafuso 4 vias, passo 5,08 mm, **azul** (KF301-4P ou 2 × KF301-2P) |
+| 1 | J6 | MOTOR | Borne de parafuso **KF128 (KRE) azul**, 4 vias (2 × 2 vias encaixados), passo 5,0/5,08 mm |
 
 <table><tr><td align="center"><img src="img/3d/peca/j6-motor.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j6-motor.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-**Azul = motor**, para não confundir com a 24 V. Entrada do fio para a **direita**. De cima para baixo: 2B, 2A, 1A, 1B.
+**Azul = motor** (tipo KF128/KRE), para não confundir com a 24 V. Dois de 2 vias encaixam pela lateral e viram um de 4. O modelo 3D é ilustrativo (Phoenix MKDS recolorido); os furos são de 1,6 mm. Entrada do fio para a **direita**. De cima para baixo: 2B, 2A, 1A, 1B.
 
 </div>
 

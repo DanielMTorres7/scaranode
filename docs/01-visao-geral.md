@@ -25,7 +25,7 @@ Cada nó controla **um motor** do SCARA. O RP2040-Zero roda o firmware do Klippe
 
 | Item | Valor |
 |---|---|
-| Dimensões | 75,8 × 64 mm, 4 furos M3 nos cantos |
+| Dimensões | 76 × 64 mm, 4 furos M3 (Ø3,2) a 3,5 mm das bordas; [desenho mecânico](03-fabricacao.md#desenho-mecânico) |
 | Material | FR-4 1,6 mm, cobre só embaixo (B.Cu), fresada |
 | Alimentação de potência | 24 V no borne J5 (protegida contra inversão e surto) |
 | Alimentação da lógica | 5 V e 3,3 V do USB do RP2040-Zero (ver [por que não há entrada 5 V](08-testes.md#o-que-a-placa-não-faz)) |

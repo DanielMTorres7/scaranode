@@ -23,14 +23,15 @@ placa apoia plana na bancada a cada etapa.
 | 5 | **D1** 1N5822 | <img src="img/local/d1-1n5822.png" width="160"> | ⚠️ Faixa do catodo para a **esquerda** (ilha quadrada). |
 | 6 | **D2** P6KE30A | <img src="img/local/d2-p6ke30a.png" width="160"> | ⚠️ Faixa do catodo para a **esquerda** (ilha quadrada). |
 | 7 | **Cerâmicos** C1–C6 | <img src="img/local/c-100nf.png" width="160"> | Sem polaridade. 100 nF: C1, C2, C3, C6 · 10 nF: C4, C5. |
-| 8 | **U2 74ACT245** (direto, sem soquete) | <img src="img/local/u2-74act245.png" width="160"> | Chanfro/pino 1 para a **esquerda**. Endireite as pernas na bancada antes. Solde dois cantos, confira que assentou e depois o resto, com pouco tempo de ferro por pino. |
+| 8 | **Soquete DIP-20** do U2 | <img src="img/local/u2-74act245.png" width="160"> | Chanfro do soquete para a **esquerda** (lado do pino 1). Solde dois cantos, confira que assentou e depois o resto. O CI só entra no passo 15. |
 | 9 | **Barras fêmea** do RP (2 × 1x9) e do TMC (2 × 1x8) | <img src="img/local/u1-rp2040.png" width="160"> | Encaixe o módulo nas barras **antes** de soldar, para as fileiras ficarem paralelas. Solde as pontas, confira o prumo e depois o resto. |
 | 10 | **ZM** (2x3) e **JU** (1x2) | <img src="img/local/zm-micropasso.png" width="160"> | Pinos curtos para baixo. Sem jumpers por enquanto. |
 | 11 | **LED D3** | <img src="img/local/d3-led.png" width="160"> | Perna curta (catodo, lado chato) na ilha **quadrada**, à direita. |
 | 12 | **JST XH** J1, J2, J3, J4, J7 | <img src="img/local/j1-j2-fim.png" width="160"> | Corpo sobre o contorno da serigrafia. J1–J3 ficam a ~0,2 mm das pernas de R2/R3/R8: pernas dos resistores retas e rentes. |
 | 13 | **C10** 470 µF | <img src="img/local/c10-470uf.png" width="160"> | ⚠️ Perna longa (+) na ilha **quadrada**, à esquerda. Assente bem: fica a ~1 mm da cabeça do M3 do H2 e a ~0,5 mm do borne J5. |
-| 14 | **Bornes** J5 (verde) e J6 (azul) | <img src="img/local/j6-motor.png" width="160"> | J5 **verde** (24 V): entrada de fio para **cima**. J6 **azul** (motor): entrada para a **direita**. Confira com o borne na mão antes de soldar. |
-| 15 | **Módulos** (só depois da [conferência](#conferência-antes-de-energizar)) | <img src="img/local/u4-tmc2209.png" width="160"> | RP2040-Zero com USB para cima. TMC2209 com EN no canto EN e VM no canto VM. |
+| 14 | **Bornes** J5 (verde) e J6 (azul) | <img src="img/local/j6-motor.png" width="160"> | J5 **verde** (24 V): entrada de fio para **cima**. J6 **azul** KF128 (motor): entrada para a **direita**. Confira com o borne na mão antes de soldar. |
+| 15 | **74ACT245** no soquete | <img src="img/local/u2-74act245.png" width="160"> | Chanfro/ponto do pino 1 para a **esquerda**, igual ao soquete. Endireite as pernas na bancada antes. |
+| 16 | **Módulos** (só depois da [conferência](#conferência-antes-de-energizar)) | <img src="img/local/u4-tmc2209.png" width="160"> | RP2040-Zero com USB para cima. TMC2209 com EN no canto EN e VM no canto VM. |
 
 ## Alturas e interferências
 
@@ -61,7 +62,7 @@ Sem módulos, sem jumpers e com o C10 descarregado:
 | Pino EN do soquete do TMC × 3V3 | ~10 kΩ (R6) |
 | GP27 × 3V3 e GP15 × 3V3 no soquete do RP | ~10 kΩ (R13, R14) |
 | GND do J3/J1/J2 × GND do J5 | continuidade (confirma o JP1) |
-| Pino 1 × pino 20 do U2 (GND × 5V) | não pode apitar |
+| Pino 1 × pino 20 do soquete do U2 (GND × 5V) | não pode apitar |
 
 No módulo TMC2209, **antes** de fechar o JU: confirme com o multímetro que o pino 5 é o PDN_UART e se o
 pino 4 está em curto com ele (se estiver, o jumper MS3 do ZM fica **sempre aberto**).

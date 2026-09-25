@@ -4,6 +4,7 @@ Projetista: **Daniel M. Torres**.
 
 | Rev. | Data | Resumo |
 |---|---|---|
+| v16 | 25/09/2026 | Placa 76 × 64 mm com furos M3 alinhados + DXF mecânico; U2 em soquete DIP-20; borne do motor KF128 azul; NTC separado dos fins de curso; LED de 5 mm |
 | v15 | 25/09/2026 | Conectores de sinal passam a JST XH 2,5 mm (as peças reais); 74ACT245 soldado direto; borne da 24 V verde e do motor azul |
 | v14 | 25/09/2026 | ENA do DM556 no GP8 (J4 passa a 4 vias); pull-ups de 10k R13/R14 nos fins de curso. Manual e repositório publicados. |
 | v13 | 25/09/2026 | Só duas brocas (1,0 e 1,6 mm) + M3 |
@@ -12,6 +13,20 @@ Projetista: **Daniel M. Torres**.
 | v10 | 24/09/2026 | LED D3 na borda; trilha de retorno de GND do borne |
 | v9 | 24/09/2026 | Anel dos conectores KK corrigido (0,40 mm); primeiros Gerbers |
 | v1–v8 | 24/09/2026 | Layout inicial, regras de fresa, pinagem do RP2040 |
+
+## v16 — dimensões redondas, soquete DIP e DXF
+
+- Contorno passa de 75,8 × 64 para **76 × 64 mm** (borda direita +0,2 mm).
+- Furos M3 a 3,5 mm das bordas: H1/H3/H4 num retângulo de 69 × 57 mm; H2 na coluna do H4, 18 mm abaixo da borda
+  de cima. Antes: H1 e H3 desalinhados 0,2 mm, cotas quebradas.
+- U2 com footprint de **soquete DIP-20** (mesmos furos, corpo maior). Exceção medida: o corpo do soquete termina
+  a ~1 mm da perna do R7.
+- `production/ScaraNode-mecanico.dxf`: contorno, furos e cotas.
+- Coluna da esquerda reorganizada: **NTC (J3) sozinho em cima** e os **dois fins de curso (J1, J2) juntos**
+  mais abaixo, com um vão de ~9 mm entre os grupos. O J2 fica no limite da trilha de 5 V (y = 41,2).
+- **LED de 5 mm** (mesmo passo de 2,54 mm e furo de 1,0 mm do de 3 mm); o R12 subiu 1 mm para ele caber.
+  Folgas medidas: LED a ~0,7 mm do J3; J1 a ~1,6 mm da perna do R8.
+- Validado: 128 pinos, 0 violações de cobre, 0 ligações faltando.
 
 ## v15 — conectores JST XH
 

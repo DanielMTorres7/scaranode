@@ -43,7 +43,7 @@ Já gerados em [`production/gerber/`](../production/gerber/):
 | Arquivo | Conteúdo |
 |---|---|
 | `ScaraNode-B_Cu.gbl` | cobre (face única), **visto por cima**, através da placa |
-| `ScaraNode-Edge_Cuts.gm1` | contorno 75,8 × 64 mm |
+| `ScaraNode-Edge_Cuts.gm1` | contorno 76 × 64 mm |
 | `ScaraNode.drl` | furação Excellon: mm, absoluto, decimal, mesma origem do Gerber |
 | `ScaraNode-drl_map.pdf` | mapa de furos por diâmetro |
 | `ScaraNode-B_Cu-ESPELHADO.pdf` / `.png` | cobre já espelhado: como a placa fica olhando o lado do cobre |
@@ -59,6 +59,23 @@ kicad-cli pcb export drill --format excellon --excellon-units mm --excellon-zero
     --drill-origin absolute --generate-map --map-format pdf -o $OUT/ $PCB
 kicad-cli pcb export pdf --layers B.Cu,Edge.Cuts --mirror -o $OUT/ScaraNode-B_Cu-ESPELHADO.pdf $PCB
 ```
+
+## Desenho mecânico
+
+Placa **76 × 64 mm**. Furos M3 de **3,2 mm**, com centro a 3,5 mm das bordas. Origem no canto **inferior
+esquerdo** da vista de cima (Y para cima, como no CAD):
+
+| Furo | X (mm) | Y (mm) | Posição |
+|---|---|---|---|
+| H3 | 3,5 | 3,5 | inferior esquerdo |
+| H4 | 72,5 | 3,5 | inferior direito |
+| H1 | 3,5 | 60,5 | superior esquerdo |
+| H2 | 72,5 | 46,0 | direita, 18 mm abaixo da borda de cima (o canto é do borne J5) |
+
+- H1, H3 e H4 formam um retângulo de **69 × 57 mm** entre centros.
+- H2 fica na mesma coluna do H4, a **42,5 mm** dele e a **14,5 mm** abaixo da linha do H1.
+- DXF para a caixa ou o suporte: [`production/ScaraNode-mecanico.dxf`](../production/ScaraNode-mecanico.dxf)
+  (camadas `CONTORNO`, `FUROS`, `CENTRO`, `COTAS`; mm).
 
 ## ⚠️ Espelhamento: o erro que inutiliza a placa
 

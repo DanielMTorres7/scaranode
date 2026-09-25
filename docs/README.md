@@ -9,9 +9,9 @@ Placa de nó de motor para um braço SCARA com **Klipper**: um **RP2040-Zero** p
 |---|---|
 | **Projeto** | ScaraNode — nó de motor Klipper |
 | **Projetista** | Daniel M. Torres |
-| **Revisão** | v15 |
+| **Revisão** | v16 |
 | **Data da revisão** | 25/09/2026 |
-| **Placa** | 75,8 × 64 mm · FR-4 1,6 mm · cobre só na face de baixo (B.Cu) |
+| **Placa** | 76 × 64 mm · FR-4 1,6 mm · cobre só na face de baixo (B.Cu) |
 | **Ferramenta** | KiCad 10.0.6 · placa gerada por ferramenta própria em Python; fonte editável: `hardware/ScaraNode.kicad_pcb` |
 | **Estado** | Validada: 128 pinos conferidos contra o esquema, DRC sem erro, vão mínimo 0,60 mm, anel mínimo 0,40 mm |
 
@@ -29,7 +29,7 @@ Placa de nó de motor para um braço SCARA com **Klipper**: um **RP2040-Zero** p
 | 8 | [Primeira ligação e testes](08-testes.md) | Roteiro de ligação, diagnóstico, limites da placa |
 | — | [Histórico de revisões](historico-de-revisoes.md) | Decisões de projeto, revisão por revisão |
 
-**PDF:** [`ScaraNode-Manual-v15.pdf`](ScaraNode-Manual-v15.pdf), gerado destes mesmos arquivos.
+**PDF:** [`ScaraNode-Manual-v16.pdf`](ScaraNode-Manual-v16.pdf), gerado destes mesmos arquivos.
 
 ## Convenções deste manual
 
