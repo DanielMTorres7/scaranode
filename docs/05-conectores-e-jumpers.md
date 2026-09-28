@@ -34,9 +34,9 @@ iam juntos para os dois.
 
 | Conector | Pino (vista de cima) | Liga em | Observação |
 |---|---|---|---|
-| **J5** 24 V (borne verde) | esquerda: **+24 V** | +24 V da fonte, por um fusível de 2 A **só desta placa** (ver [capítulo 6](06-circuitos.md#fusíveis-fora-da-placa)) | Passa pelo D1; invertido, nada liga |
+| **J5** 24 V (2EDG 90°, plugue pela borda de cima) | esquerda: **+24 V** | +24 V da fonte, por um fusível de 2 A **só desta placa** (ver [capítulo 6](06-circuitos.md#fusíveis-fora-da-placa)) | Passa pelo D1; invertido, nada liga |
 | | direita: **GND** | 0 V da fonte | Mesmo GND do USB: fonte e host no mesmo terra |
-| **J6** MOTOR (borne KF128 azul) | de cima para baixo: **2B, 2A, 1A, 1B** | bobinas do NEMA 17 | Os dois de cima são uma bobina, os dois de baixo a outra. Trocar um par inverte o sentido (ou use `!` no `dir_pin`). |
+| **J6** MOTOR (2EDG vertical, plugue por cima, fio para a direita) | de cima para baixo: **2B, 2A, 1A, 1B** | bobinas do NEMA 17 | Os dois de cima são uma bobina, os dois de baixo a outra. Trocar um par inverte o sentido (ou use `!` no `dir_pin`). |
 | **J4** DM556 | 1 (esquerda): **5V** | PUL+, DIR+ e ENA+ do DM556 (juntos) | Ânodo comum. Sem resistor: o DM556 já limita para 5 V. |
 | | 2: **PUL−** | PUL− do DM556 | Saída do 74ACT245 |
 | | 3: **DIR−** | DIR− do DM556 | |

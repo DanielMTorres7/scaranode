@@ -8,7 +8,7 @@ placa apoia plana na bancada a cada etapa.
 ## Antes de começar
 
 - Placa fresada e conferida ([capítulo 3](03-fabricacao.md#conferência-depois-de-fresar)).
-- Teste o encaixe: uma barra fêmea de 9 pinos nos furos do RP2040-Zero e o borne nos furos de 1,6 mm.
+- Teste o encaixe: uma barra fêmea de 9 pinos nos furos do RP2040-Zero e o conector 2EDG nos furos de 1,6 mm.
 - Ferro de 30–60 W, estanho 0,8 mm com fluxo, alicate de corte rente.
 - Separe as peças pelo [BOM](02-lista-de-materiais.md) e confira os valores dos resistores com o multímetro.
 
@@ -28,7 +28,7 @@ placa apoia plana na bancada a cada etapa.
 | 10 | **LED D3** | <img src="img/local/d3-led.png" width="160"> | Perna curta (catodo, lado chato) na ilha **quadrada**, à direita. |
 | 11 | **JST XH** J1, J2, J3, J4, J7, J8, J9 | <img src="img/local/j1-j2-fim.png" width="160"> | Corpo sobre o contorno da serigrafia. J1–J3 ficam a ~0,9 mm das pernas de R2/R3/R8. |
 | 12 | **C10** 470 µF | <img src="img/local/c10-470uf.png" width="160"> | ⚠️ Perna longa (+) na ilha **quadrada**, à esquerda. Assente bem: fica a ~0,8 mm da cabeça do M3 do H2 e a ~1,2 mm do borne J5. |
-| 13 | **Bornes** J5 (verde) e J6 (azul) | <img src="img/local/j6-motor.png" width="160"> | J5 **verde** (24 V): entrada de fio para **cima**. J6 **azul** KF128 (motor): entrada para a **direita**. Confira com o borne na mão antes de soldar. |
+| 13 | **Conectores 2EDG** J5 e J6 | <img src="img/local/j6-motor.png" width="160"> | J5 (24 V, macho 90°): a abertura para a **borda de cima**. J6 (motor, macho vertical): parede alta para **dentro** da placa, o fio do plugue sai para a **direita**. Confira com o plugue encaixado antes de soldar. |
 | 14 | **74ACT245** no soquete | <img src="img/local/u2-74act245.png" width="160"> | Chanfro/ponto do pino 1 para a **esquerda**, igual ao soquete. Endireite as pernas na bancada antes. |
 | 15 | **Módulos** (só depois da [conferência](#conferência-antes-de-energizar)) | <img src="img/local/u4-tmc2209.png" width="160"> | RP2040-Zero com USB para cima. TMC2209 com EN no canto EN e VM no canto VM. |
 
@@ -36,7 +36,7 @@ placa apoia plana na bancada a cada etapa.
 
 - **Embaixo do plugue USB-C** do RP só há peças deitadas (C6, R10, R11), com menos de 3 mm de altura.
 - O RP2040-Zero fica a ~8,5 mm da placa, em cima da barra fêmea; R6, R13 e R14 ficam embaixo dele.
-- **C10** (Ø10 mm) encaixa entre o borne J5 e o furo H2 sem folga para inclinar.
+- **C10** (Ø10 mm) fica a ~1,4 mm do corpo do J5: assente bem, sem inclinar.
 
 ## Polaridades: resumo
 

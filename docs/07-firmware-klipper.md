@@ -94,8 +94,8 @@ Um TMC2209 pegou fogo depois de rodar muito tempo a 1,7 A (27/09/2026). O que ev
    ~143 °C) e para a máquina com erro. Em standalone, ninguém vigia o driver.
 3. **Nunca ligue nem desligue o cabo do motor com a 24 V ligada.** A bobina gera um pico que mata o driver na hora,
    e nenhum componente da placa impede.
-4. **Ponteira (terminal tubular) nos fios** do borne do motor (J6) e da 24 V (J5), bem apertados. Borne frouxo faz
-   faísca.
+4. **Ponteira (terminal tubular) nos fios** dos plugues do motor (J6) e da 24 V (J5), bem apertados, e o plugue
+   encaixado até o fim. Contato frouxo faz faísca.
 5. **Fusível de 2 A só para esta placa** na caixa de fusíveis ([capítulo 6](06-circuitos.md#fusíveis-fora-da-placa)).
 6. **Ventoinha no J7** sempre ligada, soprando o módulo.
 

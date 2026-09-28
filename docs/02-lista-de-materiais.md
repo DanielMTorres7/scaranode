@@ -27,8 +27,8 @@ capítulo mostra **cada item** com uma imagem de referência, o modelo 3D usado 
 | 2 | Resistor 100k 1/4 W | R3 R15 |
 | 1 | Resistor 47k 1/4 W | R9 |
 | 1 | Resistor 5k6 1/4 W | R10 |
-| 1 | Borne 2 vias 5,08 mm **verde** | J5 |
-| 1 | Borne KF128 4 vias **azul** (2 × 2 vias) | J6 |
+| 1 | Conector 2EDG 2 vias 5,08 mm (macho 90° 2EDGRC + plugue 2EDGK) | J5 |
+| 1 | Conector 2EDG 4 vias 5,08 mm (macho vertical 2EDGVC + plugue 2EDGK) | J6 |
 | 1 | JST XH 4 vias | J4 |
 | 6 | JST XH 2 vias | J1 J2 J3 J7 J8 J9 |
 | 1 | Barra macho 1x2 + 1 jumper | JU |
@@ -141,7 +141,7 @@ Perna curta (catodo, lado chato) na ilha **quadrada**, à direita.
 
 <table><tr><td align="center"><img src="img/componentes/capacitor-eletrolitico.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/c10-470uf.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/c10-470uf.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-⚠️ Perna longa (+) na ilha **quadrada**, à esquerda. Faixa (−) para o lado do H2. Encaixa entre o borne J5 e o furo H2, sem folga para inclinar.
+⚠️ Perna longa (+) na ilha **quadrada**, à esquerda. Faixa (−) à direita. O corpo fica a ~1,4 mm do conector J5: assente bem, sem inclinar.
 
 </div>
 
@@ -245,29 +245,29 @@ Sem polaridade. Marcação no corpo: **103**. Filtro dos fins de curso.
 
 <div class="card" markdown="1">
 
-### Borne 24 V (J5) — verde
+### Conector 24 V (J5)
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | J5 | 24V | Borne de parafuso 2 vias, passo 5,08 mm, **verde** (KF301-2P / MKDS 1,5) |
+| 1 | J5 | 24V | Conector plugável 2EDG 2 vias, passo 5,08 mm, macho 90° 2EDGRC na placa + plugue 2EDGK com parafusos |
 
 <table><tr><td align="center"><img src="img/3d/peca/j5-24v.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j5-24v.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-**Verde = potência 24 V.** Entrada do fio para **cima**. +24 V à esquerda, GND à direita.
+Plugue entra pela **borda de cima** (a frente do macho passa ~2,5 mm da borda, para o plugue não bater na placa). +24 V à esquerda, GND à direita. Pinos de 1 mm em furo de 1,6 mm.
 
 </div>
 
 <div class="card" markdown="1">
 
-### Borne do motor (J6) — azul
+### Conector do motor (J6)
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | J6 | MOTOR | Borne de parafuso **KF128 (KRE) azul**, 4 vias (2 × 2 vias encaixados), passo 5,0/5,08 mm |
+| 1 | J6 | MOTOR | Conector plugável 2EDG 4 vias, passo 5,08 mm, macho vertical 2EDGVC na placa + plugue 2EDGK com parafusos |
 
 <table><tr><td align="center"><img src="img/3d/peca/j6-motor.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j6-motor.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-**Azul = motor** (tipo KF128/KRE), para não confundir com a 24 V. Dois de 2 vias encaixam pela lateral e viram um de 4. O modelo 3D é ilustrativo (Phoenix MKDS recolorido); os furos são de 1,6 mm. Entrada do fio para a **direita**. De cima para baixo: 2B, 2A, 1A, 1B.
+Plugue encaixa **por cima**; a parede alta do macho fica para dentro da placa e o fio sai para a **direita**. De cima para baixo: 2B, 2A, 1A, 1B. Pinos de 1 mm em furo de 1,6 mm.
 
 </div>
 
@@ -351,6 +351,6 @@ Aberto na primeira ligação. Fechado = UART do TMC2209 no GP2, pelo pino 4 do s
 
 <table><tr><td align="center"><img src="img/componentes/parafuso-espacador.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/local/h-m3.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Furos de 3,2 mm nos cantos. A cabeça do parafuso do H2 fica a ~0,8 mm do C10.
+Furos de 3,2 mm nos quatro cantos, num retângulo de 69 × 57 mm. Cabe cabeça M3 comum (~5,5 mm); com arruela, o H1 (ao lado do J7) e o H2 (ao lado do J5) ficam justos: use arruela só por baixo.
 
 </div>

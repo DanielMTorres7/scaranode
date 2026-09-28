@@ -10,7 +10,7 @@ qualquer CNC caseira.
 |---|---|
 | Isolação entre cobres (vão) | **0,60 mm** em todo lugar (mínimo medido: 0,601 mm) |
 | Trilhas | sinal 1,2 · 3,3 V 1,2 · 5 V 1,5 · motor 1,8 · 24 V e GND de potência 2,5 mm |
-| Ilhas | soquetes e headers ovais 2,6 × 1,8 · resistores 2,0 · capacitores 1,8 × 2,4 · bornes 3,0 · C10 2,4 mm |
+| Ilhas | soquetes e headers ovais 2,6 × 1,8 · resistores 2,0 · capacitores 1,8 × 2,4 · conectores 2EDG 2,4 × 3,6 · C10 2,4 mm |
 | Anel de cobre em volta do furo | mínimo **0,40 mm** em todos os furos |
 | Cobre até a borda | 0,5 mm |
 | Plano de GND | preenche o que sobra. Ilhas soltas ficam, porque sobra menos cobre para a fresa tirar. Alívio térmico em X nos pads de GND. |
@@ -24,7 +24,7 @@ qualquer CNC caseira.
 |---|---|---|
 | Isolação | V-bit 20–30° com ponta de 0,1–0,2 mm, ou fresa reta de 0,4–0,6 mm | Acima de 0,6 mm não passa entre ilhas vizinhas. Com 0,4 mm, faça 2 passadas. |
 | Furos finos | broca **1,0 mm** de metal duro | **118 furos**: R, C, DIP, LED, D2, soquetes, JST XH, headers, C10 |
-| Furos grossos | broca **1,6 mm** | **8 furos**: D1 (2), borne J5 (2) e borne J6 (4) |
+| Furos grossos | broca **1,6 mm** | **8 furos**: D1 (2), conector J5 (2) e conector J6 (4) |
 | Contorno e M3 | fresa reta de 1,5–2,0 mm | Contorno em 3–4 passadas. Os 4 furos de 3,2 mm saem com essa fresa (mill holes). |
 
 A placa usa só **duas brocas**. Os furos foram agrupados na v13, e as ilhas cresceram onde foi preciso
@@ -33,8 +33,8 @@ para manter o anel de 0,4 mm.
 **Folgas:**
 - A peça mais justa é a **barra fêmea** (pino de 0,64 mm quadrado em furo de 1,0 mm). Os furos precisam
   estar bem posicionados: fure uma fileira de 9 e teste a barra antes de fazer o resto.
-- A peça mais folgada é o **borne** (pino de 1,0 × 0,8 mm em furo de 1,6 mm). O corpo assenta na placa e a
-  ilha de 3,0 mm segura.
+- A peça mais folgada é o **conector 2EDG** (pino de ~1,0 mm em furo de 1,6 mm). O corpo assenta na placa e a
+  ilha oval de 2,4 × 3,6 mm segura.
 
 ## Arquivos de produção
 
@@ -70,10 +70,10 @@ esquerdo** da vista de cima (Y para cima, como no CAD):
 | H3 | 3,5 | 3,5 | inferior esquerdo |
 | H4 | 72,5 | 3,5 | inferior direito |
 | H1 | 3,5 | 60,5 | superior esquerdo |
-| H2 | 72,5 | 46,0 | direita, 18 mm abaixo da borda de cima (o canto é do borne J5) |
+| H2 | 72,5 | 60,5 | superior direito |
 
-- H1, H3 e H4 formam um retângulo de **69 × 57 mm** entre centros.
-- H2 fica na mesma coluna do H4, a **42,5 mm** dele e a **14,5 mm** abaixo da linha do H1.
+- Os quatro formam um retângulo de **69 × 57 mm** entre centros (v18: até a v17 o H2 ficava 14,5 mm mais baixo,
+  porque o borne J5 ocupava o canto).
 - DXF para a caixa ou o suporte: [`production/ScaraNode-mecanico.dxf`](../production/ScaraNode-mecanico.dxf)
   (camadas `CONTORNO`, `FUROS`, `CENTRO`, `COTAS`; mm).
 
@@ -82,7 +82,7 @@ esquerdo** da vista de cima (Y para cima, como no CAD):
 O Gerber da face de baixo é desenhado **visto por cima**. Se você fresa com o cobre virado para cima, o
 CAM (no FlatCAM: *Mirror*, eixo Y) tem que mostrar a placa **igual à imagem abaixo**:
 
-- borne de 24 V (J5) e borne do motor (J6) à **esquerda**
+- conector de 24 V (J5) e conector do motor (J6) à **esquerda**
 - NTC e fins de curso à **direita**
 - USB do RP2040-Zero **em cima**
 

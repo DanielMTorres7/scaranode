@@ -4,7 +4,7 @@ Projetista: **Daniel M. Torres**.
 
 | Rev. | Data | Resumo |
 |---|---|---|
-| v18 | 27/09/2026 | Um canal por driver: TMC2209 no GP4/GP5 e DM556 no GP6/GP7, independentes; UART do TMC2209 no pino 4 do soquete (GP2); sem o jumper ZM (MS1/MS2 fixos, endereço 3); segundo NTC (J8, GP26); segunda ventoinha (J9); fusível de 2 A por placa na caixa central; nenhuma curva de trilha de 90° |
+| v18 | 27/09/2026 | Um canal por driver: TMC2209 no GP4/GP5 e DM556 no GP6/GP7, independentes; UART do TMC2209 no pino 4 do soquete (GP2); sem o jumper ZM (MS1/MS2 fixos, endereço 3); segundo NTC (J8, GP26); segunda ventoinha (J9); conectores plugáveis 2EDG no J5/J6; furos M3 esquadrados; fusível de 2 A por placa na caixa central; nenhuma curva de trilha de 90° |
 | v17 | 25/09/2026 | Esquemático KiCad publicado (ERC e paridade com a placa); 13 resistores iguais de 1/4 W; R13 e R14 inclinados a 50° com o GND do RP ligado direto ao plano; coluna da esquerda com folgas iguais; GND contínuo sem o jumper de fio JP1; faixas de cor nos renders |
 | v16 | 25/09/2026 | Placa 76 × 64 mm com furos M3 alinhados + DXF mecânico; U2 em soquete DIP-20; borne do motor KF128 azul; NTC separado dos fins de curso; LED de 5 mm |
 | v15 | 25/09/2026 | Conectores de sinal passam a JST XH 2,5 mm (as peças reais); 74ACT245 soldado direto; borne da 24 V verde e do motor azul |
@@ -49,6 +49,11 @@ Projetista: **Daniel M. Torres**.
   da placa: os DM556 também precisam de fusível e não passam por ela, e um porta-fusível de placa barato e fácil de
   achar não coube na faixa de 24 V com as duas brocas. Detalhes e contas no [capítulo 6](06-circuitos.md#fusíveis-fora-da-placa).
 - **Segunda ventoinha (J9), sempre ligada**, entre o D2 e o D1: J7 no TMC2209, J9 no DM556 ou na caixa.
+- **Conectores plugáveis 2EDG (5,08 mm)** no lugar dos bornes de parafuso: J5 (24 V) macho 90° 2EDGRC com o plugue
+  entrando pela borda de cima; J6 (motor) macho vertical 2EDGVC, plugue por cima e fio para a direita. Plugue 2EDGK
+  nos dois. O J6 desceu 1,6 mm (o macho é mais comprido e encostava no parafuso do H2).
+- **Furos M3 esquadrados:** o H2 foi para o canto de cima (retângulo de 69 × 57 mm com os outros três). O J5 foi
+  5,6 mm para a esquerda e o D1 4,5 mm; a 24 V passa a descer pelo R9 até o C10 e do C10 ao VM do TMC.
 - Validado: 128 pinos, 0 violações de cobre, 0 ligações faltando, ERC e paridade 0.
 
 ## v17 — esquemático e resistores iguais

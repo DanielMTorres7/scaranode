@@ -5,13 +5,13 @@
 1;D1;1N5822;Diodo Schottky 1N5822 3 A 40 V (DO-201AD) - polaridade 24 V
 1;D3;LED 24V;"LED 5 mm (qualquer cor) - indica 24 V; o de 3 mm usa os mesmos furos"
 1;D2;P6KE30A;TVS P6KE30A unidirecional (DO-15) - protecao 24 V
-1;J5;24V;Borne parafuso 2 vias passo 5,08 mm, VERDE (KF301-2P / MKDS 1,5)
+1;J5;24V;Conector plugavel 2EDG 2 vias 5,08 mm: macho 90 graus 2EDGRC-5.08-2P + plugue 2EDGK-5.08-2P
 1;J4;DM556;Conector JST XH 4 vias 2,5 mm, vertical (B4B-XH-A + femea XHP-4 + 4 terminais): 5V, PUL-, DIR-, ENA-
 1;J7;FAN 24V;Conector JST XH 2 vias 2,5 mm, vertical (B2B-XH-A + femea XHP-2 + 2 terminais)
 1;J9;FAN2 24V;Conector JST XH 2 vias 2,5 mm, vertical (B2B-XH-A + femea XHP-2 + 2 terminais)
 1;J1;FIM1;Conector JST XH 2 vias 2,5 mm, vertical (B2B-XH-A + femea XHP-2 + 2 terminais)
 1;J2;FIM2;Conector JST XH 2 vias 2,5 mm, vertical (B2B-XH-A + femea XHP-2 + 2 terminais)
-1;J6;MOTOR;Borne parafuso KF128 (KRE) AZUL, 4 vias = 2 x 2 vias encaixados, passo 5,0/5,08 mm
+1;J6;MOTOR;Conector plugavel 2EDG 4 vias 5,08 mm: macho vertical 2EDGVC-5.08-4P + plugue 2EDGK-5.08-4P
 1;J3;NTC1;Conector JST XH 2 vias 2,5 mm, vertical (B2B-XH-A + femea XHP-2 + 2 terminais)
 1;J8;NTC2;Conector JST XH 2 vias 2,5 mm, vertical (B2B-XH-A + femea XHP-2 + 2 terminais)
 1;JU;UART;Barra de pinos macho 1x2 2,54 mm + 1 jumper (fechado = UART do TMC2209 no GP2, pino 4 do soquete)

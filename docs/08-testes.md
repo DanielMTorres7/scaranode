@@ -36,7 +36,7 @@ UART, nunca mexer no cabo do motor com a 24 V ligada.
 | TMC desarma depois de minutos | Corrente acima de ~1,2 A RMS ou sem ventoinha | Trimpot / `run_current`, J7 |
 | `DUMP_TMC` sem resposta | JU aberto, ou o pino 4 do módulo não é o PDN_UART | [Jumpers](05-conectores-e-jumpers.md#jumpers) |
 | DM556 não se move | J4 invertido, ou ENA desabilitando | Ordem 5V, PUL−, DIR−, ENA−; `enable_pin: gpio8` |
-| M112 aleatório | Queda da 24 V, ou mau contato no J5 | Aperto do borne; fonte |
+| M112 aleatório | Queda da 24 V, ou mau contato no J5 | Plugue do J5 encaixado e parafusos apertados; fonte |
 
 ## O que a placa não faz
 

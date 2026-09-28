@@ -21,7 +21,8 @@ J5 +24V ──►|── D1 1N5822 ──┬──────────┬─
 J5 GND ─────────────────────┴──────────┴──────────┴──── D3 LED ┘
 ```
 
-O retorno de GND do borne vai por uma trilha própria de 2,5 mm até o C10, e dali ao pino 15 do TMC. É o
+O +24 V desce pelo R9 até o C10 e só então vai ao VM do TMC (v18): o C10 fica no caminho do driver. O retorno
+de GND do conector vai por uma trilha própria de 2,5 mm até o C10, e dali ao pino 15 do TMC. É o
 caminho dos pulsos do chopper (até ~1 A), que não deve depender dos raios finos do alívio térmico do plano.
 
 | Grandeza | Valor | Comentário |
