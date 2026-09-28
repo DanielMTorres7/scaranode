@@ -1,7 +1,11 @@
 # 7. Firmware Klipper
 
 Cada nó é um micro-controlador (`[mcu <nome>]`) do Klipper. O host fala com os quatro pelo USB, e os
-pinos de cada nó levam o prefixo do nome (`j2:gpio6`).
+pinos de cada nó levam o prefixo do nome (`j2:gpio4`).
+
+Desde a v18 os dois drivers têm pinos próprios: um nó pode mover um motor no TMC2209 **e** outro no DM556 ao
+mesmo tempo. Nesse caso, use o FIM1 (`gpio27`) para o eixo do TMC e o FIM2 (`gpio15`) para o do DM556: cada
+chave fica no mesmo MCU que o seu motor, o que é o melhor para o homing.
 
 ## Gravar o Klipper no RP2040-Zero
 
@@ -48,10 +52,10 @@ mecânica e da cinemática SCARA está marcado com `# AJUSTAR`.
 serial: /dev/serial/by-id/usb-Klipper_rp2040_XXXX-if00
 
 [stepper_j2]
-step_pin: j2:gpio6
-dir_pin: j2:gpio7
+step_pin: j2:gpio4
+dir_pin: j2:gpio5
 enable_pin: !j2:gpio0          # EN ativo baixo
-microsteps: 16                 # ZM aberto
+microsteps: 16                 # com UART vem daqui; em standalone é fixo em 1/16
 gear_ratio: 6:1, 4:1
 endstop_pin: !j2:gpio27        # chave NA para GND
 
@@ -69,16 +73,31 @@ release_gcode:
   M112
 ```
 
-Com o **JU fechado**, acrescente:
+Com o **JU fechado** (recomendado), acrescente:
 
 ```ini
 [tmc2209 stepper_j2]
-uart_pin: j2:gpio5
-uart_address: 3                # MS1 e MS2 abertos
-run_current: 1.0
+uart_pin: j2:gpio2              # PDN_UART no pino 4 do soquete (v18)
+uart_address: 3                # MS1 e MS2 fixos em 1 (R4/R5)
+run_current: 1.0               # MÁXIMO 1,2 no StepStick
 sense_resistor: 0.110
 stealthchop_threshold: 0
 ```
+
+### ⚠️ Para não queimar o driver
+
+Um TMC2209 pegou fogo depois de rodar muito tempo a 1,7 A (27/09/2026). O que evita isso:
+
+1. **`run_current` no máximo 1,0–1,2 A** no TMC2209. O StepStick não dissipa mais que isso, mesmo com ventoinha.
+   O Klipper não impede um valor maior: o limite é seu. Motor que precisa de mais corrente vai no DM556.
+2. **Use a UART.** Só com ela o Klipper lê os avisos de temperatura do TMC2209 (pré-aviso a ~120 °C, desligamento a
+   ~143 °C) e para a máquina com erro. Em standalone, ninguém vigia o driver.
+3. **Nunca ligue nem desligue o cabo do motor com a 24 V ligada.** A bobina gera um pico que mata o driver na hora,
+   e nenhum componente da placa impede.
+4. **Ponteira (terminal tubular) nos fios** do borne do motor (J6) e da 24 V (J5), bem apertados. Borne frouxo faz
+   faísca.
+5. **Fusível de 2 A só para esta placa** na caixa de fusíveis ([capítulo 6](06-circuitos.md#fusíveis-fora-da-placa)).
+6. **Ventoinha no J7** sempre ligada, soprando o módulo.
 
 ### Nó com DM556 (NEMA 23)
 
@@ -96,10 +115,10 @@ O `microsteps` do Klipper tem que ser igual ao configurado nas chaves do DM556.
 
 | Função | TMC2209 | DM556 |
 |---|---|---|
-| STEP | `gpio6` | `!gpio6` |
-| DIR | `gpio7` | `gpio7` |
+| STEP | `gpio4` | `!gpio6` |
+| DIR | `gpio5` | `gpio7` |
 | Enable | `!gpio0` | `gpio8` |
-| UART | `gpio5` (JU fechado) | — |
-| NTC | `gpio29`, pull-up 100000 | idem |
+| UART | `gpio2` (JU fechado) | — |
+| NTC | `gpio29` (J3), pull-up 100000 | `gpio26` (J8) com dois motores na placa; `gpio29` com um |
 | Fim de curso 1 / 2 | `!gpio27` / `!gpio15` (NA) | idem |
 | Monitor 24 V | `gpio1` | idem |

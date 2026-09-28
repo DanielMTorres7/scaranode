@@ -2,14 +2,14 @@
 
 <p align="center"><img src="docs/img/3d/placa-iso.png" width="640" alt="ScaraNode"></p>
 
-Placa de nó de motor **Klipper** para braço SCARA: **RP2040-Zero** + **TMC2209** (NEMA 17) ou driver
-externo **DM556** (NEMA 23). Face única, 76 × 64 mm, feita para fresar em casa.
+Placa de nó de motor **Klipper** para braço SCARA: **RP2040-Zero** + **TMC2209** (NEMA 17) e/ou driver
+externo **DM556** (NEMA 23), cada um com STEP/DIR/enable próprios. Face única, 76 × 64 mm, feita para fresar em casa.
 
 | Projetista | Revisão | Data | Estado |
 |---|---|---|---|
-| Daniel M. Torres | v17 | 25/09/2026 | Validada: 126 pinos, ERC e paridade 0, DRC de cobre sem erro |
+| Daniel M. Torres | v18 | 27/09/2026 | Validada: 124 pinos, ERC e paridade 0, DRC de cobre sem erro, nenhuma curva de trilha de 90° |
 
-📘 **[Manual completo](docs/README.md)** · 📄 **[PDF](docs/ScaraNode-Manual-v17.pdf)** ·
+📘 **[Manual completo](docs/README.md)** · 📄 **[PDF](docs/ScaraNode-Manual-v18.pdf)** ·
 🧾 **[Lista de materiais](docs/02-lista-de-materiais.md)** · 🔧 **[Montagem](docs/04-montagem.md)** ·
 ⚙️ **[Klipper](docs/07-firmware-klipper.md)**
 

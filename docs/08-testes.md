@@ -1,7 +1,9 @@
 # 8. Primeira ligação e testes
 
 Faça na ordem. Cada passo só começa se o anterior deu o resultado esperado. Antes de tudo, faça a
-[conferência sem energia](04-montagem.md#conferência-antes-de-energizar).
+[conferência sem energia](04-montagem.md#conferência-antes-de-energizar) e leia os
+[cuidados para não queimar o driver](07-firmware-klipper.md) no capítulo 7: corrente máxima,
+UART, nunca mexer no cabo do motor com a 24 V ligada.
 
 ## Roteiro
 
@@ -23,16 +25,16 @@ Faça na ordem. Cada passo só começa se o anterior deu o resultado esperado. A
 
 | Sintoma | Causa provável | Onde olhar |
 |---|---|---|
-| Nada liga com 24 V, D3 apagado | 24 V invertido (o D1 bloqueia) ou D1 soldado ao contrário | Polaridade do J5; faixa do D1 à esquerda |
+| Nada liga com 24 V, D3 apagado | Fusível da placa aberto (caixa central), 24 V invertido (o D1 bloqueia) ou D1 soldado ao contrário | Fusível na caixa (se abriu, procure o curto antes de trocar); polaridade do J5; faixa do D1 à esquerda |
 | Fonte entra em proteção ao ligar a 24 V | D2 (TVS) soldado ao contrário | Faixa do D2 à esquerda |
 | Klipper não acha o nó | Cabo USB só de carga, ou firmware não gravado | `lsusb`, `ls /dev/serial/by-id/` |
 | Motor não segura (TMC) | EN em alto: Klipper não habilitou, ou R6 em curto | `enable_pin: !gpio0` |
 | Motor vibra mas não gira | Um par de bobinas trocado no J6 | Meça a resistência: pares de ~1–3 Ω |
 | Motor gira ao contrário | Sentido da bobina | `!` no `dir_pin` ou inverta um par |
 | Fim de curso sempre acionado | Chave NF sem `!` ajustado, ou pino de GND do conector sem solda | Continuidade GND J1 × J5 |
-| NTC marca −273 °C ou valor absurdo | NTC aberto, pino de GND do J3 sem solda, ou `pullup_resistor` errado | J3; continuidade GND J3 × J5 |
+| NTC marca −273 °C ou valor absurdo | NTC aberto, pino de GND do J3/J8 sem solda, ou `pullup_resistor` errado | J3/J8; continuidade GND J3 × J5 |
 | TMC desarma depois de minutos | Corrente acima de ~1,2 A RMS ou sem ventoinha | Trimpot / `run_current`, J7 |
-| `DUMP_TMC` sem resposta | JU aberto, pino 5 do módulo não é PDN_UART, ou MS3 fechado | [Jumpers](05-conectores-e-jumpers.md#jumpers) |
+| `DUMP_TMC` sem resposta | JU aberto, ou o pino 4 do módulo não é o PDN_UART | [Jumpers](05-conectores-e-jumpers.md#jumpers) |
 | DM556 não se move | J4 invertido, ou ENA desabilitando | Ordem 5V, PUL−, DIR−, ENA−; `enable_pin: gpio8` |
 | M112 aleatório | Queda da 24 V, ou mau contato no J5 | Aperto do borne; fonte |
 
@@ -46,6 +48,6 @@ Faça na ordem. Cada passo só começa se o anterior deu o resultado esperado. A
   por chave, no J1/J2.
 - **Corrente acima de 1,2 A RMS no soquete.** O StepStick não dissipa. Use driver externo pelo J4.
 - **Encoder ou realimentação de posição.** O sistema é malha aberta, como todo Klipper.
-- **Drivers SPI (TMC2130, TMC5160).** Os pinos 2–4 do soquete estão nos pull-ups de micropasso, sem SPI.
-- **Conector para ADXL345.** Não há. Para input shaping, ligue por fio em GP2/GP3/GP4 + um CS livre
+- **Drivers SPI (TMC2130, TMC5160).** Os pinos 2 e 3 do soquete estão nos pull-ups de MS1/MS2 e o 4 na UART, sem SPI.
+- **Conector para acelerômetro.** Não há. Para input shaping, sobram GP3, GP14 e GP28. O ADXL345 no Klipper só funciona por SPI (4 fios) e não cabe; use um acelerômetro I2C (MPU-6050/9250 ou LIS2DW, 2 fios, `i2c_software_*` no GP3/GP14) ou um acelerômetro USB à parte
   ([exemplo no cfg](../firmware/klipper/scaranode.cfg)).

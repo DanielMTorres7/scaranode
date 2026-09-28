@@ -538,10 +538,10 @@
 					)
 				)
 			)
-			(pin input line
+			(pin bidirectional line
 				(at -12.7 1.27 0)
 				(length 5.08)
-				(name "MS3"
+				(name "MS3/UART"
 					(effects
 						(font
 							(size 1.27 1.27)

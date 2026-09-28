@@ -1,12 +1,12 @@
 # 6. Circuitos e cálculos
 
 O esquema completo está em `hardware/ScaraNode.kicad_sch` (KiCad 10) e em
-[PDF, folha A3](ScaraNode-Esquematico-v17.pdf). Ele é desenhado por blocos, com rótulos na ponta de cada pino no
+[PDF, folha A3](ScaraNode-Esquematico-v18.pdf). Ele é desenhado por blocos, com rótulos na ponta de cada pino no
 lugar de fios: pinos com o mesmo rótulo estão ligados.
 
 <p align="center"><img src="img/esquematico.svg" width="900" alt="Esquemático da ScaraNode"></p>
 
-Na v17 a placa confere com o esquemático: **126 pinos**, ERC sem erro nem aviso e paridade placa × esquemático
+Na v18 a placa confere com o esquemático: **124 pinos**, ERC sem erro nem aviso e paridade placa × esquemático
 sem divergência (valor, footprint e rede de cada pino). Esquemático e conferência da placa saem da mesma descrição
 do circuito: o ERC e a paridade conferem tipos de pino e a placa, não a concepção do circuito. Os trechos abaixo
 seguem esse esquema.
@@ -16,7 +16,7 @@ seguem esse esquema.
 ```
 J5 +24V ──►|── D1 1N5822 ──┬──────────┬──────────┬───────────┬─────────┬──► VMOT (U4.16)
             (anti-inversão) │          │          │           │         │
-                          C10 470µF  D2 P6KE30A  J7 FAN     R12 10k   R9 47k ─► monitor
+                          C10 470µF  D2 P6KE30A  J7/J9 FAN  R12 10k   R9 47k ─► monitor
                             │          │ (TVS)    │           │
 J5 GND ─────────────────────┴──────────┴──────────┴──── D3 LED ┘
 ```
@@ -30,9 +30,34 @@ caminho dos pulsos do chopper (até ~1 A), que não deve depender dos raios fino
 | Frenagem | ~0,04 J (estimativa: J2, 24:1, 250 mm/s) | O D1 impede a energia de voltar para a fonte. Com 470 µF, o VM sobe a ~27,4 V; com 100 µF chegava a ~30 V. |
 | TVS P6KE30A | trabalha até 25,6 V, conduz a partir de 28,5 V | Segura surtos; não é proteção fina para o driver |
 | LED | (23,6 − 2) / 10k ≈ 2,2 mA | Visível. R12 = 4k7 dá ~4,6 mA |
-| Ventoinha | 24 V direto | Ventoinha brushless não precisa de diodo |
+| Ventoinhas (J7, J9) | 24 V direto, sempre ligadas | J7 no TMC2209, J9 no DM556 ou na caixa. Brushless não precisa de diodo. Sempre ligadas de propósito: uma ventoinha controlada por firmware pode ficar parada com o driver trabalhando |
 
-O fusível da 24 V fica na caixa de fusíveis central da máquina, não na placa.
+## Fusíveis (fora da placa)
+
+A placa não tem fusível: a proteção fica numa **caixa de fusíveis de lâmina automotiva** (6 ou 8 vias, de
+autopeças), com **um fusível por circuito**. Até a v17 havia um fusível só para a máquina toda. Como ele é
+dimensionado para a soma de tudo, inclusive os DM556, não abriu quando um TMC2209 entrou em curto e pegou fogo
+(27/09/2026).
+
+| Circuito | Fusível de lâmina (padrão ATO ou mini, 32 V DC) |
+|---|---|
+| Cada ScaraNode (TMC2209 + ventoinhas J7/J9) | **2 A** |
+| Cada DM556 com NEMA 23 a 4,2 A | **5 A** |
+
+- **Um fio por circuito, saindo da caixa.** Duas placas no mesmo fusível voltam ao problema original.
+- **Por que 2 A:** pela placa passam só o TMC2209 e as ventoinhas. O driver converte 24 V com pouca corrente em
+  poucos volts com mais corrente na bobina, então a fonte fornece só a potência gasta: bobinas (~4 W a 1,2 A),
+  perdas do driver (~1 W), trabalho mecânico (até ~9 W) e ventoinhas (~7 W) dão ~0,9 A no pior caso e ~0,5 A
+  parado. O fusível trabalha abaixo de 75% do valor e abre em milissegundos num curto (dezenas de ampères).
+- **Por que o DM556 puxa menos que 4,2 A da fonte:** pelo mesmo motivo; 5 A é folga para as acelerações.
+- **Tensão do fusível:** pelo menos **32 V DC**. É o padrão dos fusíveis de lâmina. Em DC a corrente não passa por
+  zero e o fusível precisa apagar o arco sozinho; um fusível marcado só "250 V AC" não garante isso.
+- **Pico ao ligar:** o C10 (470 µF) carrega com um pico de milissegundos (~0,5 A²s), bem abaixo do que funde um
+  fusível de lâmina de 2 A.
+- **Para conferir o consumo real:** multímetro em série no +24 V de uma placa (escala de 10 A DC), com a máquina no
+  movimento mais pesado. Se passar de 1,5 A, suba para 3 A.
+- **Fusível aberto:** procure o curto antes de trocar (driver, TVS D2, C10, motor).
+
 
 ## Monitor da 24 V
 
@@ -52,9 +77,10 @@ O fusível da 24 V fica na caixa de fusíveis central da máquina, não na placa
 
 - VDD do módulo em 3,3 V (VCC_IO). **EN com pull-up de 10k (R6):** sem firmware rodando, o driver fica
   desligado.
-- STEP e DIR chegam direto do RP (GP6, GP7).
-- MS1/MS2/MS3 com pull-up de 10k (R4, R5, R7) e jumper ZM para GND.
-- Pino 5 (PDN_UART) chega ao GP5 pelo JU. Pino 6 (CLK) fica aberto = clock interno.
+- STEP e DIR chegam direto do RP (GP4, GP5), separados dos do DM556.
+- MS1/MS2 fixos em 1 pelos pull-ups de 10k (R4, R5): endereço UART 3; em standalone, 1/16.
+- Pino 4 (PDN_UART) chega ao GP2 pelo JU, com pull-up de 10k (R7). Pinos 5 e 6 (CLK) ficam abertos = clock
+  interno.
 - Módulo com RSENSE de 0,11 Ω: no cfg, `sense_resistor: 0.110`.
 - **Corrente prática em StepStick: 1,0 a 1,2 A RMS, com ventoinha.** Acima disso o driver desarma por
   temperatura. Para 1,7 A, use driver externo pelo J4.
@@ -63,10 +89,10 @@ O fusível da 24 V fica na caixa de fusíveis central da máquina, não na placa
 
 ```
             U2 74ACT245 (modo B→A: DIR=GND, OE#=GND, VCC=5V)
-GP6 STP ─► B1 (18) ──► A1 (2) ─► J4.2 PUL−
-GP7 DIR ─► B2 (17) ──► A2 (3) ─► J4.3 DIR−
-GP8 ENA ─► B3 (16) ──► A3 (4) ─► J4.4 ENA−          J4.1 = 5V ─► PUL+ / DIR+ / ENA+
-           B4–B8 (15–11) = GND
+GP6 DM_STP ─► B1 (18) ──► A1 (2) ─► J4.2 PUL−
+GP7 DM_DIR ─► B2 (17) ──► A2 (3) ─► J4.3 DIR−
+GP8 ENA    ─► B3 (16) ──► A3 (4) ─► J4.4 ENA−          J4.1 = 5V ─► PUL+ / DIR+ / ENA+
+              B4–B8 (15–11) = GND
 ```
 
 - Entradas TTL do ACT (nível alto ≥ 2,0 V) aceitam os 3,3 V do RP.
@@ -80,12 +106,14 @@ GP8 ENA ─► B3 (16) ──► A3 (4) ─► J4.4 ENA−          J4.1 = 5V �
 ## NTC
 
 ```
-3V3 ── R3 100k ──┬── GP29 (ADC3)
+3V3 ── R3 100k ──┬── GP29 (ADC3)        NTC2: R15, C7, J8, GP26 (ADC0)
                  ├── C1 100nF ── GND
                  └── J3 ── NTC 100k ── GND
 ```
 
 100k a 25 °C com pull-up de 100k dá 1,65 V; a 70 °C (~17,6k) dá ~0,49 V. O C1 filtra o ruído do cabo.
+Desde a v18 há duas entradas iguais: com dois motores na placa, uma em cada motor. O NTC fica no motor, não no
+driver: o TMC2209 se desliga sozinho por temperatura (e o Klipper avisa), e o DM556 tem as próprias proteções.
 
 ## Fins de curso
 
@@ -100,5 +128,5 @@ em 3,3 × 1/11 ≈ **0,30 V**. Por causa dos pull-ups externos (v14), o `^` no c
 
 ## Pinos livres do RP2040
 
-GP2, GP3, GP4, GP14, GP26 e GP28 não têm trilha. Servem para ligar por fio um ADXL345 (input shaping), com
-`spi_software_*` no cfg; há um exemplo comentado em `firmware/klipper/scaranode.cfg`.
+GP3, GP14 e GP28 não têm trilha. Com o GP26 no NTC2 (v18), sobram GP3, GP14 e GP28. O ADXL345 no Klipper só funciona por SPI (4 fios) e não cabe; use um acelerômetro I2C (MPU-6050/9250 ou LIS2DW, 2 fios, `i2c_software_*` no GP3/GP14) ou um acelerômetro USB à parte. Há um exemplo comentado em
+`firmware/klipper/scaranode.cfg`.

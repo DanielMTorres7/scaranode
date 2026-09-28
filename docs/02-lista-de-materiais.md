@@ -20,25 +20,25 @@ capítulo mostra **cada item** com uma imagem de referência, o modelo 3D usado 
 | 1 | TVS P6KE30A | D2 |
 | 1 | LED 5 mm | D3 |
 | 1 | Eletrolítico 470 µF 35 V | C10 |
-| 4 | Cerâmico 100 nF (104) | C1 C2 C3 C6 |
+| 5 | Cerâmico 100 nF (104) | C1 C2 C3 C6 C7 |
 | 2 | Cerâmico 10 nF (103) | C4 C5 |
 | 8 | Resistor 10k 1/4 W | R4 R5 R6 R7 R11 R12 R13 R14 |
 | 2 | Resistor 1k 1/4 W | R2 R8 |
-| 1 | Resistor 100k 1/4 W | R3 |
+| 2 | Resistor 100k 1/4 W | R3 R15 |
 | 1 | Resistor 47k 1/4 W | R9 |
 | 1 | Resistor 5k6 1/4 W | R10 |
 | 1 | Borne 2 vias 5,08 mm **verde** | J5 |
 | 1 | Borne KF128 4 vias **azul** (2 × 2 vias) | J6 |
 | 1 | JST XH 4 vias | J4 |
-| 4 | JST XH 2 vias | J1 J2 J3 J7 |
-| 1 | Barra macho 2x3 + 3 jumpers | ZM |
+| 6 | JST XH 2 vias | J1 J2 J3 J7 J8 J9 |
 | 1 | Barra macho 1x2 + 1 jumper | JU |
 | 2 | Barra fêmea 1x9 | soquete do U1 |
 | 2 | Barra fêmea 1x8 | soquete do U4 |
 | 4 | Parafuso M3 + espaçador | H1–H4 |
 
-**Fora da placa:** NTC 100k B3950 com fio (J3), duas chaves fim de curso NA ou NF (J1/J2), ventoinha 24 V (J7),
-cabo USB-C, fonte de 24 V. Nos nós J1 e Z: driver DM556 e motor NEMA 23.
+**Fora da placa:** um ou dois NTC 100k B3950 com fio (J3, J8), duas chaves fim de curso NA ou NF (J1/J2), ventoinha 24 V (J7),
+cabo USB-C, fonte de 24 V, **fusível de lâmina de 2 A só para esta placa** na caixa de fusíveis central
+([capítulo 6](06-circuitos.md#fusíveis-fora-da-placa)). Nos nós J1 e Z: driver DM556 e motor NEMA 23.
 
 <table><tr>
 <td align="center"><img src="img/componentes/barra-femea.jpg" height="140"><br><sub>Barra fêmea (soquetes do RP e do TMC)</sub></td>
@@ -151,7 +151,7 @@ Perna curta (catodo, lado chato) na ilha **quadrada**, à direita.
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 4 | C1 C2 C3 C6 | 100 nF | Cerâmico 100 nF 50 V, passo 2,5 mm (marcação 104) |
+| 5 | C1 C2 C3 C6 C7 | 100 nF | Cerâmico 100 nF 50 V, passo 2,5 mm (marcação 104) |
 
 <table><tr><td align="center"><img src="img/componentes/capacitor-ceramico.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/c-100nf.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/c-100nf.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
@@ -203,15 +203,15 @@ Sem polaridade. Marcação no corpo: **103**. Filtro dos fins de curso.
 
 <div class="card" markdown="1">
 
-### Resistor 100 kΩ
+### Resistores 100 kΩ
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | R3 | 100k | Resistor 1/4 W 5%, furos a 10,16 mm |
+| 2 | R3 R15 | 100k | Resistor 1/4 W 5%, furos a 10,16 mm |
 
 <table><tr><td align="center"><img src="img/componentes/resistor-100k.png" height="170"><br><sub>Faixas de cor</sub></td><td align="center"><img src="img/3d/peca/r3-100k.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/r3-100k.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-4 faixas (5%, corpo bege): **marrom, preto, amarelo, dourado**. Em 5 faixas (1%, corpo geralmente azul): **marrom, preto, preto, laranja, marrom**. Confira com o multímetro antes de soldar: marrom e vermelho se confundem com pouca luz. Pull-up do NTC: tem que ser 100k (é o `pullup_resistor` do cfg).
+4 faixas (5%, corpo bege): **marrom, preto, amarelo, dourado**. Em 5 faixas (1%, corpo geralmente azul): **marrom, preto, preto, laranja, marrom**. Confira com o multímetro antes de soldar: marrom e vermelho se confundem com pouca luz. Pull-ups dos NTC: têm que ser 100k (é o `pullup_resistor` do cfg). O R15 fica deitado na vertical, ao lado do soquete do RP.
 
 </div>
 
@@ -287,15 +287,15 @@ Da esquerda para a direita: 5V, PUL−, DIR−, ENA−. Encaixe o corpo no conto
 
 <div class="card" markdown="1">
 
-### Conector NTC (J3)
+### Conectores NTC (J3, J8)
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | J3 | NTC | JST XH 2 vias 2,5 mm vertical (B2B-XH-A + XHP-2 + 2 terminais) |
+| 2 | J3 J8 | NTC1, NTC2 | JST XH 2 vias 2,5 mm vertical (B2B-XH-A + XHP-2 + 2 terminais) |
 
 <table><tr><td align="center"><img src="img/componentes/conector-xh.jpg" height="170"><br><sub>Foto (JST XH)</sub></td><td align="center"><img src="img/3d/peca/j3-ntc.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j3-ntc.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Sinal à direita, GND à esquerda. O NTC não tem polaridade.
+Sinal à direita, GND à esquerda. O NTC não tem polaridade. J3 = motor do TMC2209, J8 = motor do DM556 (só com dois motores na placa).
 
 </div>
 
@@ -315,29 +315,15 @@ Sinal à direita, GND à esquerda. A chave fecha o pino para o GND. O corpo do X
 
 <div class="card" markdown="1">
 
-### Conector da ventoinha (J7)
+### Conectores das ventoinhas (J7, J9)
 
 | Qtd | Referências | Valor | Comprar |
 |---|---|---|---|
-| 1 | J7 | FAN 24V | JST XH 2 vias 2,5 mm vertical (B2B-XH-A + XHP-2 + 2 terminais) |
+| 2 | J7 J9 | FAN 24V, FAN2 24V | JST XH 2 vias 2,5 mm vertical (B2B-XH-A + XHP-2 + 2 terminais) |
 
 <table><tr><td align="center"><img src="img/componentes/conector-xh.jpg" height="170"><br><sub>Foto (JST XH)</sub></td><td align="center"><img src="img/3d/peca/j7-fan.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/j7-fan.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-+24 V à esquerda, GND à direita. Sempre ligada.
-
-</div>
-
-<div class="card" markdown="1">
-
-### Header de micropasso (ZM)
-
-| Qtd | Referências | Valor | Comprar |
-|---|---|---|---|
-| 1 | ZM | MICROPASSO | Barra de pinos macho 2x3 2,54 mm + 3 jumpers |
-
-<table><tr><td align="center"><img src="img/componentes/barra-macho-jumper.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/zm-micropasso.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/zm-micropasso.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
-
-Serigrafia: MS3 MS2 MS1, "jumper = 0". Na primeira ligação, deixe **sem jumper** (1/16).
++24 V à esquerda, GND à direita. As duas sempre ligadas: J7 na ventoinha do TMC2209, J9 na do DM556 ou da caixa.
 
 </div>
 
@@ -351,7 +337,7 @@ Serigrafia: MS3 MS2 MS1, "jumper = 0". Na primeira ligação, deixe **sem jumper
 
 <table><tr><td align="center"><img src="img/componentes/barra-macho-jumper.jpg" height="170"><br><sub>Foto</sub></td><td align="center"><img src="img/3d/peca/ju-uart.png" height="170"><br><sub>Modelo 3D (KiCad)</sub></td><td align="center"><img src="img/local/ju-uart.png" height="170"><br><sub>Onde fica</sub></td></tr></table>
 
-Aberto na primeira ligação. Fechado = UART do TMC2209 no GP5 (ver [capítulo 5](05-conectores-e-jumpers.md#ju--uart-do-tmc2209)).
+Aberto na primeira ligação. Fechado = UART do TMC2209 no GP2, pelo pino 4 do soquete (ver [capítulo 5](05-conectores-e-jumpers.md#ju--uart-do-tmc2209)).
 
 </div>
 

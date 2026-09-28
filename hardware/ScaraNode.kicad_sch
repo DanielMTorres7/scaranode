@@ -6,8 +6,8 @@
 	(paper "A3")
 	(title_block
 		(title "ScaraNode")
-		(date "2026-09-25")
-		(rev "v17")
+		(date "2026-09-27")
+		(rev "v18")
 		(company "Daniel M. Torres")
 	)
 	(lib_symbols
@@ -905,280 +905,6 @@
 						)
 					)
 					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "Connector_Generic:Conn_02x03_Odd_Even"
-			(pin_names
-				(offset 1.016)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "J"
-				(at 1.27 5.08 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "Conn_02x03_Odd_Even"
-				(at 1.27 -5.08 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "connector"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "Connector*:*_2x??_*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "Conn_02x03_Odd_Even_1_1"
-				(rectangle
-					(start -1.27 3.81)
-					(end 3.81 -3.81)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(rectangle
-					(start -1.27 2.667)
-					(end 0 2.413)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(rectangle
-					(start -1.27 0.127)
-					(end 0 -0.127)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(rectangle
-					(start -1.27 -2.413)
-					(end 0 -2.667)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(rectangle
-					(start 3.81 2.667)
-					(end 2.54 2.413)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(rectangle
-					(start 3.81 0.127)
-					(end 2.54 -0.127)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(rectangle
-					(start 3.81 -2.413)
-					(end 2.54 -2.667)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 2.54 0)
-					(length 3.81)
-					(name "Pin_1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 7.62 2.54 180)
-					(length 3.81)
-					(name "Pin_2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 3.81)
-					(name "Pin_3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 7.62 0 180)
-					(length 3.81)
-					(name "Pin_4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 -2.54 0)
-					(length 3.81)
-					(name "Pin_5"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "5"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 7.62 -2.54 180)
-					(length 3.81)
-					(name "Pin_6"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3300,10 +3026,10 @@
 						)
 					)
 				)
-				(pin input line
+				(pin bidirectional line
 					(at -12.7 1.27 0)
 					(length 5.08)
-					(name "MS3"
+					(name "MS3/UART"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -5045,6 +4771,178 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector_Generic:Conn_01x02")
+		(at 137.16 63.5 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "45c79605-105d-523d-a901-f9304269f1de")
+		(property "Reference" "J9"
+			(at 140.97 62.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "FAN2 24V"
+			(at 140.97 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
+			(at 137.16 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 137.16 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c8012fb6-e9ed-5b89-8dbc-bbfd4f452faa")
+		)
+		(pin "2"
+			(uuid "30cf9a89-e6c2-5575-b248-b10b0cd79623")
+		)
+		(instances
+			(project "ScaraNode"
+				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
+					(reference "J9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+24V")
+		(at 132.08 63.5 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "7e4efef2-d122-5eb9-8423-2351082dd240")
+		(property "Reference" "#PWR09"
+			(at 127.14 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "24V"
+			(at 127.14 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 132.08 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 132.08 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "7bfe20c9-460b-5f99-8e70-1dc3e6cedd74")
+		)
+		(instances
+			(project "ScaraNode"
+				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
+					(reference "#PWR09")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 132.08 66.04 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "80802803-e8f2-5d8a-9afa-c72830a50cc9")
+		(property "Reference" "#PWR10"
+			(at 127.14 66.04 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 127.14 66.04 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 132.08 66.04 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 132.08 66.04 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "2530680b-4373-5297-8db3-f46faf837510")
+		)
+		(instances
+			(project "ScaraNode"
+				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
+					(reference "#PWR10")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:R")
 		(at 38.1 88.9 0)
 		(unit 1)
@@ -5112,8 +5010,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "7e4efef2-d122-5eb9-8423-2351082dd240")
-		(property "Reference" "#PWR09"
+		(uuid "c6894061-1705-5dc6-83e2-30cff892a5dc")
+		(property "Reference" "#PWR11"
 			(at 38.1 81.28 0)
 			(effects
 				(font
@@ -5149,12 +5047,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "7bfe20c9-460b-5f99-8e70-1dc3e6cedd74")
+			(uuid "ba0cfe56-daf9-5789-964c-80f8cc972642")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR09")
+					(reference "#PWR11")
 					(unit 1)
 				)
 			)
@@ -5239,8 +5137,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "80802803-e8f2-5d8a-9afa-c72830a50cc9")
-		(property "Reference" "#PWR10"
+		(uuid "45f2c926-b317-53dd-bb8a-50fc5a0faee4")
+		(property "Reference" "#PWR12"
 			(at 55.88 96.52 0)
 			(effects
 				(font
@@ -5276,12 +5174,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "2530680b-4373-5297-8db3-f46faf837510")
+			(uuid "4766e2ac-adb7-51f7-9604-cc5eb63634e0")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR10")
+					(reference "#PWR12")
 					(unit 1)
 				)
 			)
@@ -5366,8 +5264,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "c6894061-1705-5dc6-83e2-30cff892a5dc")
-		(property "Reference" "#PWR11"
+		(uuid "9e1d10f2-a21b-50ed-8e2a-36811107a99f")
+		(property "Reference" "#PWR13"
 			(at 78.74 81.28 0)
 			(effects
 				(font
@@ -5403,12 +5301,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "ba0cfe56-daf9-5789-964c-80f8cc972642")
+			(uuid "ae710fd3-d36e-5f60-b9f2-225164f03c82")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR11")
+					(reference "#PWR13")
 					(unit 1)
 				)
 			)
@@ -5504,8 +5402,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "45f2c926-b317-53dd-bb8a-50fc5a0faee4")
-		(property "Reference" "#PWR12"
+		(uuid "271680a8-2723-573c-81f5-32e5bdfe348e")
+		(property "Reference" "#PWR14"
 			(at 93.98 96.52 0)
 			(effects
 				(font
@@ -5541,12 +5439,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "4766e2ac-adb7-51f7-9604-cc5eb63634e0")
+			(uuid "7c50938c-8958-5df9-bdc5-e9f9d1d0d57d")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR12")
+					(reference "#PWR14")
 					(unit 1)
 				)
 			)
@@ -5631,8 +5529,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "9e1d10f2-a21b-50ed-8e2a-36811107a99f")
-		(property "Reference" "#PWR13"
+		(uuid "6e5fc7f1-d76d-53c6-a14e-10bb4a561f93")
+		(property "Reference" "#PWR15"
 			(at 109.22 96.52 0)
 			(effects
 				(font
@@ -5668,12 +5566,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "ae710fd3-d36e-5f60-b9f2-225164f03c82")
+			(uuid "e9a1c98f-e235-5ba4-bf80-b2eb20f348b8")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR13")
+					(reference "#PWR15")
 					(unit 1)
 				)
 			)
@@ -5873,8 +5771,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "271680a8-2723-573c-81f5-32e5bdfe348e")
-		(property "Reference" "#PWR14"
+		(uuid "1a6dd5d5-ec88-52e9-a234-a6985718d652")
+		(property "Reference" "#PWR16"
 			(at 193.98 55.88 90)
 			(effects
 				(font
@@ -5910,12 +5808,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "7c50938c-8958-5df9-bdc5-e9f9d1d0d57d")
+			(uuid "68641a26-736d-5451-8615-1013a8d7656e")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR14")
+					(reference "#PWR16")
 					(unit 1)
 				)
 			)
@@ -5929,8 +5827,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "6e5fc7f1-d76d-53c6-a14e-10bb4a561f93")
-		(property "Reference" "#PWR15"
+		(uuid "80bccf29-0dda-5413-a71f-26d38d6fca71")
+		(property "Reference" "#PWR17"
 			(at 193.18 58.42 90)
 			(effects
 				(font
@@ -5966,12 +5864,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "e9a1c98f-e235-5ba4-bf80-b2eb20f348b8")
+			(uuid "6065a59b-6e49-58cb-a4d8-6143f6f4ff8f")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR15")
+					(reference "#PWR17")
 					(unit 1)
 				)
 			)
@@ -5985,8 +5883,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "1a6dd5d5-ec88-52e9-a234-a6985718d652")
-		(property "Reference" "#PWR16"
+		(uuid "d5310a26-108d-5918-82bc-93d0a5f98028")
+		(property "Reference" "#PWR18"
 			(at 193.18 60.96 90)
 			(effects
 				(font
@@ -6022,12 +5920,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "68641a26-736d-5451-8615-1013a8d7656e")
+			(uuid "87d4154c-7bcf-5258-b514-f89a78338fcc")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR16")
+					(reference "#PWR18")
 					(unit 1)
 				)
 			)
@@ -6059,9 +5957,16 @@
 		)
 		(uuid "f2eb75fa-cc5e-55ff-b2b4-5657d73f3b8e")
 	)
-	(no_connect
-		(at 198.12 71.12)
-		(uuid "9e2f3796-521a-53a5-a2af-27950eab3736")
+	(global_label "NTC2"
+		(shape passive)
+		(at 198.12 71.12 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "0122bdca-fe38-5b69-8275-44eb7f7ee19d")
 	)
 	(global_label "SW2"
 		(shape passive)
@@ -6100,19 +6005,33 @@
 		)
 		(uuid "d8bf9e8e-13c7-591d-bd7b-2a3519288351")
 	)
-	(no_connect
-		(at 223.52 60.96)
-		(uuid "3c474ca8-6a45-576a-a38d-a47a18aa510f")
+	(global_label "UART"
+		(shape passive)
+		(at 223.52 60.96 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3d8abc96-8f10-5eb9-aff1-1fea15151e63")
 	)
 	(no_connect
 		(at 223.52 63.5)
 		(uuid "d0556490-8e85-5484-bbc8-090dc709523a")
 	)
-	(no_connect
-		(at 223.52 66.04)
-		(uuid "26dbd008-d2cd-58da-bb89-6120f573ce67")
+	(global_label "STP"
+		(shape passive)
+		(at 223.52 66.04 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "64f9d879-043d-5012-b63c-69c6a86d6618")
 	)
-	(global_label "UART"
+	(global_label "DIR"
 		(shape passive)
 		(at 223.52 68.58 0)
 		(effects
@@ -6123,7 +6042,7 @@
 		)
 		(uuid "fd1a963b-d9d3-586f-a848-9ef093bb8ea1")
 	)
-	(global_label "STP"
+	(global_label "DM_STP"
 		(shape passive)
 		(at 223.52 71.12 0)
 		(effects
@@ -6134,7 +6053,7 @@
 		)
 		(uuid "ae0977c4-e049-50a2-9ef2-9779a7e5037f")
 	)
-	(global_label "DIR"
+	(global_label "DM_DIR"
 		(shape passive)
 		(at 223.52 73.66 0)
 		(effects
@@ -6289,7 +6208,7 @@
 		)
 		(uuid "1d64f7ed-f361-5deb-abc2-7a6cad50f0e0")
 	)
-	(global_label "MS3"
+	(global_label "UART_TMC"
 		(shape passive)
 		(at 309.88 59.69 180)
 		(effects
@@ -6300,16 +6219,9 @@
 		)
 		(uuid "5a7efe59-6d5a-58dd-8595-3eb68d42ba48")
 	)
-	(global_label "UART_TMC"
-		(shape passive)
-		(at 309.88 62.23 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "534f5ca8-15c1-5e6b-aa47-0481b998a5c3")
+	(no_connect
+		(at 309.88 62.23)
+		(uuid "6dbf65ec-c297-5905-ac5c-0d0d621a2c70")
 	)
 	(no_connect
 		(at 309.88 64.77)
@@ -6345,8 +6257,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "80bccf29-0dda-5413-a71f-26d38d6fca71")
-		(property "Reference" "#PWR17"
+		(uuid "2e5d8795-8582-5e23-aec1-20f1f98516b2")
+		(property "Reference" "#PWR19"
 			(at 340.22 52.07 90)
 			(effects
 				(font
@@ -6382,12 +6294,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "6065a59b-6e49-58cb-a4d8-6143f6f4ff8f")
+			(uuid "4a009d77-0140-5169-abd4-81351e57344f")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR17")
+					(reference "#PWR19")
 					(unit 1)
 				)
 			)
@@ -6401,8 +6313,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "d5310a26-108d-5918-82bc-93d0a5f98028")
-		(property "Reference" "#PWR18"
+		(uuid "5544c5f9-f705-55ca-8473-af4094d2f08a")
+		(property "Reference" "#PWR20"
 			(at 340.22 54.61 90)
 			(effects
 				(font
@@ -6438,12 +6350,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "87d4154c-7bcf-5258-b514-f89a78338fcc")
+			(uuid "42726548-8508-5971-aa6f-f3aad757da38")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR18")
+					(reference "#PWR20")
 					(unit 1)
 				)
 			)
@@ -6501,8 +6413,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "2e5d8795-8582-5e23-aec1-20f1f98516b2")
-		(property "Reference" "#PWR19"
+		(uuid "60561ecc-a7e1-57db-a31c-f78880fe5cf6")
+		(property "Reference" "#PWR21"
 			(at 340.22 67.31 90)
 			(effects
 				(font
@@ -6538,12 +6450,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "4a009d77-0140-5169-abd4-81351e57344f")
+			(uuid "dab334db-d425-5a93-90af-12f0a5386347")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR19")
+					(reference "#PWR21")
 					(unit 1)
 				)
 			)
@@ -6557,8 +6469,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "5544c5f9-f705-55ca-8473-af4094d2f08a")
-		(property "Reference" "#PWR20"
+		(uuid "35a1e9a4-4f6c-56cc-83df-26bf58593ce2")
+		(property "Reference" "#PWR22"
 			(at 340.22 69.85 90)
 			(effects
 				(font
@@ -6594,12 +6506,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "42726548-8508-5971-aa6f-f3aad757da38")
+			(uuid "1c08168b-19f7-5340-9adb-445d2059f8b4")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR20")
+					(reference "#PWR22")
 					(unit 1)
 				)
 			)
@@ -6673,8 +6585,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "60561ecc-a7e1-57db-a31c-f78880fe5cf6")
-		(property "Reference" "#PWR21"
+		(uuid "6fc0a08f-e497-59ab-9368-c81aede88885")
+		(property "Reference" "#PWR23"
 			(at 363.22 53.34 0)
 			(effects
 				(font
@@ -6710,12 +6622,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "dab334db-d425-5a93-90af-12f0a5386347")
+			(uuid "2730ce56-d57a-5668-9561-eee480ce7636")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR21")
+					(reference "#PWR23")
 					(unit 1)
 				)
 			)
@@ -6729,8 +6641,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "35a1e9a4-4f6c-56cc-83df-26bf58593ce2")
-		(property "Reference" "#PWR22"
+		(uuid "eca1bc31-efec-5703-ad79-e2f5cc8f8cdd")
+		(property "Reference" "#PWR24"
 			(at 363.22 68.58 0)
 			(effects
 				(font
@@ -6766,12 +6678,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "1c08168b-19f7-5340-9adb-445d2059f8b4")
+			(uuid "c56ee335-865c-5df2-aa1b-41a7f5b147ce")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR22")
+					(reference "#PWR24")
 					(unit 1)
 				)
 			)
@@ -6966,8 +6878,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "6fc0a08f-e497-59ab-9368-c81aede88885")
-		(property "Reference" "#PWR23"
+		(uuid "aa87d7b3-46d8-5498-905d-4f9c6eaf56b1")
+		(property "Reference" "#PWR25"
 			(at 294.64 96.52 0)
 			(effects
 				(font
@@ -7003,12 +6915,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "2730ce56-d57a-5668-9561-eee480ce7636")
+			(uuid "1d169841-8c36-54c4-bcc5-27cf3e3d167e")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR23")
+					(reference "#PWR25")
 					(unit 1)
 				)
 			)
@@ -7093,8 +7005,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "eca1bc31-efec-5703-ad79-e2f5cc8f8cdd")
-		(property "Reference" "#PWR24"
+		(uuid "2dc690e7-2b7f-52f0-85ff-38a92318f10b")
+		(property "Reference" "#PWR26"
 			(at 312.42 96.52 0)
 			(effects
 				(font
@@ -7130,12 +7042,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "c56ee335-865c-5df2-aa1b-41a7f5b147ce")
+			(uuid "830e19da-9465-5675-b12b-b361e36dc2f3")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR24")
+					(reference "#PWR26")
 					(unit 1)
 				)
 			)
@@ -7220,8 +7132,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "aa87d7b3-46d8-5498-905d-4f9c6eaf56b1")
-		(property "Reference" "#PWR25"
+		(uuid "bd3d7eeb-cf47-59d9-8d77-e452284dbdb6")
+		(property "Reference" "#PWR27"
 			(at 330.2 96.52 0)
 			(effects
 				(font
@@ -7257,12 +7169,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "1d169841-8c36-54c4-bcc5-27cf3e3d167e")
+			(uuid "e5c307ad-1a2f-5769-8f0b-e2e801dbebdc")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR25")
+					(reference "#PWR27")
 					(unit 1)
 				)
 			)
@@ -7328,7 +7240,7 @@
 			)
 		)
 	)
-	(global_label "MS3"
+	(global_label "UART_TMC"
 		(shape passive)
 		(at 347.98 107.95 270)
 		(effects
@@ -7347,8 +7259,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "2dc690e7-2b7f-52f0-85ff-38a92318f10b")
-		(property "Reference" "#PWR26"
+		(uuid "846dca39-f28b-5b3b-aa65-f4442a93383a")
+		(property "Reference" "#PWR28"
 			(at 347.98 96.52 0)
 			(effects
 				(font
@@ -7384,12 +7296,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "830e19da-9465-5675-b12b-b361e36dc2f3")
+			(uuid "16628d36-d248-5f7b-aca7-465aa91c4ae5")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR26")
+					(reference "#PWR28")
 					(unit 1)
 				)
 			)
@@ -7568,8 +7480,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "bd3d7eeb-cf47-59d9-8d77-e452284dbdb6")
-		(property "Reference" "#PWR27"
+		(uuid "3dd3c665-2009-5864-a62b-a78ba713ea73")
+		(property "Reference" "#PWR29"
 			(at 50.94 191.77 90)
 			(effects
 				(font
@@ -7605,12 +7517,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "e5c307ad-1a2f-5769-8f0b-e2e801dbebdc")
+			(uuid "b74a601f-b825-5f1f-9c2a-2c37c6bb48bc")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR27")
+					(reference "#PWR29")
 					(unit 1)
 				)
 			)
@@ -7624,8 +7536,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "846dca39-f28b-5b3b-aa65-f4442a93383a")
-		(property "Reference" "#PWR28"
+		(uuid "e43acad4-499e-58c6-81d2-821d20066ca9")
+		(property "Reference" "#PWR30"
 			(at 50.94 194.31 90)
 			(effects
 				(font
@@ -7661,18 +7573,18 @@
 			)
 		)
 		(pin "1"
-			(uuid "16628d36-d248-5f7b-aca7-465aa91c4ae5")
+			(uuid "60dece9d-d0a7-524b-98e3-84551df836f0")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR28")
+					(reference "#PWR30")
 					(unit 1)
 				)
 			)
 		)
 	)
-	(global_label "STP"
+	(global_label "DM_STP"
 		(shape passive)
 		(at 81.28 171.45 0)
 		(effects
@@ -7683,7 +7595,7 @@
 		)
 		(uuid "76f97a0d-ab6e-567c-8a90-8dc8b2340617")
 	)
-	(global_label "DIR"
+	(global_label "DM_DIR"
 		(shape passive)
 		(at 81.28 173.99 0)
 		(effects
@@ -7713,121 +7625,9 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "3dd3c665-2009-5864-a62b-a78ba713ea73")
-		(property "Reference" "#PWR29"
-			(at 86.22 179.07 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 86.22 179.07 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 81.28 179.07 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 81.28 179.07 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "b74a601f-b825-5f1f-9c2a-2c37c6bb48bc")
-		)
-		(instances
-			(project "ScaraNode"
-				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR29")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 81.28 181.61 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "e43acad4-499e-58c6-81d2-821d20066ca9")
-		(property "Reference" "#PWR30"
-			(at 86.22 181.61 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 86.22 181.61 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 81.28 181.61 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 81.28 181.61 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "60dece9d-d0a7-524b-98e3-84551df836f0")
-		)
-		(instances
-			(project "ScaraNode"
-				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR30")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 81.28 184.15 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
 		(uuid "e6516159-ad7b-5d4e-a9d2-8f3590639e39")
 		(property "Reference" "#PWR31"
-			(at 86.22 184.15 90)
+			(at 86.22 179.07 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7836,7 +7636,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 86.22 184.15 90)
+			(at 86.22 179.07 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7844,7 +7644,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 81.28 184.15 90)
+			(at 81.28 179.07 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7853,7 +7653,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 81.28 184.15 90)
+			(at 81.28 179.07 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7875,7 +7675,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 81.28 186.69 90)
+		(at 81.28 181.61 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -7883,7 +7683,7 @@
 		(dnp no)
 		(uuid "277fef21-fd11-5e2f-9a29-5af640dd3398")
 		(property "Reference" "#PWR32"
-			(at 86.22 186.69 90)
+			(at 86.22 181.61 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7892,7 +7692,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 86.22 186.69 90)
+			(at 86.22 181.61 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7900,7 +7700,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 81.28 186.69 90)
+			(at 81.28 181.61 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7909,7 +7709,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 81.28 186.69 90)
+			(at 81.28 181.61 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7931,7 +7731,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 81.28 189.23 90)
+		(at 81.28 184.15 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -7939,6 +7739,118 @@
 		(dnp no)
 		(uuid "9071d4a1-7ea9-5017-b560-addbb5b4b7c0")
 		(property "Reference" "#PWR33"
+			(at 86.22 184.15 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 86.22 184.15 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 81.28 184.15 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 81.28 184.15 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "fb388510-8629-5578-833a-3d105a757478")
+		)
+		(instances
+			(project "ScaraNode"
+				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
+					(reference "#PWR33")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 81.28 186.69 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a76fd1c2-bc67-5282-8972-2d0c8825b35a")
+		(property "Reference" "#PWR34"
+			(at 86.22 186.69 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 86.22 186.69 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 81.28 186.69 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 81.28 186.69 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "82b3b1e5-f1e9-55a1-a559-57c77632523a")
+		)
+		(instances
+			(project "ScaraNode"
+				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
+					(reference "#PWR34")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 81.28 189.23 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "361ae101-5944-5000-98be-64b039d8e703")
+		(property "Reference" "#PWR35"
 			(at 86.22 189.23 90)
 			(effects
 				(font
@@ -7974,12 +7886,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "fb388510-8629-5578-833a-3d105a757478")
+			(uuid "1f6dd6a2-3900-5eb2-857a-0fdfc188fc95")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR33")
+					(reference "#PWR35")
 					(unit 1)
 				)
 			)
@@ -7993,8 +7905,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "a76fd1c2-bc67-5282-8972-2d0c8825b35a")
-		(property "Reference" "#PWR34"
+		(uuid "5322b6c2-544f-5b1a-b5d6-56559e398013")
+		(property "Reference" "#PWR36"
 			(at 85.42 191.77 90)
 			(effects
 				(font
@@ -8030,12 +7942,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "82b3b1e5-f1e9-55a1-a559-57c77632523a")
+			(uuid "89bdb002-1828-5ef0-afb5-231528fbb46a")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR34")
+					(reference "#PWR36")
 					(unit 1)
 				)
 			)
@@ -8049,8 +7961,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "361ae101-5944-5000-98be-64b039d8e703")
-		(property "Reference" "#PWR35"
+		(uuid "708432a9-51ac-5d9a-a63e-6df77f4a3e8c")
+		(property "Reference" "#PWR37"
 			(at 86.22 194.31 90)
 			(effects
 				(font
@@ -8086,12 +7998,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "1f6dd6a2-3900-5eb2-857a-0fdfc188fc95")
+			(uuid "424ae8c1-6ac9-5b70-aaec-aafb6845370a")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR35")
+					(reference "#PWR37")
 					(unit 1)
 				)
 			)
@@ -8165,8 +8077,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "5322b6c2-544f-5b1a-b5d6-56559e398013")
-		(property "Reference" "#PWR36"
+		(uuid "f956a301-79c7-56e1-8704-ae7f34c199cf")
+		(property "Reference" "#PWR38"
 			(at 104.14 172.72 0)
 			(effects
 				(font
@@ -8202,12 +8114,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "89bdb002-1828-5ef0-afb5-231528fbb46a")
+			(uuid "2802b64d-57ae-5aa6-81a4-dbec6320d785")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR36")
+					(reference "#PWR38")
 					(unit 1)
 				)
 			)
@@ -8221,8 +8133,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "708432a9-51ac-5d9a-a63e-6df77f4a3e8c")
-		(property "Reference" "#PWR37"
+		(uuid "1cab67bf-0c5e-5ae8-9cd2-3eae4e48009b")
+		(property "Reference" "#PWR39"
 			(at 104.14 187.96 0)
 			(effects
 				(font
@@ -8258,12 +8170,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "424ae8c1-6ac9-5b70-aaec-aafb6845370a")
+			(uuid "2cd55090-f7e2-5fab-991e-41239b84e873")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR37")
+					(reference "#PWR39")
 					(unit 1)
 				)
 			)
@@ -8343,8 +8255,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "f956a301-79c7-56e1-8704-ae7f34c199cf")
-		(property "Reference" "#PWR38"
+		(uuid "62a4c745-7d43-5d22-ac57-5228ff3f714c")
+		(property "Reference" "#PWR40"
 			(at 122.86 177.8 90)
 			(effects
 				(font
@@ -8380,12 +8292,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "2802b64d-57ae-5aa6-81a4-dbec6320d785")
+			(uuid "40f0b8ef-1da0-574c-b3f6-76463ac53acc")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR38")
+					(reference "#PWR40")
 					(unit 1)
 				)
 			)
@@ -8492,8 +8404,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "1cab67bf-0c5e-5ae8-9cd2-3eae4e48009b")
-		(property "Reference" "#PWR39"
+		(uuid "9dbd9348-4fc4-59df-b84b-7185a1b0b485")
+		(property "Reference" "#PWR41"
 			(at 165.1 165.1 0)
 			(effects
 				(font
@@ -8529,12 +8441,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "2cd55090-f7e2-5fab-991e-41239b84e873")
+			(uuid "ef1db5dc-c5ce-5193-a7e2-a02b35657bef")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR39")
+					(reference "#PWR41")
 					(unit 1)
 				)
 			)
@@ -8630,8 +8542,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "62a4c745-7d43-5d22-ac57-5228ff3f714c")
-		(property "Reference" "#PWR40"
+		(uuid "0e784d95-56a4-5c19-84ee-c1b71b163fd2")
+		(property "Reference" "#PWR42"
 			(at 182.88 180.34 0)
 			(effects
 				(font
@@ -8667,12 +8579,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "40f0b8ef-1da0-574c-b3f6-76463ac53acc")
+			(uuid "65505671-2a93-529e-89c5-26b7ab1fe3dd")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR40")
+					(reference "#PWR42")
 					(unit 1)
 				)
 			)
@@ -8696,7 +8608,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "NTC"
+		(property "Value" "NTC1"
 			(at 224.79 171.45 0)
 			(effects
 				(font
@@ -8757,8 +8669,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "9dbd9348-4fc4-59df-b84b-7185a1b0b485")
-		(property "Reference" "#PWR41"
+		(uuid "0d27adea-f812-52e2-acb9-112516c7a130")
+		(property "Reference" "#PWR43"
 			(at 210.96 172.72 90)
 			(effects
 				(font
@@ -8794,12 +8706,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "ef1db5dc-c5ce-5193-a7e2-a02b35657bef")
+			(uuid "7249a0d4-2305-5438-ab73-13931e692574")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR41")
+					(reference "#PWR43")
 					(unit 1)
 				)
 			)
@@ -8884,8 +8796,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "0e784d95-56a4-5c19-84ee-c1b71b163fd2")
-		(property "Reference" "#PWR42"
+		(uuid "f4df4eec-a886-587c-80d1-72e07154fde4")
+		(property "Reference" "#PWR44"
 			(at 165.1 198.12 0)
 			(effects
 				(font
@@ -8921,12 +8833,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "65505671-2a93-529e-89c5-26b7ab1fe3dd")
+			(uuid "69d67a31-fb66-56e6-97aa-086ff220947c")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR42")
+					(reference "#PWR44")
 					(unit 1)
 				)
 			)
@@ -9011,8 +8923,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "0d27adea-f812-52e2-acb9-112516c7a130")
-		(property "Reference" "#PWR43"
+		(uuid "cba61249-f348-5203-940b-324318faae3e")
+		(property "Reference" "#PWR45"
 			(at 182.88 213.36 0)
 			(effects
 				(font
@@ -9048,12 +8960,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "7249a0d4-2305-5438-ab73-13931e692574")
+			(uuid "b5ce3c30-c0e6-5c96-a75f-12f68f9f580d")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR43")
+					(reference "#PWR45")
 					(unit 1)
 				)
 			)
@@ -9218,8 +9130,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "f4df4eec-a886-587c-80d1-72e07154fde4")
-		(property "Reference" "#PWR44"
+		(uuid "00032d52-68be-593d-a352-f4919acdb070")
+		(property "Reference" "#PWR46"
 			(at 236.36 205.74 90)
 			(effects
 				(font
@@ -9255,12 +9167,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "69d67a31-fb66-56e6-97aa-086ff220947c")
+			(uuid "5ea68554-a410-5e84-a1c8-880e59b647eb")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR44")
+					(reference "#PWR46")
 					(unit 1)
 				)
 			)
@@ -9345,8 +9257,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "cba61249-f348-5203-940b-324318faae3e")
-		(property "Reference" "#PWR45"
+		(uuid "833e6a57-e327-5592-8bac-93b2b344d75b")
+		(property "Reference" "#PWR47"
 			(at 165.1 231.14 0)
 			(effects
 				(font
@@ -9382,12 +9294,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "b5ce3c30-c0e6-5c96-a75f-12f68f9f580d")
+			(uuid "f10069aa-9a92-5a57-9bf7-fb349b4e8081")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR45")
+					(reference "#PWR47")
 					(unit 1)
 				)
 			)
@@ -9472,8 +9384,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "00032d52-68be-593d-a352-f4919acdb070")
-		(property "Reference" "#PWR46"
+		(uuid "38b9e81d-9e0e-5563-bcf6-46fb8548ab3e")
+		(property "Reference" "#PWR48"
 			(at 182.88 246.38 0)
 			(effects
 				(font
@@ -9509,12 +9421,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "5ea68554-a410-5e84-a1c8-880e59b647eb")
+			(uuid "7ea1a3f8-e818-5d60-80d3-3f1a71ac6042")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR46")
+					(reference "#PWR48")
 					(unit 1)
 				)
 			)
@@ -9679,8 +9591,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "833e6a57-e327-5592-8bac-93b2b344d75b")
-		(property "Reference" "#PWR47"
+		(uuid "92485d04-6d87-5477-8ff4-13f181ed0f45")
+		(property "Reference" "#PWR49"
 			(at 236.36 238.76 90)
 			(effects
 				(font
@@ -9716,12 +9628,393 @@
 			)
 		)
 		(pin "1"
-			(uuid "f10069aa-9a92-5a57-9bf7-fb349b4e8081")
+			(uuid "3863a896-eff3-519f-a29f-b07af195a874")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR47")
+					(reference "#PWR49")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 165.1 271.78 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "1602913b-62f8-50c5-bfe0-c6f9e834bd69")
+		(property "Reference" "R15"
+			(at 168.91 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100k"
+			(at 168.91 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+			(at 165.1 271.78 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 165.1 271.78 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "25abf61d-417b-5133-9b4b-67389c0ce1df")
+		)
+		(pin "2"
+			(uuid "4fff70a3-612f-569c-b3de-85b996942f95")
+		)
+		(instances
+			(project "ScaraNode"
+				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
+					(reference "R15")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 165.1 267.97 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "acd460d8-3d92-5f87-b568-cc8a9b5b51d3")
+		(property "Reference" "#PWR50"
+			(at 165.1 264.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "3V3"
+			(at 165.1 264.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 165.1 267.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 165.1 267.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3f75f782-38d2-5cdf-b3f0-3d5d472f95ed")
+		)
+		(instances
+			(project "ScaraNode"
+				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
+					(reference "#PWR50")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(global_label "NTC2"
+		(shape passive)
+		(at 165.1 275.59 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "ba9a6991-ee87-58ca-bc20-ba7e05ac54e6")
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 182.88 271.78 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a31400dd-73e1-52fa-b1f7-94e44a4115b8")
+		(property "Reference" "C7"
+			(at 186.69 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100nF"
+			(at 186.69 273.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_THT:C_Disc_D3.0mm_W1.6mm_P2.50mm"
+			(at 182.88 271.78 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 182.88 271.78 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e739ed69-01b4-5e92-992b-0ab1db86a0fc")
+		)
+		(pin "2"
+			(uuid "76377e6d-1b85-5b0f-b96a-3aec4e68f2e0")
+		)
+		(instances
+			(project "ScaraNode"
+				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
+					(reference "C7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(global_label "NTC2"
+		(shape passive)
+		(at 182.88 267.97 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "36c58f82-5060-51a0-9263-3f4ed13af94c")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 182.88 275.59 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "37263c1a-b75f-53af-b001-91cec7e04f57")
+		(property "Reference" "#PWR51"
+			(at 182.88 279.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 182.88 279.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 182.88 275.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 182.88 275.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "8bf3ddc6-f6ec-5b19-9862-6bc44e86a8f0")
+		)
+		(instances
+			(project "ScaraNode"
+				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
+					(reference "#PWR51")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x02")
+		(at 220.98 269.24 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c8ff6cfe-9ffc-56da-89fd-de1a33e2128c")
+		(property "Reference" "J8"
+			(at 224.79 267.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "NTC2"
+			(at 224.79 270.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical"
+			(at 220.98 269.24 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 220.98 269.24 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c5b725ed-efa5-5fff-a372-6b96c574d845")
+		)
+		(pin "2"
+			(uuid "d3903c5a-3cbf-5ecc-819d-874236999f9c")
+		)
+		(instances
+			(project "ScaraNode"
+				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
+					(reference "J8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(global_label "NTC2"
+		(shape passive)
+		(at 215.9 269.24 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "c8abe9c6-53c0-55cc-9ecc-bbbe7ec18b8e")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 215.9 271.78 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "182b531e-ae94-5569-bd38-76ab3e84395f")
+		(property "Reference" "#PWR52"
+			(at 210.96 271.78 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 210.96 271.78 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 215.9 271.78 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 215.9 271.78 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "6e1c3c5e-f9bc-5dbd-a45a-ef93378ef9ca")
+		)
+		(instances
+			(project "ScaraNode"
+				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
+					(reference "#PWR52")
 					(unit 1)
 				)
 			)
@@ -9808,277 +10101,6 @@
 			(justify right)
 		)
 		(uuid "80305732-1ef2-5350-9c55-19978b71fe75")
-	)
-	(symbol
-		(lib_id "Connector_Generic:Conn_02x03_Odd_Even")
-		(at 330.2 172.72 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "abd42422-d1a7-5c4b-91c9-db69fb23fff7")
-		(property "Reference" "ZM"
-			(at 330.2 165.1 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "MICROPASSO"
-			(at 330.2 180.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical"
-			(at 330.2 172.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 330.2 172.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "262d4f0e-f276-5d28-8ecd-bb1b9a15d3ac")
-		)
-		(pin "2"
-			(uuid "8c45ec10-76a1-5288-9752-6eaca1d545f8")
-		)
-		(pin "3"
-			(uuid "e40306fb-acf3-5d5d-bfed-c61bb9aa2629")
-		)
-		(pin "4"
-			(uuid "3b166174-9dd7-5b42-aa70-85b73ec76061")
-		)
-		(pin "5"
-			(uuid "726f6a06-7f6f-5761-a710-c4ad54e02bee")
-		)
-		(pin "6"
-			(uuid "8ebb3b2c-b11a-5557-8ac2-193da8250dec")
-		)
-		(instances
-			(project "ScaraNode"
-				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "ZM")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(global_label "MS1"
-		(shape passive)
-		(at 325.12 170.18 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "4fb4533d-1332-59ad-b983-221f43ae3454")
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 337.82 170.18 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "38b9e81d-9e0e-5563-bcf6-46fb8548ab3e")
-		(property "Reference" "#PWR48"
-			(at 342.76 170.18 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 342.76 170.18 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 337.82 170.18 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 337.82 170.18 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "7ea1a3f8-e818-5d60-80d3-3f1a71ac6042")
-		)
-		(instances
-			(project "ScaraNode"
-				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR48")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(global_label "MS2"
-		(shape passive)
-		(at 325.12 172.72 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "e4b2e009-362d-541f-a63b-de918e6a7a75")
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 337.82 172.72 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "92485d04-6d87-5477-8ff4-13f181ed0f45")
-		(property "Reference" "#PWR49"
-			(at 342.76 172.72 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 342.76 172.72 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 337.82 172.72 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 337.82 172.72 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "3863a896-eff3-519f-a29f-b07af195a874")
-		)
-		(instances
-			(project "ScaraNode"
-				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR49")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(global_label "MS3"
-		(shape passive)
-		(at 325.12 175.26 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "e8fbb12b-0a08-52b8-b43e-cbf11650aa97")
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 337.82 175.26 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "acd460d8-3d92-5f87-b568-cc8a9b5b51d3")
-		(property "Reference" "#PWR50"
-			(at 342.76 175.26 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 342.76 175.26 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 337.82 175.26 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 337.82 175.26 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "3f75f782-38d2-5cdf-b3f0-3d5d472f95ed")
-		)
-		(instances
-			(project "ScaraNode"
-				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR50")
-					(unit 1)
-				)
-			)
-		)
 	)
 	(symbol
 		(lib_id "Mechanical:MountingHole")
@@ -10304,8 +10326,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "37263c1a-b75f-53af-b001-91cec7e04f57")
-		(property "Reference" "#PWR51"
+		(uuid "1521e410-3ef8-5aa7-b2fb-ab4a29aff793")
+		(property "Reference" "#PWR53"
 			(at 340.36 224.79 0)
 			(effects
 				(font
@@ -10341,12 +10363,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "8bf3ddc6-f6ec-5b19-9862-6bc44e86a8f0")
+			(uuid "f38f32c2-660d-583f-b303-4e52fc75efbb")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR51")
+					(reference "#PWR53")
 					(unit 1)
 				)
 			)
@@ -10419,8 +10441,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "182b531e-ae94-5569-bd38-76ab3e84395f")
-		(property "Reference" "#PWR52"
+		(uuid "73c43e36-9765-5637-81ca-b7c23e1ef5f0")
+		(property "Reference" "#PWR54"
 			(at 353.06 224.79 0)
 			(effects
 				(font
@@ -10456,12 +10478,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "6e1c3c5e-f9bc-5dbd-a45a-ef93378ef9ca")
+			(uuid "839f2256-c998-50ab-aaa4-104daea00c49")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR52")
+					(reference "#PWR54")
 					(unit 1)
 				)
 			)
@@ -10534,8 +10556,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "1521e410-3ef8-5aa7-b2fb-ab4a29aff793")
-		(property "Reference" "#PWR53"
+		(uuid "fc89fa5e-c030-5dc9-9d7c-1a30bcd29e66")
+		(property "Reference" "#PWR55"
 			(at 365.76 224.79 0)
 			(effects
 				(font
@@ -10571,12 +10593,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "f38f32c2-660d-583f-b303-4e52fc75efbb")
+			(uuid "f264581c-e200-571f-bfe7-469e7e960b6c")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR53")
+					(reference "#PWR55")
 					(unit 1)
 				)
 			)
@@ -10649,8 +10671,8 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(uuid "73c43e36-9765-5637-81ca-b7c23e1ef5f0")
-		(property "Reference" "#PWR54"
+		(uuid "7d3c1594-c7ea-5753-9caf-5779ac4d4aba")
+		(property "Reference" "#PWR56"
 			(at 378.46 232.41 0)
 			(effects
 				(font
@@ -10686,12 +10708,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "839f2256-c998-50ab-aaa4-104daea00c49")
+			(uuid "aecb379b-8eb9-5826-994a-21b33492cf3b")
 		)
 		(instances
 			(project "ScaraNode"
 				(path "/33869281-c8cf-5ebd-a482-89cc40497d2f"
-					(reference "#PWR54")
+					(reference "#PWR56")
 					(unit 1)
 				)
 			)

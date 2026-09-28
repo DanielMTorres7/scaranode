@@ -4,6 +4,7 @@ Projetista: **Daniel M. Torres**.
 
 | Rev. | Data | Resumo |
 |---|---|---|
+| v18 | 27/09/2026 | Um canal por driver: TMC2209 no GP4/GP5 e DM556 no GP6/GP7, independentes; UART do TMC2209 no pino 4 do soquete (GP2); sem o jumper ZM (MS1/MS2 fixos, endereço 3); segundo NTC (J8, GP26); segunda ventoinha (J9); fusível de 2 A por placa na caixa central; nenhuma curva de trilha de 90° |
 | v17 | 25/09/2026 | Esquemático KiCad publicado (ERC e paridade com a placa); 13 resistores iguais de 1/4 W; R13 e R14 inclinados a 50° com o GND do RP ligado direto ao plano; coluna da esquerda com folgas iguais; GND contínuo sem o jumper de fio JP1; faixas de cor nos renders |
 | v16 | 25/09/2026 | Placa 76 × 64 mm com furos M3 alinhados + DXF mecânico; U2 em soquete DIP-20; borne do motor KF128 azul; NTC separado dos fins de curso; LED de 5 mm |
 | v15 | 25/09/2026 | Conectores de sinal passam a JST XH 2,5 mm (as peças reais); 74ACT245 soldado direto; borne da 24 V verde e do motor azul |
@@ -14,6 +15,41 @@ Projetista: **Daniel M. Torres**.
 | v10 | 24/09/2026 | LED D3 na borda; trilha de retorno de GND do borne |
 | v9 | 24/09/2026 | Anel dos conectores KK corrigido (0,40 mm); primeiros Gerbers |
 | v1–v8 | 24/09/2026 | Layout inicial, regras de fresa, pinagem do RP2040 |
+
+## v18 — canais independentes, UART no pino 4 e trilhas sem curva de 90°
+
+- **Um canal por driver.** Até a v17, o GP6/GP7 ia ao TMC2209 e ao 74ACT245 ao mesmo tempo: com os dois drivers
+  ligados, os motores faziam o mesmo movimento. Agora cada driver tem STEP, DIR e enable próprios:
+
+  | | STEP | DIR | Enable | UART |
+  |---|---|---|---|---|
+  | TMC2209 (soquete U4) | GP4 | GP5 | GP0 (ativo baixo) | GP2 (JU) |
+  | DM556 (J4, via 74ACT245) | GP6 (`!`) | GP7 | GP8 (alto = habilitado) | — |
+
+  Uma placa pode mover dois motores diferentes ao mesmo tempo. O DM556 fica com as trilhas da v17 até o 245. As do
+  GP4/GP5 descem duas fileiras no canal entre o RP e o soquete do TMC.
+- **UART no pino 4 do StepStick.** Nos módulos TMC2209 comuns (e no usado nos testes), o PDN_UART fica na
+  posição do MS3 (pino 4), não no pino 5. O JU liga o GP2 ao pino 4, com o R7 (10k) como pull-up. O pino 5 fica
+  livre. Módulos com a UART no pino 5 (Watterott SilentStepStick) deixam de servir.
+- **Sem o jumper ZM.** Com a UART, o Klipper tira o micropasso do cfg (`mstep_reg_select`) e MS1/MS2 só dão o
+  endereço; com um driver por RP, o endereço é fixo. R4 e R5 ficam: MS1 = MS2 = 1, endereço 3 (o mesmo do cfg) e
+  1/16 em standalone. O jumper MS3 antigo, que aterraria a UART, sai junto.
+  ⚠️ Placas até a v17: a UART vai ao pino 5. Com esse módulo, ligue um fio do JU.2 ao pino 4 e deixe o MS3 do ZM
+  aberto.
+- **Nenhuma curva de trilha de 90°.** Cada canto de 90° virou dois de 135°, com um trecho a 45° de 1 mm de perna.
+  Junções em T continuam. A regra entrou na validação: a v17 tinha 18 cantos, a v18 tem 0.
+- **Segundo NTC (J8, GP26).** Com dois motores na placa, cada um tem o seu termômetro. O pull-up (R15, 100k) fica
+  deitado na vertical, ao lado do soquete do RP, do 3V3 ao GP26. O C1 e o C4 saíram dessa coluna e foram para o vão
+  entre o R3 e o R2, e o C7 (100 nF) fica abaixo do R8. Os quatro conectores da esquerda (NTC1, FIM1, NTC2, FIM2)
+  ficam a 6,05 mm uns dos outros, e a trilha de 5 V desceu 1,1 mm para o J2 caber. Com o GP26 ocupado, sobram GP3,
+  GP14 e GP28: o ADXL345 (só SPI no Klipper) não cabe mais; use um acelerômetro I2C.
+- **Fusível por placa, na caixa central.** Um TMC2209 pegou fogo a 1,7 A (acima dos 1,0–1,2 A que o StepStick
+  aguenta), e o fusível único da máquina, dimensionado para tudo, não abriu. Agora cada placa tem o seu fusível de
+  2 A, e cada DM556 o seu de 5 A, numa caixa de fusíveis de lâmina automotiva (32 V DC, fácil de achar). Ficou fora
+  da placa: os DM556 também precisam de fusível e não passam por ela, e um porta-fusível de placa barato e fácil de
+  achar não coube na faixa de 24 V com as duas brocas. Detalhes e contas no [capítulo 6](06-circuitos.md#fusíveis-fora-da-placa).
+- **Segunda ventoinha (J9), sempre ligada**, entre o D2 e o D1: J7 no TMC2209, J9 no DM556 ou na caixa.
+- Validado: 128 pinos, 0 violações de cobre, 0 ligações faltando, ERC e paridade 0.
 
 ## v17 — esquemático e resistores iguais
 
@@ -121,5 +157,5 @@ Projetista: **Daniel M. Torres**.
 - **Pino 6 (CLK) do StepStick livre:** aterrar sem medir o módulo pode danificar variantes que usam esse
   pino para outra coisa.
 - **Sem homing sensorless:** o módulo usado não expõe o DIAG; o homing é por chave (J1/J2).
-- **Fusível da 24 V** fica na caixa de fusíveis central da máquina.
+- **Fusível da 24 V:** fora da placa, na caixa central, mas **um por placa** (2 A) e um por DM556 (5 A) desde a v18.
 - **LED:** R12 = 10k (~2,2 mA). Para mais brilho, R12 = 4k7 (~4,6 mA).
