@@ -1,0 +1,1488 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel ScaraNode</title>
+<style>
+:root {
+  --bg: #f4f5f7; --card: #ffffff; --ink: #1a1d21; --muted: #626b75; --line: #dde1e6;
+  --field: #f8f9fb; --accent: #2458d6; --accent-ink: #ffffff;
+  --ok: #17803d; --ok-bg: #e5f4ea; --warn: #a15c07; --warn-bg: #fdf1dc;
+  --bad: #c0262d; --bad-bg: #fbe6e7; --off: #9aa3ad; --off-bg: #eceef1;
+  --c1: #2458d6; --c2: #d9721b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121418; --card: #1b1e24; --ink: #e7e9ec; --muted: #9aa3ad; --line: #2c3139;
+    --field: #22262d; --accent: #6b93f5; --accent-ink: #0e1116;
+    --ok: #4cc47a; --ok-bg: #173323; --warn: #e9a94b; --warn-bg: #3a2a12;
+    --bad: #f0646b; --bad-bg: #3e1b1e; --off: #6c747e; --off-bg: #262a31;
+    --c1: #6b93f5; --c2: #f0994b;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121418; --card: #1b1e24; --ink: #e7e9ec; --muted: #9aa3ad; --line: #2c3139;
+  --field: #22262d; --accent: #6b93f5; --accent-ink: #0e1116;
+  --ok: #4cc47a; --ok-bg: #173323; --warn: #e9a94b; --warn-bg: #3a2a12;
+  --bad: #f0646b; --bad-bg: #3e1b1e; --off: #6c747e; --off-bg: #262a31;
+  --c1: #6b93f5; --c2: #f0994b;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+[hidden] { display: none !important; }
+.topo { position: sticky; top: 0; z-index: 5; background: var(--card); border-bottom: 1px solid var(--line); }
+header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 20px; }
+.barra { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 8px 20px;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg); }
+.barra .grow { flex: 1; }
+.bval { display: grid; line-height: 1.2; }
+.bval .k { font-size: 11.5px; color: var(--muted); }
+.bval b { font-size: 16px; font-variant-numeric: tabular-nums; }
+nav.abas { display: flex; gap: 2px; padding: 0 14px; overflow-x: auto; }
+nav.abas button { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none;
+  padding: 10px 12px; color: var(--muted); font-weight: 600; }
+nav.abas button:hover { color: var(--ink); border-bottom-color: var(--line); }
+nav.abas button.on { color: var(--ink); border-bottom-color: var(--accent); }
+@media (max-width: 420px) { header, .barra { padding-left: 16px; padding-right: 16px; } nav.abas { padding: 0 8px; } }
+header h1 { font-size: 17px; margin: 0; font-weight: 650; }
+header .sub { color: var(--muted); font-size: 13px; }
+header .grow { flex: 1; }
+main { padding: 16px 20px 40px; display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); max-width: 1500px; margin: 0 auto; }
+@media (max-width: 420px) { main { padding: 12px 16px 32px; grid-template-columns: 1fr; } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+  margin: 0 0 12px; font-weight: 650; display: flex; align-items: center; gap: 8px; }
+.card h2 .grow { flex: 1; }
+.span2 { grid-column: 1 / -1; }
+@media (max-width: 800px) { .span2 { grid-column: auto; } }
+
+button { font: inherit; border: 1px solid var(--line); background: var(--field); color: var(--ink);
+  border-radius: 7px; padding: 7px 12px; cursor: pointer; white-space: nowrap; }
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button.pri { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+button.stop { background: var(--warn-bg); color: var(--warn); border-color: var(--warn); font-weight: 650; }
+button.emerg { background: var(--bad); color: #fff; border-color: var(--bad); font-weight: 700; }
+button.big { padding: 12px 16px; font-size: 15px; }
+button.jog { user-select: none; touch-action: none; -webkit-user-select: none; }
+button.jog.ativo { background: var(--accent); color: var(--accent-ink); }
+input, select { font: inherit; color: var(--ink); background: var(--field); border: 1px solid var(--line);
+  border-radius: 7px; padding: 6px 8px; min-width: 0; }
+input[type=number] { width: 100%; }
+input[type=range] { width: 100%; padding: 0; accent-color: var(--accent); }
+input:focus, select:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+label.f { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.hint { color: var(--muted); font-size: 12.5px; margin: 8px 0 0; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 99px;
+  font-size: 12.5px; font-weight: 600; background: var(--off-bg); color: var(--off); }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.ok { background: var(--ok-bg); color: var(--ok); }
+.chip.warn { background: var(--warn-bg); color: var(--warn); }
+.chip.bad { background: var(--bad-bg); color: var(--bad); }
+.chip.acc { background: var(--field); color: var(--accent); }
+
+.big-num { font-variant-numeric: tabular-nums; font-size: 30px; font-weight: 650; letter-spacing: -.01em; line-height: 1.1; }
+.num { font-variant-numeric: tabular-nums; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+.stat .k { color: var(--muted); font-size: 12px; }
+.stat .v { font-variant-numeric: tabular-nums; font-size: 19px; font-weight: 600; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; font-size: 13.5px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-variant-numeric: tabular-nums; }
+.flags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.sens { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.sen { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.sen .k { color: var(--muted); font-size: 12px; }
+.sen .v { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+
+#log { height: min(60vh, 520px); overflow: auto; font: 12.5px/1.5 ui-monospace, "Cascadia Mono", Consolas, monospace;
+  background: var(--field); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+#log div { white-space: pre-wrap; word-break: break-word; }
+#log .t { color: var(--muted); }
+#log .bad { color: var(--bad); }
+#log .ok { color: var(--ok); }
+#log .warn { color: var(--warn); }
+#log .raw { color: var(--muted); }
+
+canvas { width: 100%; height: 150px; display: block; }
+.legend { display: flex; gap: 14px; font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+
+#toasts { position: fixed; right: 16px; bottom: 16px; display: grid; gap: 8px; z-index: 20; max-width: min(420px, calc(100vw - 32px)); }
+.toast { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+  border-radius: 8px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+.toast.bad { border-left-color: var(--bad); }
+.toast.ok { border-left-color: var(--ok); }
+.toast.warn { border-left-color: var(--warn); }
+#aviso { display: none; margin: 16px 20px 0; padding: 12px 14px; border-radius: 8px;
+  background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn); }
+.off-when-disc { transition: opacity .2s; }
+body.desconectado .off-when-disc { opacity: .5; pointer-events: none; }
+body:not(.modo-dm):not(.modo-ambos) .so-dm, body.modo-dm .so-tmc { display: none !important; }
+.calgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.calgrid h3 { font-size: 14px; margin: 0 0 8px; }
+#calRes { margin: 14px 0 0; max-height: 240px; overflow: auto; white-space: pre-wrap; background: var(--field);
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font: 12.5px/1.5 ui-monospace, Consolas, monospace; }
+#calRes:empty { display: none; }
+body.rotina #btnCurso, body.rotina #btnPerda, body.rotina #btnVarV, body.rotina #btnVarA, body.rotina #btnMargem { opacity: .45; pointer-events: none; }
+table.leds { border-collapse: collapse; width: 100%; font-size: 13px; }
+table.leds td { padding: 5px 6px; border-top: 1px solid var(--line); vertical-align: top; }
+table.leds td:nth-child(2) { white-space: nowrap; font-weight: 600; }
+table.leds td:nth-child(3) { color: var(--muted); }
+i.led { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: var(--c);
+  box-shadow: 0 0 8px var(--c); }
+i.led[data-p="rapido"] { animation: pisca .2s steps(1) infinite; }
+i.led[data-p="lento"] { animation: pisca 1s steps(1) infinite; }
+i.led[data-p="meio"] { animation: pisca 2s steps(1) infinite; }
+i.led[data-p="curto"] { animation: curto 2s steps(1) infinite; }
+i.led[data-p="duplo"] { animation: duplo 1s steps(1) infinite; }
+i.led[data-p="resp"] { animation: resp 3s ease-in-out infinite; }
+@keyframes pisca { 50% { opacity: .08; } }
+@keyframes curto { 12% { opacity: .08; } }
+@keyframes duplo { 10% { opacity: .08; } 20% { opacity: 1; } 30% { opacity: .08; } 40% { opacity: 1; } 40.1% { opacity: .08; } }
+@keyframes resp { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { i.led { animation: none !important; } }
+.corrAviso { margin-top: 10px; padding: 8px 10px; border-radius: 8px; font-size: 13px; }
+.corrAviso.ok { background: var(--ok-bg); color: var(--ok); }
+.corrAviso.warn { background: var(--warn-bg); color: var(--warn); }
+.corrAviso.bad { background: var(--bad-bg); color: var(--bad); font-weight: 600; }
+kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--line); border-bottom-width: 2px;
+  border-radius: 4px; padding: 0 4px; background: var(--field); }
+</style>
+</head>
+<body class="desconectado">
+<div class="topo">
+<header>
+  <div>
+    <h1>Painel ScaraNode</h1>
+    <div class="sub">RP2040-Zero · TMC2209 ou DM556 · Web Serial</div>
+  </div>
+  <div class="grow"></div>
+  <label class="row" style="gap:6px"><span class="sub">Driver</span>
+    <select id="drvSel"><option value="tmc">TMC2209 (motor no J6)</option><option value="dm556">DM556 (pelo J4)</option><option value="ambos">Ambos (comparar)</option></select></label>
+  <span id="chipCon" class="chip">desconectado</span>
+  <span id="chipVM" class="chip">24 V</span>
+  <span id="chipTMC" class="chip so-tmc">TMC</span>
+  <span id="chipEN" class="chip">motor solto</span>
+  <button id="btnCon" class="pri">Conectar</button>
+</header>
+<div class="barra off-when-disc">
+  <div class="bval"><span class="k">posição</span><b id="barPos" class="num">—</b></div>
+  <div class="bval"><span class="k">velocidade</span><b class="num"><span id="barVel">—</span> rpm</b></div>
+  <span id="chipMov" class="chip">parado</span>
+  <span id="chipRot" class="chip warn" hidden>rotina rodando</span>
+  <div class="grow"></div>
+  <button id="btnParar" class="stop">Parar <kbd>Espaço</kbd></button>
+  <button id="btnEmerg" class="emerg">Emergência <kbd>Esc</kbd></button>
+</div>
+<nav class="abas" aria-label="Páginas">
+  <button data-aba="status">Status</button>
+  <button data-aba="mover">Mover</button>
+  <button data-aba="drivers">Drivers</button>
+  <button data-aba="sensores">Sensores</button>
+  <button data-aba="testes">Testes</button>
+  <button data-aba="registro">Registro</button>
+</nav>
+</div>
+<div id="aviso"></div>
+
+<!-- ================= STATUS ================= -->
+<main class="aba" id="aba-status">
+  <section class="card off-when-disc">
+    <h2>Posição</h2>
+    <div class="big-num" id="posPrinc">—</div>
+    <div class="hint" id="posUnid">voltas do motor</div>
+    <hr>
+    <div class="stats">
+      <div class="stat"><div class="k">passos</div><div class="v" id="posPassos">—</div></div>
+      <div class="stat"><div class="k">graus na saída</div><div class="v" id="posSaida">—</div></div>
+      <div class="stat"><div class="k">velocidade</div><div class="v"><span id="vel">—</span> <small>rpm</small></div></div>
+    </div>
+    <p class="hint" id="cursoInfo">Curso: não calibrado (página Testes).</p>
+  </section>
+
+  <section class="card off-when-disc">
+    <h2>Sensores da placa</h2>
+    <div class="sens">
+      <div class="sen"><div class="k">24 V (VSENSE, GP1)</div><div class="v" id="sVM">—</div></div>
+      <div class="sen"><div class="k">NTC (GP29)</div><div class="v" id="sNTC">—</div></div>
+      <div class="sen"><div class="k">FIM1 (GP27)</div><div class="v" id="sF1">—</div></div>
+      <div class="sen"><div class="k">FIM2 (GP15)</div><div class="v" id="sF2">—</div></div>
+      <div class="sen"><div class="k">RP2040 (interno)</div><div class="v" id="sRP">—</div></div>
+      <div class="sen so-tmc"><div class="k">UART por VACTUAL</div><div class="v" id="sVact">—</div></div>
+    </div>
+  </section>
+
+  <section class="card off-when-disc so-tmc">
+    <h2>TMC2209: diagnóstico <span class="grow"></span><span id="chipModo" class="chip">—</span></h2>
+    <dl class="kv">
+      <dt>Endereço / versão</dt><dd id="tAddr">—</dd>
+      <dt>Corrente real</dt><dd id="tCorr">—</dd>
+      <dt>Escala atual (CS)</dt><dd id="tCS">—</dd>
+      <dt>Carga (StallGuard)</dt><dd id="tSG">—</dd>
+      <dt>Velocidade medida</dt><dd id="tTstep">—</dd>
+      <dt>Pinos vistos pelo TMC</dt><dd id="tIoin">—</dd>
+    </dl>
+    <div class="flags" id="flags" style="margin-top:12px"></div>
+    <p class="hint">"Fase aberta" só vale com o motor girando devagar. Carga (StallGuard) só é medida em stealthChop, girando.</p>
+  </section>
+
+  <section class="card off-when-disc">
+    <h2>Últimos 30 s</h2>
+    <canvas id="graf" width="600" height="150"></canvas>
+    <div class="legend"><span><i style="background:var(--c1)"></i>velocidade (rpm)</span><span class="so-tmc"><i style="background:var(--c2)"></i>carga StallGuard (0–510)</span></div>
+  </section>
+
+  <section class="card">
+    <h2>LED da placa (RP2040-Zero)</h2>
+    <table class="leds">
+      <tr><td><i class="led" style="--c:#ff2020" data-p="rapido"></i></td><td>vermelho piscando rápido</td><td>erro: emergência, 24 V caiu, TMC superaqueceu ou curto (6 s; na falha do TMC até reconfigurar)</td></tr>
+      <tr><td><i class="led" style="--c:#ff30ff" data-p="duplo"></i></td><td>magenta, 2 piscadas</td><td>parou por fim de curso ou travamento (StallGuard)</td></tr>
+      <tr><td><i class="led" style="--c:#ff7a00" data-p="lento"></i></td><td>laranja piscando</td><td>TMC acima de 120 °C (corrente já reduzida)</td></tr>
+      <tr><td><i class="led" style="--c:#ffb000" data-p="curto"></i></td><td>amarelo, piscada curta</td><td>sem 24 V no J5 (modo TMC ou Ambos)</td></tr>
+      <tr><td><i class="led" style="--c:#ff2020" data-p="meio"></i></td><td>vermelho lento</td><td>tem 24 V, mas o TMC não responde pelo UART</td></tr>
+      <tr><td><i class="led" style="--c:#00aaff"></i></td><td>ciano</td><td>girando (amarelo fixo: desacelerando)</td></tr>
+      <tr><td><i class="led" style="--c:#20e020"></i></td><td>verde</td><td>parado e energizado</td></tr>
+      <tr><td><i class="led" style="--c:#b0b0b0"></i></td><td>branco</td><td>pronto, motor solto</td></tr>
+      <tr><td><i class="led" style="--c:#2060ff" data-p="resp"></i></td><td>azul "respirando"</td><td>sem painel conectado há mais de 3 s</td></tr>
+      <tr><td><i class="led" style="--c:#8a2be2"></i></td><td>roxo</td><td>firmware parado (mpremote/REPL)</td></tr>
+    </table>
+  </section>
+</main>
+
+<!-- ================= MOVER ================= -->
+<main class="aba" id="aba-mover" hidden>
+  <section class="card off-when-disc">
+    <h2>Movimento</h2>
+    <div class="grid2">
+      <label class="f">Velocidade (rpm do motor)
+        <input id="rpm" type="number" min="1" max="1800" step="1" value="60"></label>
+      <label class="f">Aceleração (voltas/s²)
+        <input id="acel" type="number" min="0.1" max="200" step="0.5" value="4"></label>
+    </div>
+    <input id="rpmR" type="range" min="1" max="1200" value="60" style="margin-top:8px">
+    <label class="f" style="margin-top:10px">Rampa
+      <select id="rampa">
+        <option value="0">trapezoidal: aceleração constante (igual ao Klipper)</option>
+        <option value="1">S: aceleração sobe e desce suave, sem tranco (~57% mais longa)</option>
+      </select></label>
+    <hr>
+    <div class="grid2">
+      <label class="f">Distância
+        <input id="dist" type="number" step="any" value="1"></label>
+      <label class="f">Unidade
+        <select id="unid">
+          <option value="volta">voltas do motor</option>
+          <option value="grau">graus na saída</option>
+          <option value="passo">passos</option>
+        </select></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="btnMenos" style="flex:1">◀ Mover −</button>
+      <button id="btnMais" class="pri" style="flex:1">Mover + ▶</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <input id="alvo" type="number" step="any" value="0" style="flex:1" aria-label="Posição alvo">
+      <button id="btnIr">Ir para posição</button>
+    </div>
+    <hr>
+    <div class="row">
+      <button id="jogMenos" class="jog big" style="flex:1">◀◀ segurar</button>
+      <button id="jogMais" class="jog big" style="flex:1">segurar ▶▶</button>
+    </div>
+    <p class="hint">Jog: o motor gira enquanto o botão estiver pressionado, na velocidade acima. Parar e Emergência ficam no topo, em todas as páginas.</p>
+  </section>
+
+  <section class="card off-when-disc">
+    <h2>Motor</h2>
+    <div class="row">
+      <button id="btnEN">Energizar</button>
+      <button id="btnZero">Zerar posição</button>
+    </div>
+    <p class="hint">Mover com o motor solto energiza automaticamente.</p>
+    <label class="row" style="margin-top:10px; font-size:13px"><input type="checkbox" id="segura"> Emergência mantém o motor energizado (eixo Z ou carga que cai sozinha)</label>
+    <p class="hint">Parar desacelera com rampa. Emergência corta os passos na hora e, sem a opção acima, solta o motor.</p>
+    <div class="so-tmc">
+      <hr>
+      <h2 style="margin-bottom:8px">Girar pelo UART (VACTUAL)</h2>
+      <div class="row">
+        <input id="vactRpm" type="number" value="60" step="1" style="width:110px" aria-label="rpm VACTUAL"> <span class="hint" style="margin:0">rpm (negativo inverte)</span>
+        <button id="btnVact">Girar</button>
+        <button id="btnVactStop">Parar</button>
+      </div>
+      <p class="hint">Gerador interno do TMC, sem usar o pino STEP: serve para isolar problema de fiação. Não tem rampa e não conta a posição.</p>
+    </div>
+  </section>
+</main>
+
+<!-- ================= DRIVERS ================= -->
+<main class="aba" id="aba-drivers" hidden>
+  <section class="card off-when-disc so-tmc">
+    <h2>TMC2209</h2>
+    <div class="grid2">
+      <label class="f">Corrente rodando (RMS): <b class="num" id="runV">0,80 A</b>
+        <input id="run" type="range" min="0.1" max="1.4" step="0.05" value="0.8"></label>
+      <label class="f">Corrente parado (RMS): <b class="num" id="holdV">0,40 A</b>
+        <input id="hold" type="range" min="0" max="1.4" step="0.05" value="0.4"></label>
+      <label class="f">Micropassos
+        <select id="micro">
+          <option>1</option><option>2</option><option>4</option><option>8</option>
+          <option selected>16</option><option>32</option><option>64</option><option>128</option><option>256</option>
+        </select></label>
+      <label class="f">Modo do chopper
+        <select id="modo">
+          <option value="stealth">stealthChop (silencioso)</option>
+          <option value="spread">spreadCycle (mais torque)</option>
+          <option value="auto">automático (troca pela velocidade)</option>
+        </select></label>
+      <label class="f" id="vthrBox">Troca para spreadCycle acima de (rpm)
+        <input id="vthr" type="number" min="1" step="1" value="200"></label>
+      <label class="f">Interpolação para 256
+        <select id="intpol"><option value="1">ligada</option><option value="0">desligada</option></select></label>
+      <label class="f">Atraso para reduzir a corrente (0–15)
+        <input id="hdelay" type="number" min="0" max="15" value="8"></label>
+      <label class="f">Tempo parado até reduzir (0–255 × 21 ms)
+        <input id="tpd" type="number" min="0" max="255" value="20"></label>
+    </div>
+    <div id="corrAviso" class="corrAviso"></div>
+    <div class="grid2" style="margin-top:10px; align-items:end">
+      <label class="f">Corrente do motor na etiqueta (A/fase)<input id="motorI" type="number" min="0.1" step="0.05" value="1.7"></label>
+      <button id="btnCorrIdeal">Usar a corrente recomendada</button>
+    </div>
+    <p class="hint" id="corrIdeal"></p>
+    <div class="row" style="margin-top:12px">
+      <button id="btnCfg" class="pri">Aplicar no driver</button>
+      <span class="hint" id="cfgRes" style="margin:0"></span>
+    </div>
+    <p class="hint">O firmware limita a 1,4 A RMS e, acima de 120 °C no chip, baixa a corrente para 60% sozinho; em superaquecimento ou curto corta tudo. O trimpot do módulo é ignorado com o UART ativo.</p>
+    <hr>
+    <h2 style="margin-bottom:8px">Mecânica do motor no TMC</h2>
+    <div class="grid2">
+      <label class="f">Passos por volta do motor
+        <select id="fullsteps"><option value="200">200 (1,8°)</option><option value="400">400 (0,9°)</option></select></label>
+      <label class="f">Redução (voltas do motor por volta da saída)
+        <input id="red" type="number" min="0.001" step="any" value="1"></label>
+      <label class="f">Sentido
+        <select id="tmcInvDir"><option value="0">normal</option><option value="1">invertido</option></select></label>
+    </div>
+    <p class="hint">J2 do SCARA: planetária 6:1 × correia 4:1 = 24. Fica salvo neste navegador.</p>
+    <hr>
+    <h2 style="margin-bottom:8px">Parar por travamento (StallGuard)</h2>
+    <div class="grid2">
+      <label class="f">Detecção
+        <select id="sgOn"><option value="0">desligada (só mede)</option><option value="1">ligada: para o motor</option></select></label>
+      <label class="f">Travado se SG abaixo de (0–510)
+        <input id="sgLim" type="number" min="0" max="510" step="1" value="50"></label>
+      <label class="f">Só acima de (rpm)
+        <input id="sgVmin" type="number" min="1" step="1" value="60"></label>
+      <label class="f">Leituras baixas seguidas
+        <input id="sgN" type="number" min="1" max="20" step="1" value="2"></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="btnSg">Aplicar</button>
+      <span class="hint" style="margin:0">Menor SG no último movimento: <b class="num" id="sgMin">—</b></span>
+    </div>
+    <p class="hint">Calibrar: gire livre na velocidade de uso e anote o menor SG. Repita segurando o eixo (pano ou luva) até quase travar. Ponha o limite entre os dois. Só funciona em stealthChop; no modo automático, só abaixo da rpm de troca. Uma leitura a cada ~2 ms pelo UART.</p>
+  </section>
+
+  <section class="card off-when-disc so-dm">
+    <h2>DM556 (externo, pelo J4)</h2>
+    <div class="grid2">
+      <label class="f">Pulsos por volta (chaves SW5–SW8)
+        <input id="dmPpr" type="number" min="200" step="200" value="3200"></label>
+      <label class="f">Redução (voltas do motor por volta da saída)
+        <input id="dmRed" type="number" min="0.001" step="any" value="1"></label>
+      <label class="f">Pulso do STEP
+        <select id="dmInvStep"><option value="1">ativo baixo (!gpio6, padrão)</option><option value="0">ativo alto</option></select></label>
+      <label class="f">Sentido
+        <select id="dmInvDir"><option value="0">normal</option><option value="1">invertido</option></select></label>
+    </div>
+    <div class="row" style="margin-top:12px"><button id="btnDM" class="pri">Aplicar</button></div>
+    <p class="hint" id="ambosAviso" style="display:none; color: var(--warn)"></p>
+    <p class="hint">Use o mesmo número de pulsos por volta das chaves do DM556 (tabela na lateral do driver). J1 do SCARA: 260:20 = redução 13.</p>
+    <hr>
+    <dl class="kv">
+      <dt>J4 pino 1 (5 V)</dt><dd>PUL+, DIR+ e ENA+</dd>
+      <dt>J4 pino 2</dt><dd>PUL−</dd>
+      <dt>J4 pino 3</dt><dd>DIR−</dd>
+      <dt>J4 pino 4</dt><dd>ENA− (GP8 alto = motor energizado)</dd>
+    </dl>
+    <p class="hint">A placa não recebe nada de volta do DM556 (nem alarme, nem corrente): se o LED vermelho do driver acender, é falha. Neste modo o TMC fica desabilitado; no modo TMC, o DM556 fica solto (GP8 baixo).</p>
+  </section>
+</main>
+
+<!-- ================= SENSORES ================= -->
+<main class="aba" id="aba-sensores" hidden>
+  <section class="card off-when-disc">
+    <h2>Fins de curso</h2>
+    <div class="row" style="gap:18px; margin-bottom:12px">
+      <span>FIM1 agora: <span id="sF1b">—</span></span>
+      <span>FIM2 agora: <span id="sF2b">—</span></span>
+    </div>
+    <div class="grid2">
+      <label class="f">FIM1
+        <select id="f1"><option value="0">só mostrar</option><option value="-1">bloqueia sentido −</option><option value="1">bloqueia sentido +</option><option value="2">bloqueia os dois</option></select></label>
+      <label class="f">FIM2
+        <select id="f2"><option value="0">só mostrar</option><option value="-1">bloqueia sentido −</option><option value="1">bloqueia sentido +</option><option value="2">bloqueia os dois</option></select></label>
+      <label class="f">Tipo de chave
+        <select id="inv"><option value="0">NA (fecha para o GND)</option><option value="1">NF (abre quando aciona)</option></select></label>
+    </div>
+    <p class="hint">Com "bloqueia", a chave acionada para o motor na hora e impede mover naquele sentido; o outro sentido continua livre. "Calibrar curso" (página Testes) configura isso sozinho.</p>
+  </section>
+
+  <section class="card off-when-disc">
+    <h2>NTC</h2>
+    <div class="grid2">
+      <label class="f">R a 25 °C (Ω)<input id="r25" type="number" value="100000" step="1000"></label>
+      <label class="f">Beta<input id="beta" type="number" value="3950" step="1"></label>
+    </div>
+    <p class="hint">Pull-up de 100k na placa (R3). Com o conector vazio aparece "desligado"; um valor fixo que não muda com a temperatura indica o R3 aberto.</p>
+    <div class="row" style="margin-top:12px"><button id="btnFim" class="pri">Aplicar fins de curso e NTC</button></div>
+  </section>
+</main>
+
+<!-- ================= TESTES ================= -->
+<main class="aba" id="aba-testes" hidden>
+  <section class="card off-when-disc span2">
+    <h2>Testes e calibração <span class="grow"></span><button id="btnCancelar" class="stop">Cancelar rotina</button></h2>
+    <div class="calgrid">
+      <div>
+        <h3>1. Curso pelos fins de curso</h3>
+        <div class="grid2">
+          <label class="f">Busca (rpm)<input id="cBusca" type="number" min="1" value="60"></label>
+          <label class="f">Aproximação lenta (rpm)<input id="cFina" type="number" min="1" value="10"></label>
+          <label class="f">Recuo da chave (voltas do motor)<input id="cRecuo" type="number" min="0.05" step="0.05" value="0.5"></label>
+          <label class="f">mm por volta do motor (TR8x8 direto = 8; 0 = sem mm)<input id="cMm" type="number" min="0" step="any" value="0"></label>
+        </div>
+        <div class="row" style="margin-top:10px"><button id="btnCurso" class="pri">Calibrar curso</button></div>
+        <p class="hint">Descobre qual FIM fica em cada ponta, zera no lado − com aproximação lenta e mede até o lado +. No fim deixa os fins de curso bloqueando e o eixo no meio. Dá para simular dando curto nos fios da chave.</p>
+      </div>
+
+      <div>
+        <h3>2. Perda de passo (qualquer driver e modo)</h3>
+        <div class="grid2">
+          <label class="f" style="grid-column: 1 / -1">Teste
+            <select id="pModo">
+              <option value="unico">único: rpm e aceleração da página Mover</option>
+              <option value="vel">varrer velocidade</option>
+              <option value="acel">varrer aceleração (rpm da página Mover)</option>
+            </select></label>
+          <label class="f">Idas e voltas por nível<input id="pCiclos" type="number" min="1" max="100" value="5"></label>
+          <label class="f" style="grid-column: 1 / -1">Velocidade de / degrau / até (rpm)
+            <span class="grid3"><input id="pIni" type="number" min="1" value="100"><input id="pPasso" type="number" min="1" value="50"><input id="pMax" type="number" min="1" value="800"></span></label>
+          <label class="f" style="grid-column: 1 / -1">Aceleração de / até (voltas/s², ×1,5 por nível)
+            <span class="grid2"><input id="pAIni" type="number" min="0.1" step="any" value="2"><input id="pAMax" type="number" min="0.1" step="any" value="80"></span></label>
+          <label class="f">Distância por ida (voltas do motor; limitada ao curso)<input id="pDist" type="number" min="0.1" step="any" value="10"></label>
+          <label class="f">Tolerância (passos inteiros)<input id="pTol" type="number" min="0" step="any" value="1"></label>
+        </div>
+        <div class="row" style="margin-top:10px"><button id="btnPerda" class="pri">Testar perda de passo</button></div>
+        <p class="hint">Zera no fim de curso do lado − (aproximação lenta), faz as idas e voltas e volta devagar até a chave: se ela acionar no mesmo passo do zero (dentro da tolerância), não perdeu passo. Mede perda real, então vale para spreadCycle e para o DM556. Precisa do curso calibrado e de uma chave acionada pelo eixo de verdade (não dá para simular com a mão).</p>
+      </div>
+
+      <div class="so-tmc">
+        <h3>3. Velocidade e aceleração pelo StallGuard (TMC)</h3>
+        <div class="grid2">
+          <label class="f">Começa em (rpm)<input id="vIni" type="number" min="1" value="60"></label>
+          <label class="f">Degrau (rpm)<input id="vPasso" type="number" min="1" value="30"></label>
+          <label class="f">Até (rpm)<input id="vMax" type="number" min="1" value="600"></label>
+          <label class="f">SG mínimo aceito (margem)<input id="vMarg" type="number" min="1" max="510" value="100"></label>
+          <label class="f">Aceleração de (voltas/s²)<input id="aIni" type="number" min="0.1" step="any" value="2"></label>
+          <label class="f">até (voltas/s²)<input id="aMax" type="number" min="0.1" step="any" value="80"></label>
+          <label class="f">Rotação da varredura de aceleração (vazio = 80% da máxima)<input id="aRpm" type="number" min="1" placeholder="auto"></label>
+        </div>
+        <div class="row" style="margin-top:10px"><button id="btnVarV">Varrer velocidade</button><button id="btnVarA">Varrer aceleração</button></div>
+        <p class="hint">Rápido e sem fim de curso, mas só em stealthChop: no spreadCycle os limites reais costumam ser maiores (use o teste 2 para medir). Alterna o sentido a cada degrau; use com o motor solto ou com curso sobrando.</p>
+      </div>
+
+      <div class="so-tmc">
+        <h3>4. Margem de torque (TMC)</h3>
+        <div class="grid2">
+          <label class="f">Rotação do teste (rpm)<input id="mRpm" type="number" min="1" value="120"></label>
+        </div>
+        <div class="row" style="margin-top:10px"><button id="btnMargem">Medir margem</button></div>
+        <p class="hint">Com a carga real acoplada, gira na rotação escolhida e baixa a corrente de 0,05 em 0,05 A até o StallGuard indicar travamento. Margem = corrente configurada ÷ corrente em que travou (2× = a carga usa metade do torque). No fim volta a corrente.</p>
+      </div>
+    </div>
+    <pre id="calRes"></pre>
+  </section>
+</main>
+
+<!-- ================= REGISTRO ================= -->
+<main class="aba" id="aba-registro" hidden>
+  <section class="card span2">
+    <h2>Firmware da placa</h2>
+    <div class="row">
+      <span>Na placa: <b id="fwPlaca">—</b></span>
+      <span>No site: <b id="fwSite">carregando…</b></span>
+      <span id="chipFw" class="chip" hidden></span>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label class="row" style="gap:6px">Revisão da placa
+        <select id="fwRev">
+          <option value="v17">v14–v17 · STEP/DIR compartilhados, UART no GP5</option>
+          <option value="v18">v18 · TMC e DM556 independentes, UART no GP2</option>
+        </select></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="btnFwSite" class="pri" disabled>Gravar firmware do site</button>
+      <button id="btnFwArq">Gravar arquivos do computador…</button>
+      <input id="fwArq" type="file" accept=".py" multiple hidden>
+      <progress id="fwProg" max="1" value="0" hidden style="flex:1; min-width:120px"></progress>
+    </div>
+    <p class="hint">A revisão escolhida vai num placa.py (REV = "v17") e decide os pinos que o no.py usa; errar a revisão
+      manda os passos para os pinos errados. O modo Ambos só existe até a v17.</p>
+    <p class="hint">Solta o motor, para o firmware e grava main.py, no.py e placa.py pela USB (raw REPL, como o mpremote).
+      Cada arquivo vai para um .tmp e só substitui o antigo depois de conferido (tamanho e SHA-256); se algo falhar
+      no meio, a placa continua com o firmware anterior. Funciona também com a placa sem o firmware do painel,
+      desde que tenha MicroPython.</p>
+  </section>
+  <section class="card span2">
+    <h2>Registro <span class="grow"></span><button id="btnLimpa">Limpar</button></h2>
+    <div id="log" aria-live="polite"></div>
+    <div class="row" style="margin-top:10px">
+      <input id="raw" style="flex:1; font-family: ui-monospace, Consolas, monospace" placeholder='{"c":"reg","r":108}  → comando JSON direto para a placa'>
+      <button id="btnRaw">Enviar</button>
+    </div>
+  </section>
+</main>
+<div id="toasts"></div>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const fmt = (x, d = 2) => Number(x).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+// ---------- preferências locais ----------
+const PREF_KEY = "scaranode-painel";
+const pref = Object.assign({ fullsteps: 200, red: 1, unid: "volta", rpm: 60, acel: 4, r25: 100000, beta: 3950,
+  drv: "tmc", tmcInvDir: false, placa: "v17", dmPpr: 3200, dmRed: 1, dmInvStep: true, dmInvDir: false,
+  sgOn: false, sgLim: 50, sgVmin: 60, sgN: 2, segura: false, cMm: 0, rampa: false, motorI: 1.7 },
+  (() => { try { return JSON.parse(localStorage.getItem(PREF_KEY)) || {}; } catch (e) { return {}; } })());
+if (!pref.ntcFix) { pref.r25 = 100000; pref.ntcFix = 1; }   // o padrão antigo (10k) estava errado
+function salvaPref() { try { localStorage.setItem(PREF_KEY, JSON.stringify(pref)); } catch (e) {} }
+$("#fullsteps").value = pref.fullsteps; $("#red").value = pref.red; $("#unid").value = pref.unid;
+$("#rpm").value = pref.rpm; $("#rpmR").value = Math.min(1200, pref.rpm); $("#acel").value = pref.acel;
+$("#r25").value = pref.r25; $("#beta").value = pref.beta;
+$("#drvSel").value = pref.drv; $("#tmcInvDir").value = pref.tmcInvDir ? "1" : "0";
+$("#dmPpr").value = pref.dmPpr; $("#dmRed").value = pref.dmRed;
+$("#dmInvStep").value = pref.dmInvStep ? "1" : "0"; $("#dmInvDir").value = pref.dmInvDir ? "1" : "0";
+$("#segura").checked = !!pref.segura; $("#cMm").value = pref.cMm;
+$("#rampa").value = pref.rampa ? "1" : "0"; $("#motorI").value = pref.motorI;
+$("#sgOn").value = pref.sgOn ? "1" : "0"; $("#sgLim").value = pref.sgLim; $("#sgVmin").value = pref.sgVmin; $("#sgN").value = pref.sgN;
+const ehDM = () => pref.drv === "dm556";
+const usaDM = () => pref.drv !== "tmc";                            // DM556 ou ambos
+function aplicaModo() {
+  document.body.classList.toggle("modo-dm", ehDM());
+  document.body.classList.toggle("modo-ambos", pref.drv === "ambos");
+  $("#drvSel").value = pref.drv; hist.length = 0;
+  avisoAmbos();
+}
+function avisoAmbos() {
+  const el = document.getElementById("ambosAviso");
+  if (!el) return;
+  const tmcPpr = pref.fullsteps * micro;
+  el.textContent = pref.drv !== "ambos" ? "" : (pref.dmPpr === tmcPpr
+    ? "Comparando: os dois recebem os mesmos pulsos, " + tmcPpr + " por volta nos dois."
+    : "Atenção: o TMC está em " + tmcPpr + " pulsos/volta e o DM556 em " + pref.dmPpr + ". Iguale para os dois motores darem a mesma volta.");
+  el.style.display = el.textContent ? "" : "none";
+}
+
+let micro = 16;
+const spr = () => ehDM() ? pref.dmPpr : pref.fullsteps * micro;   // passos por volta do motor
+const red = () => ehDM() ? pref.dmRed : pref.red;                  // voltas do motor por volta da saída
+function paraPassos(v, u) {
+  if (u === "volta") return v * spr();
+  if (u === "grau") return v / 360 * red() * spr();
+  return v;
+}
+const vPassos = () => Math.max(0.1, +$("#rpm").value) / 60 * spr();
+const aPassos = () => Math.max(0.01, +$("#acel").value) * spr();
+
+// ---------- registro e avisos ----------
+function log(msg, cls = "") {
+  const el = $("#log"), d = document.createElement("div");
+  const t = new Date().toLocaleTimeString("pt-BR");
+  d.innerHTML = `<span class="t">${t}</span> `;
+  const s = document.createElement("span"); s.className = cls; s.textContent = msg; d.appendChild(s);
+  const fim = el.scrollTop + el.clientHeight >= el.scrollHeight - 4;
+  el.appendChild(d);
+  while (el.childElementCount > 400) el.firstChild.remove();
+  if (fim) el.scrollTop = el.scrollHeight;
+}
+function toast(msg, cls = "") {
+  const t = document.createElement("div"); t.className = "toast " + cls; t.textContent = msg;
+  $("#toasts").appendChild(t); setTimeout(() => t.remove(), 4500);
+}
+function aviso(msg) { const a = $("#aviso"); a.textContent = msg || ""; a.style.display = msg ? "block" : "none"; }
+function chip(el, txt, cls) { el.textContent = txt; el.className = "chip " + (cls || ""); }
+
+// ---------- Web Serial ----------
+let port = null, reader = null, writer = null, conectado = false, pollTimer = null;
+let pend = new Map(), nextId = 1, stPend = false, falhas = 0;
+const enc = new TextEncoder();
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function escrever(s) { if (writer) await writer.write(enc.encode(s)); }
+
+function cmd(o, timeout = 1500) {
+  if (!conectado) return Promise.reject(new Error("não conectado"));
+  const id = nextId++;
+  o = Object.assign({}, o, { id });
+  return new Promise((res, rej) => {
+    const t = setTimeout(() => { pend.delete(id); rej(new Error("sem resposta da placa (" + o.c + ")")); }, timeout);
+    pend.set(id, m => { clearTimeout(t); pend.delete(id); m.ok ? res(m) : rej(new Error(m.erro || "erro")); });
+    escrever(JSON.stringify(o) + "\n").catch(e => { clearTimeout(t); pend.delete(id); rej(e); });
+  });
+}
+async function acao(o, timeout = 2500, silencio = false) {
+  try { const r = await cmd(o, timeout); if (!silencio) log("→ " + o.c + " ok", "ok"); return r; }
+  catch (e) { log("→ " + o.c + ": " + e.message, "bad"); toast(e.message, "bad"); return null; }
+}
+
+function linha(l) {
+  if (l[0] === "{") {
+    let m; try { m = JSON.parse(l); } catch (e) { log(l, "raw"); return; }
+    if (m.id != null && pend.has(m.id)) { pend.get(m.id)(m); return; }
+    if (m.ev) { m.ev.forEach(e => log("placa: " + e, "warn")); return; }
+    log(l, "raw"); return;
+  }
+  log(l, "raw");
+}
+
+async function lerLoop() {
+  const dec = new TextDecoder();
+  let buf = "";
+  reader = port.readable.getReader();
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      if (rawSink) { rawSink(buf); buf = ""; continue; }     // gravando firmware: bytes crus para o raw REPL
+      let i;
+      while ((i = buf.indexOf("\n")) >= 0) {
+        const l = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+        if (l) linha(l);
+      }
+    }
+  } catch (e) {
+    if (conectado) { log("conexão perdida: " + e.message, "bad"); toast("Conexão com a placa perdida", "bad"); }
+  } finally {
+    try { reader.releaseLock(); } catch (e) {}
+    if (conectado) desconectar();
+  }
+}
+
+async function conectar() {
+  if (!("serial" in navigator)) {
+    aviso("Este navegador não tem Web Serial. Abra esta página no Chrome ou no Edge (computador).");
+    return;
+  }
+  try {
+    port = await navigator.serial.requestPort({ filters: [{ usbVendorId: 0x2E8A }] });
+    await abrePorta();
+    await iniciaPainel();
+  } catch (e) {
+    if (e.name !== "NotFoundError") { log(e.message, "bad"); aviso(e.message); }
+    await desconectar();
+  }
+}
+
+async function abrePorta() {
+  await port.open({ baudRate: 115200 });
+  try { await port.setSignals({ dataTerminalReady: true, requestToSend: true }); } catch (e) {}
+  writer = port.writable.getWriter();
+  lerLoop();
+}
+
+// Porta já aberta: conversa com o no.py e sobe o painel (lança erro se a placa não responder).
+async function iniciaPainel() {
+  conectado = true;
+  chip($("#chipCon"), "conectando…", "warn");
+  let r = await cmd({ c: "info" }, 800).catch(() => null);
+  if (!r) {
+    log("o firmware do painel não respondeu; reiniciando o MicroPython…", "warn");
+    await escrever("\x03\x03"); await sleep(300); await escrever("\x04"); await sleep(2500);
+    r = await cmd({ c: "info" }, 1500).catch(() => null);
+  }
+  if (!r) throw new Error("A placa não respondeu. Confira se nenhum outro programa (mpremote, Thonny) está usando a porta; " +
+    "se a placa ainda não tem o firmware do painel, grave-o em Registro › Firmware da placa.");
+  aplicaInfo(r);
+  await enviaSensores(true);
+  await enviaDriver(true);
+  await enviaSg(true);
+  await acao({ c: "rampa", s: !!pref.rampa }, 2500, true);
+  if (pref.tmcInvDir) await acao({ c: "cfg", shaft: true }, 4000, true);
+  document.body.classList.remove("desconectado");
+  chip($("#chipCon"), "conectado", "ok");
+  $("#btnCon").textContent = "Desconectar"; $("#btnCon").classList.remove("pri");
+  aviso("");
+  log("conectado · firmware " + r.fw, "ok");
+  falhas = 0;
+  pollTimer = setInterval(tickStatus, 250);
+  fwPlaca = r.fw; revPlaca = r.placa || null; comparaFw(true);
+}
+
+// Painel conectado → para de conversar com o no.py, mas mantém a porta aberta (para gravar o firmware).
+function pausaPainel() {
+  conectado = false;
+  clearInterval(pollTimer); pollTimer = null; stPend = false;
+  pend.forEach(f => f({ ok: 0, erro: "gravando firmware" })); pend.clear();
+  document.body.classList.add("desconectado");
+  chip($("#chipCon"), "gravando firmware", "warn");
+}
+
+async function desconectar() {
+  const estava = conectado;
+  conectado = false;
+  clearInterval(pollTimer); pollTimer = null; stPend = false;
+  pend.forEach(f => f({ ok: 0, erro: "desconectado" })); pend.clear();
+  try { if (reader) await reader.cancel(); } catch (e) {}
+  try { if (writer) { writer.releaseLock(); } } catch (e) {}
+  try { if (port) await port.close(); } catch (e) {}
+  reader = writer = port = null;
+  document.body.classList.add("desconectado");
+  chip($("#chipCon"), "desconectado"); chip($("#chipVM"), "24 V"); chip($("#chipTMC"), "TMC"); chip($("#chipEN"), "motor solto");
+  $("#btnCon").textContent = "Conectar"; $("#btnCon").classList.add("pri");
+  if (estava) log("desconectado");
+}
+
+// ---------- gravação do firmware (raw REPL, como o mpremote) ----------
+const FW_ARQS = ["main.py", "no.py"];          // servidos ao lado desta página no site
+let fwSite = null, fwPlaca = null, revPlaca = null, gravando = false;
+const REVS = { v17: "v14–v17", v18: "v18" };
+let rawSink = null, rx = "", rxAviso = null;
+
+function rxEspera(teste, ms, oque) {
+  return new Promise((res, rej) => {
+    const t = setTimeout(() => { rxAviso = null; rej(new Error("a placa não respondeu (" + oque + ")")); }, ms);
+    rxAviso = () => { const r = teste(rx); if (r != null) { clearTimeout(t); rxAviso = null; res(r); } };
+    rxAviso();
+  });
+}
+async function rawEntra() {
+  for (let i = 0; i < 3; i++) {
+    await escrever("\r\x03"); await sleep(400 + 300 * i);   // um Ctrl+C por vez: um 2º interromperia o finally do no.py, que solta o motor
+    rx = ""; await escrever("\x01");
+    const ok = await rxEspera(s => /raw REPL; CTRL-B to exit\r?\n>/.test(s) || null, 1500, "raw REPL").catch(() => false);
+    if (ok) return;
+  }
+  throw new Error("a placa não entrou no raw REPL");
+}
+// Executa código no raw REPL; devolve o que ele imprimiu, lança erro com a última linha do traceback.
+async function rawExec(code, ms = 5000) {
+  if (!writer) throw new Error("porta fechada");
+  rx = "";
+  const b = enc.encode(code);
+  for (let i = 0; i < b.length; i += 256) await writer.write(b.subarray(i, i + 256));
+  await escrever("\x04");
+  const [out, err] = await rxEspera(s => {
+    const k = s.indexOf("OK"); if (k < 0) return null;
+    const p = s.slice(k + 2).split("\x04");                 // saída \x04 erro \x04 >
+    return p.length >= 3 && p[2].includes(">") ? [p[0], p[1]] : null;
+  }, ms, "executar");
+  if (err.trim()) throw new Error("placa: " + err.trim().split("\n").pop());
+  return out;
+}
+async function sha256hex(d) {
+  if (!(window.crypto && crypto.subtle)) return null;
+  const h = new Uint8Array(await crypto.subtle.digest("SHA-256", d));
+  return Array.from(h, x => x.toString(16).padStart(2, "0")).join("");
+}
+function b64(u8) { let s = ""; for (let i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return btoa(s); }
+const fwVersao = dados => { const m = new TextDecoder().decode(dados).match(/^FW\s*=\s*"([^"]+)"/m); return m ? m[1] : null; };
+
+// Na placa: imprime "tamanho sha256" do arquivo (sha256 "-" se o MicroPython não tiver hashlib).
+const RAW_INI = `import os,binascii
+d=binascii.a2b_base64
+def _h(n):
+ try:
+  import hashlib
+  h=hashlib.sha256();f=open(n,'rb')
+  while 1:
+   c=f.read(1024)
+   if not c:break
+   h.update(c)
+  f.close();x=binascii.hexlify(h.digest()).decode()
+ except ImportError:
+  x='-'
+ print(os.stat(n)[6],x)
+`;
+
+async function gravaFirmware(arqs, origem) {
+  if (gravando) return;
+  if (!("serial" in navigator)) { aviso("Este navegador não tem Web Serial. Abra esta página no Chrome ou no Edge (computador)."); return; }
+  const rev = pref.placa;
+  if (!arqs.some(a => a.nome === "placa.py")) arqs = [...arqs, { nome: "placa.py", dados: enc.encode(`REV = "${rev}"\n`) }];
+  const outra = revPlaca && revPlaca !== rev
+    ? `\n\n⚠ A placa conectada diz ser ${REVS[revPlaca] || revPlaca} e você escolheu ${REVS[rev]}. Com a revisão errada os passos saem nos pinos errados.` : "";
+  if (!confirm(`Gravar ${arqs.map(a => a.nome).join(", ")} na placa (${origem}, placa ${REVS[rev]})?\n\n` +
+               "O motor é solto, o firmware atual para e a placa reinicia no fim." + outra)) return;
+  if (!conectado && !port) {
+    try { port = await navigator.serial.requestPort({ filters: [{ usbVendorId: 0x2E8A }] }); await abrePorta(); }
+    catch (e) { if (e.name !== "NotFoundError") { log(e.message, "bad"); aviso(e.message); } await desconectar(); return; }
+  } else if (conectado) pausaPainel();
+  gravando = true;
+  [$("#btnFwSite"), $("#btnFwArq"), $("#btnCon")].forEach(b => b.disabled = true);
+  const prog = $("#fwProg"); prog.hidden = false; prog.value = 0;
+  rx = ""; rawSink = s => { rx += s; if (rxAviso) rxAviso(); };
+  let gravou = false;
+  try {
+    log("firmware: parando o painel e entrando no raw REPL…");
+    await rawEntra();
+    await rawExec(RAW_INI);
+    const total = arqs.reduce((s, a) => s + a.dados.length, 0) || 1;
+    let feito = 0;
+    for (const a of arqs) {
+      log(`firmware: gravando ${a.nome} (${a.dados.length.toLocaleString("pt-BR")} bytes)…`);
+      await rawExec(`f=open('${a.nome}.tmp','wb')\nw=f.write\n`);
+      for (let i = 0; i < a.dados.length; i += 1536) {       // ~2 kB de código por execução
+        let code = "";
+        for (let j = i; j < Math.min(i + 1536, a.dados.length); j += 384) code += `w(d('${b64(a.dados.subarray(j, j + 384))}'))\n`;
+        await rawExec(code);
+        feito += Math.min(1536, a.dados.length - i); prog.value = feito / total;
+      }
+      await rawExec("f.close()\n");
+      const [tam, hash] = (await rawExec(`_h('${a.nome}.tmp')\n`)).trim().split(/\s+/);
+      const esperado = await sha256hex(a.dados);
+      if (+tam !== a.dados.length) throw new Error(`${a.nome}: gravou ${tam} bytes, esperava ${a.dados.length}`);
+      if (esperado && hash !== "-" && hash !== esperado) throw new Error(`${a.nome}: SHA-256 não confere`);
+      log(`firmware: ${a.nome} conferido (${hash !== "-" && esperado ? "SHA-256" : "tamanho"})`, "ok");
+    }
+    // tudo conferido: só agora troca os arquivos antigos
+    await rawExec(arqs.map(a => `try:\n os.remove('${a.nome}')\nexcept OSError:\n pass\nos.rename('${a.nome}.tmp','${a.nome}')\n`).join(""));
+    gravou = true;
+    log("firmware gravado; reiniciando a placa…", "ok");
+  } catch (e) {
+    log("firmware: " + e.message + " — a placa continua com o firmware anterior", "bad");
+    toast("Falha ao gravar o firmware: " + e.message, "bad");
+  }
+  try {
+    await escrever("\x02"); await sleep(200);           // sai do raw REPL
+    rawSink = null; rx = "";
+    await escrever("\x04"); await sleep(2500);          // soft reset: roda o main.py
+    await iniciaPainel();
+    if (gravou) toast("Firmware " + fwPlaca + " gravado", "ok");
+  } catch (e) {
+    log(e.message, "bad"); aviso(e.message);
+    await desconectar();
+  } finally {
+    rawSink = null; gravando = false;
+    $("#btnFwSite").disabled = !fwSite; $("#btnFwArq").disabled = false; $("#btnCon").disabled = false;
+    prog.hidden = true;
+  }
+}
+
+function comparaFw(avisar) {
+  $("#fwPlaca").textContent = fwPlaca ? fwPlaca + " · placa " + (revPlaca ? REVS[revPlaca] || revPlaca : "? (firmware antigo)") : "—";
+  const c = $("#chipFw");
+  c.hidden = !(fwSite && fwPlaca);
+  if (c.hidden) return;
+  const igual = fwSite.fw === fwPlaca, mesmaRev = !revPlaca || revPlaca === pref.placa;
+  chip(c, !mesmaRev ? "revisão diferente da escolhida" : igual ? "atualizado" : "diferente do site", igual && mesmaRev ? "ok" : "warn");
+  if (!igual && avisar) {
+    log(`o firmware da placa (${fwPlaca}) é diferente do site (${fwSite.fw}); grave em Registro › Firmware da placa`, "warn");
+    toast(`Firmware da placa: ${fwPlaca} · no site: ${fwSite.fw}`, "warn");
+  }
+}
+
+async function carregaFwSite() {
+  if (location.protocol === "file:") { $("#fwSite").textContent = "— (página aberta do disco: use os arquivos do computador)"; return; }
+  try {
+    const arqs = [];
+    for (const nome of FW_ARQS) {
+      const r = await fetch(nome, { cache: "no-cache" });
+      if (!r.ok) throw new Error(nome + ": HTTP " + r.status);
+      arqs.push({ nome, dados: new Uint8Array(await r.arrayBuffer()) });
+    }
+    const fw = fwVersao(arqs.find(a => a.nome === "no.py").dados);
+    if (!fw) throw new Error("no.py sem a linha FW = \"…\"");
+    fwSite = { fw, arquivos: arqs };
+    $("#fwSite").textContent = fw; $("#btnFwSite").disabled = gravando;
+    comparaFw(conectado);
+  } catch (e) { $("#fwSite").textContent = "não encontrado (" + e.message + ")"; }
+}
+
+$("#fwRev").value = pref.placa;
+$("#fwRev").onchange = () => { pref.placa = $("#fwRev").value; salvaPref(); comparaFw(false); };
+$("#btnFwSite").onclick = () => fwSite && gravaFirmware(fwSite.arquivos, "firmware do site " + fwSite.fw);
+$("#btnFwArq").onclick = () => $("#fwArq").click();
+$("#fwArq").onchange = async e => {
+  const fs = Array.from(e.target.files); e.target.value = "";
+  if (!fs.length) return;
+  const ruim = fs.find(f => !/^[\w.-]+\.py$/.test(f.name));
+  if (ruim) { toast("Nome de arquivo inválido: " + ruim.name, "bad"); return; }
+  const arqs = await Promise.all(fs.map(async f => ({ nome: f.name, dados: new Uint8Array(await f.arrayBuffer()) })));
+  const no = arqs.find(a => a.nome === "no.py");
+  gravaFirmware(arqs, "do computador" + (no && fwVersao(no.dados) ? ", " + fwVersao(no.dados) : ""));
+};
+
+// ---------- estado ----------
+let ultimo = null;
+function aplicaInfo(r) {
+  const c = r.cfg;
+  const ambos = r.ambos !== false;                  // firmware antigo não informa: placa até a v17
+  $("#drvSel").querySelector('option[value="ambos"]').disabled = !ambos;
+  if (!ambos && pref.drv === "ambos") {
+    pref.drv = "tmc"; salvaPref(); aplicaModo();
+    log("esta placa (" + r.placa + ") não tem o modo Ambos: voltando para TMC2209", "warn");
+  }
+  micro = c.micro;
+  $("#run").value = c.run; $("#hold").value = c.hold; $("#micro").value = c.micro; $("#modo").value = c.modo;
+  $("#intpol").value = c.intpol ? "1" : "0"; $("#hdelay").value = c.hdelay; $("#tpd").value = c.tpd;
+  if (c.vthr > 0) $("#vthr").value = Math.round(c.vthr / spr() * 60);
+  if (r.fimcfg) { $("#f1").value = r.fimcfg.f1; $("#f2").value = r.fimcfg.f2; $("#inv").value = r.fimcfg.inv ? "1" : "0"; }
+  mostraCorrentes(); mostraVthr(); mostraTmcInfo(r.tmc);
+}
+function mostraTmcInfo(t) {
+  if (!t) return;
+  if (t.addr != null) $("#tAddr").textContent = t.addr + " / 0x" + (t.ver || 0).toString(16).toUpperCase();
+  if (t.irun != null) $("#tCorr").textContent = fmt(t.irun) + " A rodando · " + fmt(t.ihold) + " A parado (vsense " + t.vsense + ")";
+}
+
+const FLAGS = [[1, "superaquecido", "bad"], [0, "pré-aquecimento", "warn"], [2, "curto GND A", "bad"], [3, "curto GND B", "bad"],
+  [4, "curto VS A", "bad"], [5, "curto VS B", "bad"], [6, "fase A aberta", "warn"], [7, "fase B aberta", "warn"],
+  [8, ">120 °C", "warn"], [9, ">143 °C", "warn"], [10, ">150 °C", "bad"], [11, ">157 °C", "bad"]];
+const MOVTXT = { "": ["parado", ""], mover: ["movendo", "acc"], jog: ["jog", "acc"], parando: ["parando", "warn"], vact: ["VACTUAL", "acc"] };
+
+let reenviando = false;
+function atualiza(s) {
+  ultimo = s;
+  if (s.drv && s.drv !== pref.drv && !reenviando) {      // a placa reiniciou (volta no modo TMC)
+    reenviando = true; enviaDriver(true).finally(() => { reenviando = false; });
+  }
+  const voltas = s.pos / spr();
+  const u = $("#unid").value;
+  if (u === "grau") { $("#posPrinc").textContent = fmt(voltas / red() * 360, 2) + "°"; $("#posUnid").textContent = "graus na saída"; }
+  else if (u === "passo") { $("#posPrinc").textContent = s.pos.toLocaleString("pt-BR"); $("#posUnid").textContent = "passos"; }
+  else { $("#posPrinc").textContent = fmt(voltas, 3); $("#posUnid").textContent = "voltas do motor"; }
+  $("#posPassos").textContent = s.pos.toLocaleString("pt-BR");
+  $("#posSaida").textContent = fmt(voltas / red() * 360, 2) + "°";
+  const rpm = s.v / spr() * 60;
+  $("#vel").textContent = fmt(rpm, 1);
+  $("#barVel").textContent = fmt(rpm, 1);
+  $("#barPos").textContent = $("#posPrinc").textContent + (u === "volta" ? " voltas" : u === "passo" ? " passos" : " na saída");
+  $("#cursoInfo").textContent = pref.curso
+    ? "Curso calibrado: " + pref.curso.toLocaleString("pt-BR") + " passos (" + fmt(pref.curso / spr(), 2) + " voltas do motor" +
+      (pref.cMm > 0 ? ", " + fmt(pref.curso / spr() * pref.cMm, 1) + " mm" : "") + ")"
+    : "Curso: não calibrado (página Testes).";
+  const [mt, mc] = MOVTXT[s.mov] || [s.mov, "acc"];
+  chip($("#chipMov"), mt, mc);
+
+  chip($("#chipEN"), s.en ? "motor energizado" : "motor solto", s.en ? "ok" : "");
+  $("#btnEN").textContent = s.en ? "Soltar motor" : "Energizar";
+  chip($("#chipVM"), s.vm ? "24 V ok" : "sem 24 V", s.vm ? "ok" : "bad");
+  $("#sVM").innerHTML = s.vm ? '<span class="chip ok">presente</span>' : '<span class="chip bad">ausente</span>';
+  const fimTxt = (a, raw) => (a ? '<span class="chip warn">acionado</span>' : '<span class="chip">livre</span>') + ` <small class="hint">pino ${raw}</small>`;
+  $("#sF1").innerHTML = fimTxt(s.f1, s.fr1); $("#sF2").innerHTML = fimTxt(s.f2, s.fr2);
+  $("#sF1b").innerHTML = fimTxt(s.f1, s.fr1); $("#sF2b").innerHTML = fimTxt(s.f2, s.fr2);
+  $("#sNTC").textContent = s.ntc == null ? (s.ntcr > 60000 ? "desligado" : "curto?") : fmt(s.ntc, 1) + " °C";
+  $("#sRP").textContent = fmt(s.trp, 1) + " °C";
+  $("#sgMin").textContent = s.sgmin == null ? "—" : s.sgmin;
+  $("#sVact").textContent = s.vact ? fmt(s.vact * 0.715 / spr() * 60, 1) + " rpm" : "parado";
+
+  const ti = s.tmci || {};
+  mostraTmcInfo(ti);
+  const t = s.tmc;
+  if (!s.vm) { chip($("#chipTMC"), "TMC sem VM", "warn"); }
+  else if (!ti.on || !t) { chip($("#chipTMC"), "TMC não responde", "bad"); }
+  else chip($("#chipTMC"), "TMC ok", "ok");
+
+  const fl = $("#flags"); fl.innerHTML = "";
+  if (t && t.drv != null) {
+    const d = t.drv >>> 0;
+    $("#tCS").textContent = ((d >> 16) & 31) + " / 31";
+    chip($("#chipModo"), (d >>> 30) & 1 ? "stealthChop" : "spreadCycle", "acc");
+    $("#tSG").textContent = t.sg == null ? "—" : t.sg;
+    const ts = t.tstep;
+    $("#tTstep").textContent = ts == null || ts >= 0xFFFFF ? "parado" : fmt(12e6 / ts / 256 / pref.fullsteps * 60, 1) + " rpm";
+    if (t.ioin != null) {
+      const io = t.ioin >>> 0;
+      $("#tIoin").textContent = `EN ${io & 1} · STEP ${(io >> 7) & 1} · DIR ${(io >> 9) & 1} · MS1 ${(io >> 2) & 1} · MS2 ${(io >> 3) & 1}`;
+    }
+    let algum = false;
+    for (const [b, nome, cls] of FLAGS) if ((d >> b) & 1) {
+      if ((b === 6 || b === 7) && !s.mov) continue;
+      const c = document.createElement("span"); c.className = "chip " + cls; c.textContent = nome; fl.appendChild(c); algum = true;
+    }
+    if (t.gstat) {
+      const g = []; if (t.gstat & 2) g.push("erro do driver (desliga até EN)"); if (t.gstat & 4) g.push("subtensão da bomba de carga");
+      g.forEach(x => { const c = document.createElement("span"); c.className = "chip bad"; c.textContent = x; fl.appendChild(c); algum = true; });
+    }
+    if (!algum) { const c = document.createElement("span"); c.className = "chip ok"; c.textContent = "sem alertas"; fl.appendChild(c); }
+    if ((d >> 31) & 1) { const c = document.createElement("span"); c.className = "chip"; c.textContent = "parado (stst)"; fl.appendChild(c); }
+    ponto(rpm, t.sg);
+  } else {
+    ["#tCS", "#tSG", "#tTstep", "#tIoin"].forEach(k => $(k).textContent = "—");
+    chip($("#chipModo"), "—");
+    ponto(rpm, null);
+  }
+  if (s.ev) s.ev.forEach(e => { log("placa: " + e, "warn"); toast(e, /EMERG|caiu|FIM|travamento|TMC|limitada/.test(e) ? "bad" : "warn"); });
+}
+
+async function tickStatus() {
+  if (!conectado || stPend) return;
+  stPend = true;
+  try { const s = await cmd({ c: "st" }, 1500); falhas = 0; atualiza(s); }
+  catch (e) { if (++falhas === 6) { log("a placa parou de responder ao status", "bad"); toast("A placa parou de responder", "bad"); } }
+  finally { stPend = false; }
+}
+
+// ---------- gráfico ----------
+const hist = [];
+function ponto(rpm, sg) { hist.push([rpm, sg]); if (hist.length > 120) hist.shift(); desenha(); }
+function desenha() {
+  const cv = $("#graf"), dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth, h = cv.clientHeight;
+  if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+  const st = getComputedStyle(document.documentElement), css = { getPropertyValue: k => st.getPropertyValue(k).trim() };
+  g.strokeStyle = css.getPropertyValue("--line"); g.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) { const y = 6 + (h - 12) * i / 4; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+  const maxR = Math.max(60, ...hist.map(p => Math.abs(p[0])));
+  const x = i => w - (hist.length - 1 - i) * (w / 119);
+  const linhaDe = (f, cor) => {
+    g.strokeStyle = cor; g.lineWidth = 2; g.beginPath(); let on = false;
+    hist.forEach((p, i) => { const v = f(p); if (v == null) { on = false; return; } const y = 6 + (h - 12) * (1 - v);
+      on ? g.lineTo(x(i), y) : g.moveTo(x(i), y); on = true; });
+    g.stroke();
+  };
+  linhaDe(p => 0.5 + p[0] / maxR / 2, css.getPropertyValue("--c1"));
+  linhaDe(p => p[1] == null ? null : Math.min(1, p[1] / 510), css.getPropertyValue("--c2"));
+  g.fillStyle = css.getPropertyValue("--muted"); g.font = "11px system-ui";
+  g.fillText("+" + Math.round(maxR) + " rpm", 4, 16); g.fillText("−" + Math.round(maxR) + " rpm", 4, h - 8);
+}
+window.addEventListener("resize", desenha);
+
+// ---------- ações ----------
+$("#btnCon").onclick = () => conectado ? desconectar() : conectar();
+$("#btnEN").onclick = () => acao({ c: "en", v: ultimo && ultimo.en ? 0 : 1 });
+$("#btnZero").onclick = () => acao({ c: "zero", p: 0 });
+function mover(sinal) {
+  const n = Math.round(paraPassos(Math.abs(+$("#dist").value), $("#unid").value)) * sinal;
+  if (!n) return;
+  acao({ c: "mover", n, v: vPassos(), a: aPassos() });
+}
+$("#btnMenos").onclick = () => mover(-1);
+$("#btnMais").onclick = () => mover(1);
+$("#btnIr").onclick = () => acao({ c: "ir", p: Math.round(paraPassos(+$("#alvo").value, $("#unid").value)), v: vPassos(), a: aPassos() });
+$("#btnParar").onclick = () => acao({ c: "parar" }, 2500, true);
+$("#btnEmerg").onclick = () => acao({ c: "emerg" });
+
+function jog(btn, sinal) {
+  let ativo = false;
+  const solta = () => { if (!ativo) return; ativo = false; btn.classList.remove("ativo"); acao({ c: "parar" }, 2500, true); };
+  btn.addEventListener("pointerdown", e => {
+    if (!conectado) return;
+    btn.setPointerCapture(e.pointerId); ativo = true; btn.classList.add("ativo");
+    acao({ c: "jog", v: sinal * vPassos(), a: aPassos() }, 2500, true).then(r => { if (!r) solta(); });
+  });
+  ["pointerup", "pointercancel", "lostpointercapture"].forEach(ev => btn.addEventListener(ev, solta));
+  window.addEventListener("blur", solta);
+}
+jog($("#jogMenos"), -1); jog($("#jogMais"), 1);
+
+document.addEventListener("keydown", e => {
+  if (!conectado) return;
+  const campo = /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
+  if (e.key === "Escape") { e.preventDefault(); acao({ c: "emerg" }); }
+  else if (e.key === " " && !campo) { e.preventDefault(); acao({ c: "parar" }, 2500, true); }
+});
+document.addEventListener("keyup", e => {        // impede o Espaço de também "clicar" o botão em foco
+  if (e.key === " " && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) e.preventDefault();
+});
+
+// corrente de etiqueta (A/fase) = pico da senoide do micropasso; o TMC recebe RMS = etiqueta / raiz(2)
+const nominalRms = () => Math.max(0.1, +pref.motorI || 1.7) / Math.SQRT2;
+const corrRecomendada = () => Math.min(1.2, Math.round(nominalRms() * 0.9 / 0.05) * 0.05);
+function mostraCorrentes() {
+  const run = +$("#run").value, hold = +$("#hold").value, nom = nominalRms();
+  $("#runV").textContent = fmt(run) + " A";
+  $("#holdV").textContent = fmt(hold) + " A";
+  let cls = "ok", msg = "Faixa segura para o módulo StepStick.";
+  if (run > 1.2) { cls = "bad"; msg = "Acima de 1,2 A: no limite térmico do módulo StepStick, só com dissipador e ventoinha forte, e por pouco tempo. Um TMC já queimou rodando a 1,7 A."; }
+  else if (run > 1.0) { cls = "warn"; msg = "Acima de 1,0 A: use dissipador no chip e a ventoinha no J7."; }
+  if (run > nom * 1.05) {
+    cls = "bad";
+    msg += " E acima do nominal do motor (" + fmt(nom) + " A RMS para " + fmt(pref.motorI) + " A/fase): o motor esquenta além do especificado.";
+  }
+  const el = $("#corrAviso"); el.className = "corrAviso " + cls; el.textContent = msg;
+  $("#corrIdeal").textContent = "Motor de " + fmt(pref.motorI) + " A/fase → nominal " + fmt(nom) + " A RMS no TMC. Recomendado: " +
+    fmt(corrRecomendada()) + " A rodando (90% do nominal, no máximo 1,2 A pelo módulo) e metade disso parado.";
+}
+$("#motorI").oninput = () => { pref.motorI = Math.max(0.1, +$("#motorI").value || 1.7); salvaPref(); mostraCorrentes(); };
+$("#btnCorrIdeal").onclick = () => {
+  const r = corrRecomendada();
+  $("#run").value = r; $("#hold").value = Math.round(r / 2 / 0.05) * 0.05; mostraCorrentes();
+  toast("Correntes ajustadas: " + fmt(r) + " A / " + fmt(+$("#hold").value) + " A. Clique em Aplicar no driver.", "ok");
+};
+function mostraVthr() { $("#vthrBox").style.display = $("#modo").value === "auto" ? "" : "none"; }
+$("#run").oninput = () => { if (+$("#hold").value > +$("#run").value) $("#hold").value = $("#run").value; mostraCorrentes(); };
+$("#hold").oninput = () => { if (+$("#hold").value > +$("#run").value) $("#run").value = $("#hold").value; mostraCorrentes(); };
+$("#modo").onchange = mostraVthr;
+$("#btnCfg").onclick = async () => {
+  if (+$("#run").value > 1.2 && !confirm("Corrente de " + fmt(+$("#run").value) + " A RMS: no limite do módulo TMC2209 (um já queimou a 1,7 A). Tem dissipador e ventoinha ligada?")) return;
+  if (+$("#run").value > 1.0) toast("Acima de 1,0 A: confira se a ventoinha do J7 está ligada.", "warn");
+  const novoMicro = +$("#micro").value;
+  const r = await acao({
+    c: "cfg", run: +$("#run").value, hold: +$("#hold").value, micro: novoMicro, modo: $("#modo").value,
+    vthr: Math.max(1, +$("#vthr").value) / 60 * pref.fullsteps * novoMicro,
+    intpol: $("#intpol").value === "1", hdelay: +$("#hdelay").value, tpd: +$("#tpd").value, shaft: pref.tmcInvDir
+  }, 4000);
+  if (r) {
+    micro = r.cfg.micro; mostraTmcInfo(r.tmc); avisoAmbos(); enviaSg(true);
+    $("#cfgRes").textContent = r.tmc.on ? "gravado e confirmado pelo driver" : "TMC não respondeu: fica salvo e é gravado quando ele voltar";
+  }
+};
+
+async function enviaSensores(silencio) {
+  pref.r25 = +$("#r25").value || 100000; pref.beta = +$("#beta").value || 3950; salvaPref();
+  return acao({ c: "fim", f1: +$("#f1").value, f2: +$("#f2").value, inv: $("#inv").value === "1", r25: pref.r25, beta: pref.beta }, 2500, silencio);
+}
+$("#btnFim").onclick = () => enviaSensores(false);
+
+function enviaSg(silencio) {
+  // rpm -> passos/s sempre na resolução do TMC (o StallGuard é dele)
+  return acao({ c: "sg", on: pref.sgOn, lim: pref.sgLim, vmin: pref.sgVmin / 60 * pref.fullsteps * micro, n: pref.sgN }, 2500, silencio);
+}
+$("#btnSg").onclick = () => {
+  pref.sgOn = $("#sgOn").value === "1";
+  pref.sgLim = Math.max(0, Math.min(510, Math.round(+$("#sgLim").value) || 0));
+  pref.sgVmin = Math.max(1, +$("#sgVmin").value || 60);
+  pref.sgN = Math.max(1, Math.min(20, Math.round(+$("#sgN").value) || 2));
+  salvaPref();
+  if (pref.sgOn && $("#modo").value === "spread") toast("O StallGuard só mede em stealthChop: troque o modo do chopper.", "warn");
+  if (conectado) enviaSg(false);
+};
+
+function enviaDriver(silencio) {
+  return acao({ c: "drv", tipo: pref.drv, inv_step: usaDM() ? pref.dmInvStep : false,
+                inv_dir: usaDM() ? pref.dmInvDir : false, segura: !!pref.segura }, 2500, silencio);
+}
+$("#drvSel").onchange = async () => {
+  const antes = pref.drv;
+  pref.drv = $("#drvSel").value;
+  if (conectado) {
+    const r = await enviaDriver(false);
+    if (!r) { pref.drv = antes; aplicaModo(); return; }
+    log({ tmc: "modo TMC2209: DM556 solto (posição zerada)", dm556: "modo DM556: TMC desabilitado, passos pelo J4 (posição zerada)",
+          ambos: "modo ambos: TMC e DM556 habilitados com os mesmos pulsos (posição zerada)" }[pref.drv], "ok");
+  }
+  salvaPref(); aplicaModo();
+  if (ultimo) atualiza(ultimo);
+};
+// sentido do motor do TMC pelo bit shaft (UART): independe do pino DIR, que é comum aos dois drivers
+$("#tmcInvDir").onchange = () => { pref.tmcInvDir = $("#tmcInvDir").value === "1"; salvaPref(); if (conectado) acao({ c: "cfg", shaft: pref.tmcInvDir }, 4000); };
+$("#btnDM").onclick = () => {
+  pref.dmPpr = Math.max(1, Math.round(+$("#dmPpr").value) || 3200);
+  pref.dmRed = Math.max(0.001, +$("#dmRed").value || 1);
+  pref.dmInvStep = $("#dmInvStep").value === "1"; pref.dmInvDir = $("#dmInvDir").value === "1";
+  salvaPref(); avisoAmbos(); if (ultimo) atualiza(ultimo);
+  if (conectado) enviaDriver(false);
+};
+$("#btnVact").onclick = () => acao({ c: "vact", v: +$("#vactRpm").value / 60 * spr() });
+$("#btnVactStop").onclick = () => acao({ c: "parar" });
+
+$("#rpm").oninput = () => { $("#rpmR").value = $("#rpm").value; pref.rpm = +$("#rpm").value; salvaPref(); };
+$("#rpmR").oninput = () => { $("#rpm").value = $("#rpmR").value; pref.rpm = +$("#rpm").value; salvaPref(); };
+$("#acel").oninput = () => { pref.acel = +$("#acel").value; salvaPref(); };
+$("#fullsteps").onchange = () => { pref.fullsteps = +$("#fullsteps").value; salvaPref(); if (ultimo) atualiza(ultimo); };
+$("#red").oninput = () => { pref.red = Math.max(0.001, +$("#red").value || 1); salvaPref(); if (ultimo) atualiza(ultimo); };
+$("#unid").onchange = () => { pref.unid = $("#unid").value; salvaPref(); if (ultimo) atualiza(ultimo); };
+
+$("#btnLimpa").onclick = () => { $("#log").innerHTML = ""; };
+async function enviaRaw() {
+  const txt = $("#raw").value.trim(); if (!txt) return;
+  let o; try { o = JSON.parse(txt); } catch (e) { toast("JSON inválido", "bad"); return; }
+  log("» " + txt);
+  try { const r = await cmd(o, 3000); delete r.id; log("« " + JSON.stringify(r), "ok"); }
+  catch (e) { log("« " + e.message, "bad"); }
+}
+$("#btnRaw").onclick = enviaRaw;
+$("#raw").addEventListener("keydown", e => { if (e.key === "Enter") enviaRaw(); });
+
+$("#rampa").onchange = async () => {
+  const antes = pref.rampa;
+  pref.rampa = $("#rampa").value === "1";
+  if (conectado && !(await acao({ c: "rampa", s: pref.rampa }))) { pref.rampa = antes; $("#rampa").value = antes ? "1" : "0"; return; }
+  salvaPref();
+};
+$("#segura").onchange = () => { pref.segura = $("#segura").checked; salvaPref(); if (conectado) enviaDriver(false); };
+
+// ---------- calibração ----------
+// As rotinas rodam aqui e comandam o firmware; o que precisa de reação rápida (chave, travamento)
+// é detectado no firmware, que corta os pulsos sozinho.
+let rotina = null, cancelar = false;
+class Cancelado extends Error {}
+function calLog(msg, cls) {
+  log("calibração: " + msg, cls || "");
+  const el = $("#calRes"); el.textContent += msg + "\n"; el.scrollTop = el.scrollHeight;
+}
+async function pausa(ms) {
+  const t0 = Date.now();
+  while (Date.now() - t0 < ms) { if (cancelar) throw new Cancelado(); await sleep(Math.min(50, ms)); }
+}
+const ex = (o, t = 4000) => cmd(o, t);
+async function lerSt() { const s = await cmd({ c: "st" }, 2000); atualiza(s); return s; }
+async function esperaParar(maxMs = 600000) {
+  const t0 = Date.now();
+  for (;;) {
+    const s = await lerSt();
+    if (!s.mov) return s;
+    if (cancelar) throw new Cancelado();
+    if (Date.now() - t0 > maxMs) throw new Error("tempo esgotado esperando o motor parar");
+    await sleep(60);
+  }
+}
+async function esperaVelocidade(v, maxMs = 30000) {
+  const t0 = Date.now();
+  for (;;) {
+    const s = await lerSt();
+    if (!s.mov || Math.abs(s.v) >= v * 0.98) return s;
+    if (cancelar) throw new Cancelado();
+    if (Date.now() - t0 > maxMs) throw new Error("não chegou na velocidade");
+    await sleep(50);
+  }
+}
+async function rodaRotina(nome, fn) {
+  if (!conectado) { toast("Conecte a placa primeiro", "bad"); return; }
+  if (rotina) { toast("Já tem uma rotina rodando: " + rotina, "warn"); return; }
+  rotina = nome; cancelar = false; $("#calRes").textContent = "";
+  document.body.classList.add("rotina");
+  $("#chipRot").hidden = false; $("#chipRot").textContent = "rotina: " + nome;
+  calLog("início: " + nome);
+  try { await fn(); calLog("fim: " + nome, "ok"); }
+  catch (e) {
+    try { await cmd({ c: "parar" }, 2500); } catch (_) {}
+    calLog(e instanceof Cancelado ? "cancelada" : "erro: " + e.message, "bad");
+  } finally {
+    rotina = null; document.body.classList.remove("rotina"); $("#chipRot").hidden = true;
+  }
+}
+$("#btnCancelar").onclick = () => { cancelar = true; };
+function exigeTMC() {
+  if (pref.drv === "dm556") throw new Error("precisa do TMC (o DM556 não tem StallGuard): troque o driver para TMC2209 ou Ambos");
+  if ($("#modo").value !== "stealth") throw new Error("o StallGuard só mede em stealthChop: ponha o modo do chopper em stealthChop e aplique");
+}
+const restauraSg = () => enviaSg(true);
+const sgTeste = (vmin, marg) => ex({ c: "sg", on: true, lim: Math.min(30, marg), vmin, n: 2 });
+
+async function calibraCurso() {
+  const vB = Math.max(1, +$("#cBusca").value) / 60 * spr(), vF = Math.max(1, +$("#cFina").value) / 60 * spr();
+  const a = aPassos(), rec = Math.max(1, Math.round(+$("#cRecuo").value * spr()));
+  pref.cMm = Math.max(0, +$("#cMm").value || 0); salvaPref();
+  let s = await lerSt();
+  if (s.f1 || s.f2) throw new Error("já tem fim de curso acionado: afaste o eixo ou solte a chave antes");
+  await ex({ c: "fim", f1: 2, f2: 2 });                       // na busca, qualquer chave para
+  calLog("procurando o fim de curso do lado − ...");
+  await ex({ c: "jog", v: -vB, a });
+  s = await esperaParar();
+  const neg = s.f1 ? 1 : s.f2 ? 2 : 0;
+  if (!neg) throw new Error("o motor parou sem fim de curso acionado");
+  const outro = neg === 1 ? 2 : 1;
+  const fc = { c: "fim" }; fc["f" + neg] = -1; fc["f" + outro] = 1;
+  await ex(fc);
+  $("#f1").value = fc.f1; $("#f2").value = fc.f2;
+  calLog("lado − = FIM" + neg + ", lado + = FIM" + outro + " (agora bloqueando)");
+  await ex({ c: "mover", n: rec, v: vB, a }); await esperaParar();
+  s = await lerSt();
+  if (s["f" + neg]) throw new Error("recuou e a chave continua acionada: aumente o recuo");
+  await ex({ c: "jog", v: -vF, a }); s = await esperaParar();
+  if (!s["f" + neg]) throw new Error("a aproximação lenta parou sem a chave");
+  await ex({ c: "zero", p: 0 });
+  calLog("zero no FIM" + neg + " (aproximação lenta)");
+  await ex({ c: "mover", n: rec, v: vB, a }); await esperaParar();
+  calLog("procurando o fim de curso do lado + ...");
+  await ex({ c: "jog", v: vB, a }); s = await esperaParar();
+  if (!s["f" + outro]) throw new Error("parou sem o FIM" + outro + (s["f" + neg] ? ": acionou o FIM" + neg + " de novo, as duas chaves estão ligadas juntas?" : ""));
+  await ex({ c: "mover", n: -rec, v: vB, a }); await esperaParar();
+  await ex({ c: "jog", v: vF, a }); s = await esperaParar();
+  if (!s["f" + outro]) throw new Error("a aproximação lenta do lado + parou sem a chave");
+  const curso = s.pos;
+  pref.curso = curso; salvaPref();
+  const volt = curso / spr();
+  calLog("CURSO: " + curso.toLocaleString("pt-BR") + " passos = " + fmt(volt, 3) + " voltas do motor = " +
+    fmt(volt / red() * 360, 1) + "° na saída" + (pref.cMm > 0 ? " = " + fmt(volt * pref.cMm, 1) + " mm" : ""), "ok");
+  await ex({ c: "ir", p: Math.round(curso / 2), v: vB, a }); await esperaParar();
+  calLog("eixo no meio do curso");
+}
+
+async function varreVelocidade() {
+  exigeTMC();
+  const r0 = Math.max(1, +$("#vIni").value), dr = Math.max(1, +$("#vPasso").value), rMax = +$("#vMax").value;
+  const marg = +$("#vMarg").value, a = aPassos();
+  let maxOk = null, dir = 1;
+  try {
+    for (let rpm = r0; rpm <= rMax; rpm += dr) {
+      const v = rpm / 60 * spr();
+      await sgTeste(v * 0.5, marg);                           // trava de verdade: o firmware corta na hora
+      await ex({ c: "jog", v: dir * v, a });
+      let s = await esperaVelocidade(v);
+      if (s.mov) { await ex({ c: "sgzera" }); await pausa(1000); s = await lerSt(); }
+      const travou = !s.mov, sgm = s.sgmin;
+      if (s.mov) { await ex({ c: "parar" }); await esperaParar(); }
+      calLog(rpm + " rpm: " + (travou ? "TRAVOU" : "SG mínimo " + sgm), travou || sgm < marg ? "bad" : "");
+      if (travou || sgm == null || sgm < marg) break;
+      maxOk = rpm; dir = -dir;
+    }
+  } finally { await restauraSg(); }
+  if (maxOk) {
+    pref.calVmax = maxOk; salvaPref();
+    calLog("velocidade máxima com SG ≥ " + marg + ": " + maxOk + " rpm → use até ~" + Math.round(maxOk * 0.8) + " rpm", "ok");
+  } else calLog("nenhum degrau passou da margem", "bad");
+}
+
+async function varreAceleracao() {
+  exigeTMC();
+  const rpm = +$("#aRpm").value || (pref.calVmax ? Math.round(pref.calVmax * 0.8) : 200);
+  const marg = +$("#vMarg").value, v = rpm / 60 * spr();
+  let aOk = null, dir = 1;
+  calLog("rotação da varredura: " + rpm + " rpm");
+  try {
+    await sgTeste(v * 0.3, marg);
+    for (let ar = Math.max(0.1, +$("#aIni").value); ar <= +$("#aMax").value; ar = +(ar * 1.5).toFixed(2)) {
+      const a = ar * spr();
+      const n = Math.round(v * v / a + v * 0.3);                // sobe, 0,3 s em regime, desce
+      const s0 = await lerSt();
+      await ex({ c: "mover", n: dir * n, v, a });
+      const s = await esperaParar();
+      const travou = s.pos !== s0.pos + dir * n, sgm = s.sgmin;
+      calLog(fmt(ar, 1) + " voltas/s²: " + (travou ? "TRAVOU" : "SG mínimo " + sgm), travou || sgm < marg ? "bad" : "");
+      if (travou || sgm == null || sgm < marg) break;
+      aOk = ar; dir = -dir;
+    }
+  } finally { await restauraSg(); }
+  if (aOk) calLog("aceleração máxima a " + rpm + " rpm com SG ≥ " + marg + ": " + fmt(aOk, 1) + " voltas/s² → use ~" + fmt(aOk * 0.7, 1), "ok");
+  else calLog("nem a primeira aceleração passou da margem", "bad");
+}
+
+async function margemTorque() {
+  exigeTMC();
+  const rpm = Math.max(1, +$("#mRpm").value), marg = +$("#vMarg").value, v = rpm / 60 * spr();
+  const run = +$("#run").value;
+  let iCrit = null;
+  try {
+    await sgTeste(v * 0.5, marg);
+    await ex({ c: "jog", v, a: aPassos() });
+    await esperaVelocidade(v);
+    for (let i = run; i >= 0.1 - 1e-9; i = +(i - 0.05).toFixed(2)) {
+      const r = await ex({ c: "irun", run: i });
+      await pausa(300); await ex({ c: "sgzera" }); await pausa(600);
+      const s = await lerSt();
+      const travou = !s.mov;
+      calLog(fmt(r.irun) + " A: " + (travou ? "TRAVOU" : "SG mínimo " + s.sgmin), travou || s.sgmin < marg ? "bad" : "");
+      if (travou || s.sgmin < marg) { iCrit = r.irun; break; }
+    }
+  } finally {
+    try { await ex({ c: "irun", run }); } catch (_) {}
+    try { await ex({ c: "parar" }); await esperaParar(); } catch (_) {}
+    await restauraSg();
+  }
+  if (iCrit) calLog("margem de torque a " + rpm + " rpm: " + fmt(run / iCrit, 1) + "× (a carga usa ~" +
+    Math.round(iCrit / run * 100) + "% do torque disponível com " + fmt(run) + " A)", "ok");
+  else calLog("não travou nem com 0,10 A: carga leve demais para medir por este método", "ok");
+}
+
+// ---- perda de passo: o fim de curso do lado − é a referência de posição ----
+function ladoNeg() {
+  if (+$("#f1").value === -1) return 1;
+  if (+$("#f2").value === -1) return 2;
+  throw new Error("nenhum fim de curso configurado como lado −: rode Calibrar curso antes");
+}
+async function aproximaDevagar(neg, vF, a) {
+  // do ponto atual (fora da chave) anda devagar para o − até a chave; devolve a posição do acionamento
+  let s = await lerSt();
+  if (s["f" + neg]) throw new Error("a chave do lado − já está acionada antes da aproximação");
+  await ex({ c: "jog", v: -vF, a }); s = await esperaParar();
+  if (!s["f" + neg]) throw new Error("a aproximação lenta parou sem a chave");
+  return s.pos;
+}
+async function testePerda() {
+  const neg = ladoNeg();
+  if (!pref.curso) throw new Error("rode Calibrar curso antes: o teste precisa saber o tamanho do curso");
+  const vB = Math.max(1, +$("#cBusca").value) / 60 * spr(), vF = Math.max(1, +$("#cFina").value) / 60 * spr();
+  const aRef = aPassos(), rec = Math.max(1, Math.round(+$("#cRecuo").value * spr()));
+  const N = Math.max(1, Math.round(+$("#pCiclos").value));
+  const passoInteiro = spr() / (ehDM() ? 200 : pref.fullsteps);
+  const tol = Math.max(0, +$("#pTol").value) * passoInteiro;
+  const A = 2 * rec, B = Math.min(pref.curso - 2 * rec, A + Math.round(Math.max(0.1, +$("#pDist").value) * spr()));
+  if (B <= A) throw new Error("curso curto demais para o recuo escolhido");
+  const modo = $("#pModo").value, rpmMover = +$("#rpm").value, acMover = +$("#acel").value;
+  const niveis = [];
+  if (modo === "vel") for (let r = +$("#pIni").value; r <= +$("#pMax").value; r += Math.max(1, +$("#pPasso").value)) niveis.push({ rpm: r, ac: acMover });
+  else if (modo === "acel") for (let x = +$("#pAIni").value; x <= +$("#pAMax").value; x = +(x * 1.5).toFixed(2)) niveis.push({ rpm: rpmMover, ac: x });
+  else niveis.push({ rpm: rpmMover, ac: acMover });
+  if (!niveis.length) throw new Error("nenhum nível no intervalo escolhido");
+  calLog("ida e volta entre " + fmt(A / spr(), 2) + " e " + fmt(B / spr(), 2) + " voltas do zero, " + N + "× por nível; tolerância " + fmt(tol / passoInteiro, 1) + " passo(s) inteiro(s)");
+
+  // referência: se estiver longe, busca rápida; depois recua e aproxima devagar
+  let s = await lerSt();
+  if (!s["f" + neg]) { await ex({ c: "jog", v: -vB, a: aRef }); s = await esperaParar(); if (!s["f" + neg]) throw new Error("parou sem o FIM" + neg); }
+  await ex({ c: "mover", n: rec, v: vB, a: aRef }); await esperaParar();
+  await aproximaDevagar(neg, vF, aRef);
+  await ex({ c: "zero", p: 0 });
+  calLog("zero no FIM" + neg + " (aproximação lenta)");
+
+  let ok = null;
+  for (const nv of niveis) {
+    const v = nv.rpm / 60 * spr(), a = nv.ac * spr(), nome = nv.rpm + " rpm, " + fmt(nv.ac, 1) + " voltas/s²";
+    await ex({ c: "ir", p: A, v: vB, a: aRef }); await esperaParar();
+    for (let i = 0; i < N; i++) {
+      await ex({ c: "ir", p: B, v, a }); s = await esperaParar();
+      if (s.pos !== B) throw new Error(nome + ": movimento interrompido (fim de curso ou travamento) na ida " + (i + 1));
+      await ex({ c: "ir", p: A, v, a }); s = await esperaParar();
+      if (s.pos !== A) throw new Error(nome + ": movimento interrompido na volta " + (i + 1));
+    }
+    const erro = await aproximaDevagar(neg, vF, aRef);            // deveria acionar em 0
+    const bom = Math.abs(erro) <= tol;
+    calLog(nome + ": chave acionou em " + erro + " micropassos (" + fmt(erro / passoInteiro, 2) + " passos inteiros) → " +
+      (bom ? "sem perda" : "PERDEU PASSO"), bom ? "" : "bad");
+    await ex({ c: "zero", p: 0 });                                // nova referência para o próximo nível
+    if (!bom) break;
+    ok = nv;
+  }
+  await ex({ c: "ir", p: A, v: vB, a: aRef }); await esperaParar();
+  if (!ok) calLog("perdeu passo já no primeiro nível", "bad");
+  else if (modo === "unico") calLog("sem perda de passo em " + ok.rpm + " rpm e " + fmt(ok.ac, 1) + " voltas/s²", "ok");
+  else if (modo === "vel") calLog("maior velocidade sem perda: " + ok.rpm + " rpm (a " + fmt(ok.ac, 1) + " voltas/s²) → use ~" + Math.round(ok.rpm * 0.8) + " rpm", "ok");
+  else calLog("maior aceleração sem perda: " + fmt(ok.ac, 1) + " voltas/s² (a " + ok.rpm + " rpm) → use ~" + fmt(ok.ac * 0.7, 1), "ok");
+}
+
+$("#btnPerda").onclick = () => rodaRotina("perda de passo", testePerda);
+$("#btnCurso").onclick = () => rodaRotina("calibrar curso", calibraCurso);
+
+// ---------- páginas ----------
+const ABAS = ["status", "mover", "drivers", "sensores", "testes", "registro"];
+function mostraAba(a) {
+  if (!ABAS.includes(a)) a = "status";
+  for (const x of ABAS) $("#aba-" + x).hidden = x !== a;
+  document.querySelectorAll("nav.abas button").forEach(b => b.classList.toggle("on", b.dataset.aba === a));
+  try { localStorage.setItem(PREF_KEY + "-aba", a); } catch (e) {}
+  if (location.hash !== "#" + a) history.replaceState(null, "", "#" + a);
+  if (a === "status") desenha();
+  if (a === "registro") { const el = $("#log"); el.scrollTop = el.scrollHeight; }
+}
+document.querySelectorAll("nav.abas button").forEach(b => b.onclick = () => mostraAba(b.dataset.aba));
+window.addEventListener("hashchange", () => mostraAba(location.hash.slice(1)));
+mostraAba(location.hash.slice(1) || (() => { try { return localStorage.getItem(PREF_KEY + "-aba"); } catch (e) { return null; } })() || "status");
+$("#btnVarV").onclick = () => rodaRotina("varrer velocidade", varreVelocidade);
+$("#btnVarA").onclick = () => rodaRotina("varrer aceleração", varreAceleracao);
+$("#btnMargem").onclick = () => rodaRotina("margem de torque", margemTorque);
+
+if (!("serial" in navigator)) aviso("Este navegador não tem Web Serial. Abra esta página no Chrome ou no Edge (computador).");
+if (navigator.serial) navigator.serial.addEventListener("disconnect", e => { if (e.target === port || e.port === port) desconectar(); });
+mostraCorrentes(); mostraVthr(); aplicaModo(); desenha();
+carregaFwSite();
+log("pronto. Feche o mpremote/Thonny e clique em Conectar.");
+</script>
+</body>
+</html>

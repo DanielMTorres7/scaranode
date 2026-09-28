@@ -1,0 +1,33 @@
+# Publica o painel web (firmware/painel) no GitHub Pages a cada push em main que mexa nele.
+# O site entrega index.html + no.py + main.py: o botão "Gravar firmware do site" busca esses arquivos.
+name: painel
+
+on:
+  push:
+    branches: [main]
+    paths: ["firmware/painel/**", ".github/workflows/painel.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: firmware/painel
+      - id: deploy
+        uses: actions/deploy-pages@v4

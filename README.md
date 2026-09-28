@@ -11,14 +11,15 @@ externo **DM556** (NEMA 23), cada um com STEP/DIR/enable próprios. Face única,
 
 📘 **[Manual completo](docs/README.md)** · 📄 **[PDF](docs/ScaraNode-Manual-v18.pdf)** ·
 🧾 **[Lista de materiais](docs/02-lista-de-materiais.md)** · 🔧 **[Montagem](docs/04-montagem.md)** ·
-⚙️ **[Klipper](docs/07-firmware-klipper.md)**
+⚙️ **[Klipper](docs/07-firmware-klipper.md)** ·
+🎛️ **[Painel web](https://danielmtorres7.github.io/scaranode/)** ([como usar](firmware/painel/README.md))
 
 ## Estrutura
 
 ```
 hardware/     placa e esquemático KiCad (ScaraNode.kicad_pro / .kicad_pcb / .kicad_sch + bibliotecas do projeto)
 production/   arquivos para fabricar: gerber/, furação, BOM.csv
-firmware/     configuração Klipper de referência
+firmware/     configuração Klipper de referência; painel/ = painel web de bancada + firmware MicroPython
 docs/         manual (Markdown + PDF), imagens, histórico de revisões
 ```
 
