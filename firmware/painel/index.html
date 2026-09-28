@@ -133,6 +133,24 @@ body:not(.modo-dm):not(.modo-ambos) .so-dm, body.modo-dm .so-tmc { display: none
 #calRes { margin: 14px 0 0; max-height: 240px; overflow: auto; white-space: pre-wrap; background: var(--field);
   border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font: 12.5px/1.5 ui-monospace, Consolas, monospace; }
 #calRes:empty { display: none; }
+a { color: var(--accent); }
+a.gh { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); text-decoration: none;
+  border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: var(--field); }
+a.gh:hover { border-color: var(--accent); }
+#bemVindo { margin: 16px 20px 0; }
+@media (min-width: 1540px) { #bemVindo { max-width: 1460px; margin-left: auto; margin-right: auto; } }
+@media (max-width: 420px) { #bemVindo { margin: 12px 16px 0; } }
+.bv-topo { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; }
+.bv-topo > div { flex: 1; min-width: 0; }
+.bv-topo p { margin: 0; max-width: 90ch; }
+#bemVindo h2.bv-titulo { font-size: 18px; text-transform: none; letter-spacing: 0; color: var(--ink); margin-bottom: 6px; }
+.bv-passos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 16px 0 4px; }
+.bv-passo { position: relative; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px 14px 50px; background: var(--field); }
+.bv-passo h3 { font-size: 14px; margin: 0 0 4px; }
+.bv-passo p { margin: 0 0 10px; color: var(--muted); }
+.bv-n { position: absolute; left: 14px; top: 12px; width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 13px; }
+ol.passos { margin: 0; padding-left: 20px; display: grid; gap: 12px; }
 body.rotina #btnCurso, body.rotina #btnPerda, body.rotina #btnVarV, body.rotina #btnVarA, body.rotina #btnMargem { opacity: .45; pointer-events: none; }
 table.leds { border-collapse: collapse; width: 100%; font-size: 13px; }
 table.leds td { padding: 5px 6px; border-top: 1px solid var(--line); vertical-align: top; }
@@ -174,6 +192,10 @@ kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--li
   <span id="chipTMC" class="chip so-tmc">TMC</span>
   <span id="chipEN" class="chip">motor solto</span>
   <button id="btnCon" class="pri">Conectar</button>
+  <button id="btnAjuda" title="Tela de boas-vindas">Ajuda</button>
+  <a id="lnkRepo" class="gh" target="_blank" rel="noopener" title="Código, manual e placa no GitHub">
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+    GitHub</a>
 </header>
 <div class="barra off-when-disc">
   <div class="bval"><span class="k">posição</span><b id="barPos" class="num">—</b></div>
@@ -191,9 +213,41 @@ kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--li
   <button data-aba="sensores">Sensores</button>
   <button data-aba="testes">Testes</button>
   <button data-aba="registro">Registro</button>
+  <button data-aba="firmware">Firmware</button>
 </nav>
 </div>
 <div id="aviso"></div>
+<section id="bemVindo" class="card" hidden>
+  <div class="bv-topo">
+    <div>
+      <h2 class="bv-titulo">Bem-vindo ao painel do ScaraNode</h2>
+      <p>Painel de bancada para testar a placa sem Klipper: mover o motor, configurar o TMC2209 ou o DM556,
+        ler fins de curso, NTC e 24 V, e gravar o firmware. A conexão vai <b>direto do navegador para a placa</b>
+        ligada na USB deste computador; nada passa por servidor.</p>
+    </div>
+    <button id="btnBvFecha" title="Esconder (volta pelo botão Ajuda)">Fechar</button>
+  </div>
+  <div class="bv-passos">
+    <div class="bv-passo"><span class="bv-n">1</span>
+      <h3>MicroPython na placa</h3>
+      <p>Só na primeira vez: segure <b>BOOT</b> no RP2040-Zero, ligue a USB e copie o
+        <a href="https://micropython.org/download/RPI_PICO/" target="_blank" rel="noopener">.uf2 do MicroPython</a>
+        para o drive <code>RPI-RP2</code> que aparece.</p></div>
+    <div class="bv-passo"><span class="bv-n">2</span>
+      <h3>Firmware do painel</h3>
+      <p>Escolha a revisão da placa e grave o firmware pela própria página. Também dá para baixar os arquivos,
+        editar e gravar a sua versão.</p>
+      <button id="btnBvFw">Abrir Firmware</button></div>
+    <div class="bv-passo"><span class="bv-n">3</span>
+      <h3>Conectar</h3>
+      <p>Feche Thonny/mpremote (a porta só aceita um programa) e escolha a placa na lista do navegador.</p>
+      <button id="btnBvCon" class="pri">Conectar</button></div>
+  </div>
+  <p class="hint">Precisa de <b>Chrome ou Edge no computador</b> (Web Serial). ⚠ TMC2209 no máximo 1,2 A, e nunca
+    ligue ou desligue o motor com os 24 V ligados.
+    Placa, manual e código: <a id="lnkBvRepo" target="_blank" rel="noopener">GitHub</a> ·
+    <a id="lnkBvManual" target="_blank" rel="noopener">manual</a>.</p>
+</section>
 
 <!-- ================= STATUS ================= -->
 <main class="aba" id="aba-status">
@@ -516,8 +570,8 @@ kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--li
   </section>
 </main>
 
-<!-- ================= REGISTRO ================= -->
-<main class="aba" id="aba-registro" hidden>
+<!-- ================= FIRMWARE ================= -->
+<main class="aba" id="aba-firmware" hidden>
   <section class="card span2">
     <h2>Firmware da placa</h2>
     <div class="row">
@@ -534,8 +588,6 @@ kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--li
     </div>
     <div class="row" style="margin-top:10px">
       <button id="btnFwSite" class="pri" disabled>Gravar firmware do site</button>
-      <button id="btnFwArq">Gravar arquivos do computador…</button>
-      <input id="fwArq" type="file" accept=".py" multiple hidden>
       <progress id="fwProg" max="1" value="0" hidden style="flex:1; min-width:120px"></progress>
     </div>
     <p class="hint">A revisão escolhida vai num placa.py (REV = "v17") e decide os pinos que o no.py usa; errar a revisão
@@ -545,6 +597,32 @@ kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--li
       no meio, a placa continua com o firmware anterior. Funciona também com a placa sem o firmware do painel,
       desde que tenha MicroPython.</p>
   </section>
+  <section class="card span2">
+    <h2>Editar o firmware</h2>
+    <ol class="passos">
+      <li><b>Baixe</b> os arquivos da versão do site:
+        <div class="row" style="margin-top:6px">
+          <button class="fwBaixa" data-arq="no.py" disabled>no.py</button>
+          <button class="fwBaixa" data-arq="main.py" disabled>main.py</button>
+          <button class="fwBaixa" data-arq="placa.py">placa.py</button>
+        </div></li>
+      <li><b>Edite</b> no seu editor (VS Code, Thonny…). Mudou o comportamento? Suba o <code>FW = "painel 1.x"</code>
+        no topo do no.py para saber qual versão está na placa.</li>
+      <li><b>Grave</b> os arquivos editados:
+        <div class="row" style="margin-top:6px">
+          <button id="btnFwArq">Gravar arquivos do computador…</button>
+          <input id="fwArq" type="file" accept=".py" multiple hidden>
+        </div>
+        <p class="hint">Escolha um ou mais .py (segure Ctrl). Só os escolhidos são trocados; se o placa.py não
+          estiver entre eles, ele sai da revisão selecionada acima.</p></li>
+    </ol>
+    <p class="hint">Deu errado? <b>Gravar firmware do site</b> volta para a versão publicada. Código e histórico no
+      <a id="lnkFw" target="_blank" rel="noopener">GitHub</a>.</p>
+  </section>
+</main>
+
+<!-- ================= REGISTRO ================= -->
+<main class="aba" id="aba-registro" hidden>
   <section class="card span2">
     <h2>Registro <span class="grow"></span><button id="btnLimpa">Limpar</button></h2>
     <div id="log" aria-live="polite"></div>
@@ -715,7 +793,7 @@ async function iniciaPainel() {
     r = await cmd({ c: "info" }, 1500).catch(() => null);
   }
   if (!r) throw new Error("A placa não respondeu. Confira se nenhum outro programa (mpremote, Thonny) está usando a porta; " +
-    "se a placa ainda não tem o firmware do painel, grave-o em Registro › Firmware da placa.");
+    "se a placa ainda não tem o firmware do painel, grave-o na aba Firmware.");
   aplicaInfo(r);
   await enviaSensores(true);
   await enviaDriver(true);
@@ -723,6 +801,7 @@ async function iniciaPainel() {
   await acao({ c: "rampa", s: !!pref.rampa }, 2500, true);
   if (pref.tmcInvDir) await acao({ c: "cfg", shaft: true }, 4000, true);
   document.body.classList.remove("desconectado");
+  mostraBemVindo();
   chip($("#chipCon"), "conectado", "ok");
   $("#btnCon").textContent = "Desconectar"; $("#btnCon").classList.remove("pri");
   aviso("");
@@ -751,6 +830,7 @@ async function desconectar() {
   try { if (port) await port.close(); } catch (e) {}
   reader = writer = port = null;
   document.body.classList.add("desconectado");
+  mostraBemVindo();
   chip($("#chipCon"), "desconectado"); chip($("#chipVM"), "24 V"); chip($("#chipTMC"), "TMC"); chip($("#chipEN"), "motor solto");
   $("#btnCon").textContent = "Conectar"; $("#btnCon").classList.add("pri");
   if (estava) log("desconectado");
@@ -758,6 +838,7 @@ async function desconectar() {
 
 // ---------- gravação do firmware (raw REPL, como o mpremote) ----------
 const FW_ARQS = ["main.py", "no.py"];          // servidos ao lado desta página no site
+const REPO = "https://github.com/DanielMTorres7/scaranode";
 let fwSite = null, fwPlaca = null, revPlaca = null, gravando = false;
 const REVS = { v17: "v14–v17", v18: "v18" };
 let rawSink = null, rx = "", rxAviso = null;
@@ -890,7 +971,7 @@ function comparaFw(avisar) {
   const igual = fwSite.fw === fwPlaca, mesmaRev = !revPlaca || revPlaca === pref.placa;
   chip(c, !mesmaRev ? "revisão diferente da escolhida" : igual ? "atualizado" : "diferente do site", igual && mesmaRev ? "ok" : "warn");
   if (!igual && avisar) {
-    log(`o firmware da placa (${fwPlaca}) é diferente do site (${fwSite.fw}); grave em Registro › Firmware da placa`, "warn");
+    log(`o firmware da placa (${fwPlaca}) é diferente do site (${fwSite.fw}); grave na aba Firmware`, "warn");
     toast(`Firmware da placa: ${fwPlaca} · no site: ${fwSite.fw}`, "warn");
   }
 }
@@ -908,9 +989,33 @@ async function carregaFwSite() {
     if (!fw) throw new Error("no.py sem a linha FW = \"…\"");
     fwSite = { fw, arquivos: arqs };
     $("#fwSite").textContent = fw; $("#btnFwSite").disabled = gravando;
+    document.querySelectorAll(".fwBaixa").forEach(b => b.disabled = false);
     comparaFw(conectado);
   } catch (e) { $("#fwSite").textContent = "não encontrado (" + e.message + ")"; }
 }
+
+function baixa(nome, dados) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([dados], { type: "text/x-python" })); a.download = nome;
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+document.querySelectorAll(".fwBaixa").forEach(b => b.onclick = () => {
+  const n = b.dataset.arq;
+  if (n === "placa.py") return baixa(n, `REV = "${pref.placa}"\n`);
+  const a = fwSite && fwSite.arquivos.find(x => x.nome === n);
+  if (a) baixa(n, a.dados);
+});
+$("#lnkRepo").href = $("#lnkBvRepo").href = REPO;
+$("#lnkBvManual").href = REPO + "/blob/main/docs/README.md";
+$("#lnkFw").href = REPO + "/tree/main/firmware/painel";
+
+// boas-vindas: aparece sem placa conectada até ser fechada (volta pelo botão Ajuda)
+function mostraBemVindo() { $("#bemVindo").hidden = conectado || !!pref.bvFechado; }
+$("#btnBvFecha").onclick = () => { pref.bvFechado = true; salvaPref(); mostraBemVindo(); };
+$("#btnAjuda").onclick = () => { pref.bvFechado = false; salvaPref(); $("#bemVindo").hidden = false; window.scrollTo({ top: 0, behavior: "smooth" }); };
+$("#btnBvFw").onclick = () => mostraAba("firmware");
+$("#btnBvCon").onclick = () => conectar();
 
 $("#fwRev").value = pref.placa;
 $("#fwRev").onchange = () => { pref.placa = $("#fwRev").value; salvaPref(); comparaFw(false); };
@@ -1461,7 +1566,7 @@ $("#btnPerda").onclick = () => rodaRotina("perda de passo", testePerda);
 $("#btnCurso").onclick = () => rodaRotina("calibrar curso", calibraCurso);
 
 // ---------- páginas ----------
-const ABAS = ["status", "mover", "drivers", "sensores", "testes", "registro"];
+const ABAS = ["status", "mover", "drivers", "sensores", "testes", "registro", "firmware"];
 function mostraAba(a) {
   if (!ABAS.includes(a)) a = "status";
   for (const x of ABAS) $("#aba-" + x).hidden = x !== a;
@@ -1482,6 +1587,7 @@ if (!("serial" in navigator)) aviso("Este navegador não tem Web Serial. Abra es
 if (navigator.serial) navigator.serial.addEventListener("disconnect", e => { if (e.target === port || e.port === port) desconectar(); });
 mostraCorrentes(); mostraVthr(); aplicaModo(); desenha();
 carregaFwSite();
+mostraBemVindo();
 log("pronto. Feche o mpremote/Thonny e clique em Conectar.");
 </script>
 </body>

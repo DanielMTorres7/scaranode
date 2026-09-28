@@ -17,7 +17,7 @@ por servidor nenhum.
 
 A placa precisa de **MicroPython** no RP2040-Zero (segure BOOT, ligue a USB e copie o `.uf2` do
 [micropython.org](https://micropython.org/download/RPI_PICO/) para o drive `RPI-RP2`).
-Depois, no painel, em **Registro › Firmware da placa**:
+Depois, no painel, na aba **Firmware**:
 
 1. escolha a **revisão da placa** (v14–v17 ou v18): ela vai num `placa.py` (`REV = "v17"`) e decide os pinos;
 2. clique em **Gravar firmware do site**.
@@ -25,6 +25,12 @@ Depois, no painel, em **Registro › Firmware da placa**:
 O painel solta o motor, para o firmware e grava `main.py`, `no.py` e `placa.py` pelo raw REPL (como o
 `mpremote`). Cada arquivo vai para um `.tmp`, é conferido (tamanho e SHA-256) e só então substitui o
 antigo: se algo falhar no meio, a placa continua com o firmware anterior.
+
+## Editar o firmware
+
+Na aba **Firmware**, **Editar o firmware**: baixe `no.py`, `main.py` e `placa.py`, edite no seu editor e grave com
+**Gravar arquivos do computador…** (um ou mais `.py`; só os escolhidos são trocados). Para voltar à versão
+publicada, **Gravar firmware do site**. Para publicar a sua versão para todos, faça o commit aqui (veja abaixo).
 
 ## Pinos por revisão
 
