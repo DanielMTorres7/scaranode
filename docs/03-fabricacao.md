@@ -40,7 +40,7 @@ para manter o anel de 0,4 mm.
 
 **Para mandar ao operador da CNC:** [`production/cnc/ScaraNode-v18-CNC.zip`](../production/cnc/ScaraNode-v18-CNC.zip).
 Tem um arquivo por ferramenta, com a operação e a ferramenta no nome (isolação, uma furação por broca, contorno),
-numerados na ordem da fresa, e um PDF de uma página com o resumo, as ferramentas e o aviso de espelhamento.
+numerados na ordem da fresa, e um PDF com o resumo, as ferramentas, o aviso de espelhamento e a imagem de conferência.
 
 Já gerados em [`production/gerber/`](../production/gerber/):
 
