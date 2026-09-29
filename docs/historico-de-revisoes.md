@@ -55,6 +55,10 @@ Projetista: **Daniel M. Torres**.
 - **Furos M3 esquadrados:** o H2 foi para o canto de cima (retângulo de 69 × 57 mm com os outros três). O J5 foi
   5,6 mm para a esquerda e o D1 4,5 mm; a 24 V passa a descer pelo R9 até o C10 e do C10 ao VM do TMC.
 - Validado: 128 pinos, 0 violações de cobre, 0 ligações faltando, ERC e paridade 0.
+- **Validada em hardware (29/09/2026)**, placa fresada na CNC, RP2040-Zero com MicroPython 1.29 e firmware do painel
+  1.12: UART do TMC2209 pelo GP2 → pino 4 (endereço 3, versão 0x21), 24 V no GP1, NTC1 no GP29 e o canal do DM556
+  (STEP GP6, DIR GP7, ENA GP8 pelo 74ACT245 até o J4) girando o motor. Na montagem, a perna 2 do 74ACT245 (saída
+  PUL) sem contato deixava o DM556 só dar um tranco ao habilitar: confira as pernas do CI no soquete.
 
 ## v17 — esquemático e resistores iguais
 
