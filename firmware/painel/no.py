@@ -5,6 +5,7 @@
 # não depende do laço em Python (GC, USB, leitura do TMC); a varredura em Python fica de reserva.
 # A revisão da placa vem do placa.py (REV = "v17"), gravado pelo painel; sem ele, v17.
 # Pinos comuns: EN GP0 · VSENSE GP1 · ENA do DM556 GP8 (alto = habilitado) · FIM1 GP27 · FIM2 GP15 · NTC GP29
+# v18 também tem o NTC2 (motor do DM556) no GP26.
 # v14–v17: UART GP5 (fio até o pino 4 do módulo) · STEP GP6 · DIR GP7, que vão ao mesmo tempo para o
 #          TMC (soquete) e para o 74ACT245 -> J4 (DM556).
 # v18:     TMC STEP GP4 · DIR GP5 · UART GP2 (pino 4); DM556 STEP GP6 · DIR GP7 pelo 74ACT245, independentes.
@@ -16,7 +17,7 @@ import sys, time, math, array, json, select, uctypes, micropython, gc
 from machine import Pin, ADC, mem32
 from rp2 import PIO, StateMachine, asm_pio
 
-FW = "painel 1.11"
+FW = "painel 1.12"
 try:
     from placa import REV
 except ImportError:
@@ -30,6 +31,7 @@ PIN_UART, PIN_STEP_TMC, PIN_DIR_TMC, PIN_STEP_DM, PIN_DIR_DM = PLACAS[REV if REV
 COMUM = PIN_STEP_TMC == PIN_STEP_DM     # STEP/DIR compartilhados: permite o modo "ambos"
 PIN_EN, PIN_VS, PIN_ENA = 0, 1, 8
 PIN_FIM1, PIN_FIM2 = 27, 15
+PIN_NTC, PIN_NTC2 = 29, (26 if REV == "v18" else None)
 PIN_LED = 16                # WS2812 do RP2040-Zero (GRB)
 BAUD = 115200             # UART do TMC: ~1,2 ms por leitura de registrador
 RSENSE = 0.110
@@ -234,13 +236,17 @@ ena = Pin(PIN_ENA, Pin.OUT, value=0)     # DM556 desabilitado até o painel pedi
 dirp = None                              # DIR do driver em uso (_pinos)
 vs = Pin(PIN_VS, Pin.IN)
 fim = (Pin(PIN_FIM1, Pin.IN, Pin.PULL_UP), Pin(PIN_FIM2, Pin.IN, Pin.PULL_UP))
-adc_ntc = ADC(3)
+# ADC pelo Pin: pelo número do canal (ADC(3)) o MicroPython 1.29 deixa o pull-down do GPIO ligado,
+# que carrega o divisor de 100k e fazia o NTC marcar ~60 °C no ar.
+adc_ntc = ADC(Pin(PIN_NTC))
+adc_ntc2 = ADC(Pin(PIN_NTC2)) if PIN_NTC2 is not None else None
 adc_t = ADC(4)
 
 cfg = {"run": 0.8, "hold": 0.4, "micro": 16, "modo": "stealth", "vthr": 0,
        "intpol": True, "hdelay": 8, "tpd": 20, "shaft": False}    # shaft inverte só o motor do TMC
 fimcfg = {"f1": 0, "f2": 0, "inv": False,     # f: 0 só mostra, -1 bloqueia o -, 1 bloqueia o +, 2 os dois
-          "r25": 100000, "beta": 3950}           # NTC; o pull-up R3 da placa é 100k
+          "r25": 100000, "beta": 3950,           # NTC1; o pull-up R3 da placa é 100k
+          "r25_2": 100000, "beta2": 3950}        # NTC2 (v18); pull-up R15 de 100k
 drv = {"tipo": "tmc", "inv_step": False, "inv_dir": False,
        "segura": False}    # segura: a emergência corta os pulsos mas NÃO solta o motor (Z com fuso)
 tmc = None
@@ -824,12 +830,12 @@ def _vigia_sg():
 
 # ---------- sensores ----------
 
-def _ntc():
-    r = adc_ntc.read_u16()
+def _ntc(adc=adc_ntc, r25="r25", beta="beta"):
+    r = adc.read_u16()
     if r > 64000 or r < 300:
         return None, r
     R = 100000 * r / (65535 - r)
-    return round(1 / (1 / 298.15 + math.log(R / fimcfg["r25"]) / fimcfg["beta"]) - 273.15, 1), r
+    return round(1 / (1 / 298.15 + math.log(R / fimcfg[r25]) / fimcfg[beta]) - 273.15, 1), r
 
 
 def _trp():
@@ -845,7 +851,7 @@ def _livre():
 
 def c_info(m):
     return {"fw": FW, "placa": REV, "ambos": COMUM, "cfg": cfg, "fimcfg": fimcfg, "drv": drv, "sgcfg": sgcfg, "tmc": _tmc_resumo(),
-            "pos": pos, "vmax": VMAX, "rampa_s": rampa_s, "imax": IMAX_RUN}
+            "tem_ntc2": adc_ntc2 is not None, "pos": pos, "vmax": VMAX, "rampa_s": rampa_s, "imax": IMAX_RUN}
 
 
 def c_rampa(m):
@@ -1087,7 +1093,7 @@ def c_fim(m):
             fimcfg[k] = max(-1, min(2, int(m[k])))
     if "inv" in m:
         fimcfg["inv"] = bool(m["inv"])
-    for k in ("r25", "beta"):
+    for k in ("r25", "beta", "r25_2", "beta2"):
         if k in m and float(m[k]) > 0:
             fimcfg[k] = float(m[k])
     return {"fimcfg": fimcfg}
@@ -1100,6 +1106,8 @@ def c_st(m):
     d = {"pos": p, "v": v, "mov": mov.tipo if mov else ("vact" if vact else ""), "drv": drv["tipo"],
          "en": 1 if _energizado() else 0, "vm": vs.value(), "f1": int(_fim(0)), "f2": int(_fim(1)),
          "fr1": fim[0].value(), "fr2": fim[1].value(), "ntc": ntc, "ntcr": ntcr, "trp": _trp(), "vact": vact}
+    if adc_ntc2 is not None:
+        d["ntc2"], d["ntcr2"] = _ntc(adc_ntc2, "r25_2", "beta2")
     t = None
     if vs.value() and _usa_tmc():
         if not _tmc_on() and time.ticks_diff(time.ticks_ms(), ult_busca) > 2000:

@@ -268,7 +268,8 @@ kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--li
     <h2>Sensores da placa</h2>
     <div class="sens">
       <div class="sen"><div class="k">24 V (VSENSE, GP1)</div><div class="v" id="sVM">—</div></div>
-      <div class="sen"><div class="k">NTC (GP29)</div><div class="v" id="sNTC">—</div></div>
+      <div class="sen"><div class="k">NTC1 (GP29)</div><div class="v" id="sNTC">—</div></div>
+      <div class="sen so-ntc2" hidden><div class="k">NTC2 (GP26)</div><div class="v" id="sNTC2">—</div></div>
       <div class="sen"><div class="k">FIM1 (GP27)</div><div class="v" id="sF1">—</div></div>
       <div class="sen"><div class="k">FIM2 (GP15)</div><div class="v" id="sF2">—</div></div>
       <div class="sen"><div class="k">RP2040 (interno)</div><div class="v" id="sRP">—</div></div>
@@ -496,10 +497,14 @@ kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--li
   <section class="card off-when-disc">
     <h2>NTC</h2>
     <div class="grid2">
-      <label class="f">R a 25 °C (Ω)<input id="r25" type="number" value="100000" step="1000"></label>
-      <label class="f">Beta<input id="beta" type="number" value="3950" step="1"></label>
+      <label class="f">NTC1 (J3): R a 25 °C (Ω)<input id="r25" type="number" value="100000" step="1000"></label>
+      <label class="f">NTC1: Beta<input id="beta" type="number" value="3950" step="1"></label>
     </div>
-    <p class="hint">Pull-up de 100k na placa (R3). Com o conector vazio aparece "desligado"; um valor fixo que não muda com a temperatura indica o R3 aberto.</p>
+    <div class="grid2 so-ntc2" hidden style="margin-top:12px">
+      <label class="f">NTC2 (J8): R a 25 °C (Ω)<input id="r25_2" type="number" value="100000" step="1000"></label>
+      <label class="f">NTC2: Beta<input id="beta2" type="number" value="3950" step="1"></label>
+    </div>
+    <p class="hint">Pull-up de 100k na placa (R3 no NTC1, R15 no NTC2, só na v18). Com o conector vazio aparece "desligado"; um valor fixo que não muda com a temperatura indica o pull-up aberto.</p>
     <div class="row" style="margin-top:12px"><button id="btnFim" class="pri">Aplicar fins de curso e NTC</button></div>
   </section>
 </main>
@@ -641,7 +646,7 @@ const fmt = (x, d = 2) => Number(x).toLocaleString("pt-BR", { minimumFractionDig
 
 // ---------- preferências locais ----------
 const PREF_KEY = "scaranode-painel";
-const pref = Object.assign({ fullsteps: 200, red: 1, unid: "volta", rpm: 60, acel: 4, r25: 100000, beta: 3950,
+const pref = Object.assign({ fullsteps: 200, red: 1, unid: "volta", rpm: 60, acel: 4, r25: 100000, beta: 3950, r25_2: 100000, beta2: 3950,
   drv: "tmc", tmcInvDir: false, placa: "v17", dmPpr: 3200, dmRed: 1, dmInvStep: true, dmInvDir: false,
   sgOn: false, sgLim: 50, sgVmin: 60, sgN: 2, segura: false, cMm: 0, rampa: false, motorI: 1.7 },
   (() => { try { return JSON.parse(localStorage.getItem(PREF_KEY)) || {}; } catch (e) { return {}; } })());
@@ -650,6 +655,7 @@ function salvaPref() { try { localStorage.setItem(PREF_KEY, JSON.stringify(pref)
 $("#fullsteps").value = pref.fullsteps; $("#red").value = pref.red; $("#unid").value = pref.unid;
 $("#rpm").value = pref.rpm; $("#rpmR").value = Math.min(1200, pref.rpm); $("#acel").value = pref.acel;
 $("#r25").value = pref.r25; $("#beta").value = pref.beta;
+$("#r25_2").value = pref.r25_2; $("#beta2").value = pref.beta2;
 $("#drvSel").value = pref.drv; $("#tmcInvDir").value = pref.tmcInvDir ? "1" : "0";
 $("#dmPpr").value = pref.dmPpr; $("#dmRed").value = pref.dmRed;
 $("#dmInvStep").value = pref.dmInvStep ? "1" : "0"; $("#dmInvDir").value = pref.dmInvDir ? "1" : "0";
@@ -1036,6 +1042,7 @@ let ultimo = null;
 function aplicaInfo(r) {
   const c = r.cfg;
   const ambos = r.ambos !== false;                  // firmware antigo não informa: placa até a v17
+  document.querySelectorAll(".so-ntc2").forEach(e => e.hidden = !r.tem_ntc2);
   $("#drvSel").querySelector('option[value="ambos"]').disabled = !ambos;
   if (!ambos && pref.drv === "ambos") {
     pref.drv = "tmc"; salvaPref(); aplicaModo();
@@ -1090,7 +1097,9 @@ function atualiza(s) {
   const fimTxt = (a, raw) => (a ? '<span class="chip warn">acionado</span>' : '<span class="chip">livre</span>') + ` <small class="hint">pino ${raw}</small>`;
   $("#sF1").innerHTML = fimTxt(s.f1, s.fr1); $("#sF2").innerHTML = fimTxt(s.f2, s.fr2);
   $("#sF1b").innerHTML = fimTxt(s.f1, s.fr1); $("#sF2b").innerHTML = fimTxt(s.f2, s.fr2);
-  $("#sNTC").textContent = s.ntc == null ? (s.ntcr > 60000 ? "desligado" : "curto?") : fmt(s.ntc, 1) + " °C";
+  const ntcTxt = (t, raw) => t == null ? (raw > 60000 ? "desligado" : "curto?") : fmt(t, 1) + " °C";
+  $("#sNTC").textContent = ntcTxt(s.ntc, s.ntcr);
+  if (s.ntcr2 != null) $("#sNTC2").textContent = ntcTxt(s.ntc2, s.ntcr2);
   $("#sRP").textContent = fmt(s.trp, 1) + " °C";
   $("#sgMin").textContent = s.sgmin == null ? "—" : s.sgmin;
   $("#sVact").textContent = s.vact ? fmt(s.vact * 0.715 / spr() * 60, 1) + " rpm" : "parado";
@@ -1250,8 +1259,10 @@ $("#btnCfg").onclick = async () => {
 };
 
 async function enviaSensores(silencio) {
-  pref.r25 = +$("#r25").value || 100000; pref.beta = +$("#beta").value || 3950; salvaPref();
-  return acao({ c: "fim", f1: +$("#f1").value, f2: +$("#f2").value, inv: $("#inv").value === "1", r25: pref.r25, beta: pref.beta }, 2500, silencio);
+  pref.r25 = +$("#r25").value || 100000; pref.beta = +$("#beta").value || 3950;
+  pref.r25_2 = +$("#r25_2").value || 100000; pref.beta2 = +$("#beta2").value || 3950; salvaPref();
+  return acao({ c: "fim", f1: +$("#f1").value, f2: +$("#f2").value, inv: $("#inv").value === "1", r25: pref.r25, beta: pref.beta,
+    r25_2: pref.r25_2, beta2: pref.beta2 }, 2500, silencio);
 }
 $("#btnFim").onclick = () => enviaSensores(false);
 
