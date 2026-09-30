@@ -24,7 +24,7 @@ import sys, os, time, math, array, json, select, uctypes, micropython, gc, struc
 from machine import Pin, ADC, mem32, unique_id
 from rp2 import PIO, StateMachine, asm_pio
 
-FW = "painel 1.13"
+FW = "painel 1.14"
 try:
     from placa import REV
 except ImportError:
@@ -177,6 +177,7 @@ def _traj():
     wrap()
     label("para")
     irq(block, rel(0))
+    jmp("para")                 # não sai do sentinela nem se o irq for limpo com a SM ligada
 
 
 T_PASSO, T_ALTO, T_PARA = 9, 12, 16       # posições no _traj: início do passo, depois do set(pins, 1), sentinela
@@ -937,7 +938,7 @@ def _vigia_sg():
 R_DMA_ABORT = 0x50000444
 R_PIO1_CTRL_SET = 0x50302000
 R_PIO1_FLEVEL = 0x5030000C
-TJ_RING = (4 * TJ_N).bit_length() - 1     # log2 do anel em bytes, para o RING_SIZE do DMA
+TJ_RING = 11                              # log2 do anel em bytes (4 * TJ_N = 2048), para o RING_SIZE do DMA
 tj_ult = None                             # resultado da última trajetória: {"tid", "ok", "msg"}
 
 
@@ -1013,9 +1014,10 @@ class _Canal:
         n = self.feitas()
         return self.pr[(n - 1) & (TJ_N - 1)] if n else self.p0
 
-    def pos_corte(self, inv):
-        """posição exata com a SM e o DMA parados"""
-        lidas, fl = self.lidas(), self.fifo()
+    def pos_corte(self, inv, lidas):
+        """posição exata com a SM parada; lidas = contagem do DMA tirada ANTES do abort (o abort zera o
+        TRANS_COUNT no RP2040)"""
+        fl = self.fifo()
         pc = (mem32[self.r_addr] & 0x1F) - self.ini
         n_ok = lidas - fl - (0 if pc == 0 else 1)         # no pull: a palavra atual nem saiu da FIFO
         parc = 0
@@ -1162,6 +1164,8 @@ class Traj:
         global tj, pos, tj_ult
         if self.on:
             _tj_corta_v(self.pinos, self.sms)
+        # SMs paradas: a FIFO enche e o DMA fica esperando, a contagem não muda mais. Lê antes do abort.
+        lidas = [c.lidas() for c in self.cs] if self.on else None
         m = 0
         for c in self.cs:
             mem32[c.r_al1] = 0
@@ -1169,8 +1173,8 @@ class Traj:
         mem32[R_DMA_ABORT] = m
         while mem32[R_DMA_ABORT] & m:
             pass
-        for c in self.cs:
-            posk[c.k] = c.pos_corte(self.inv) if self.on else c.p0
+        for j, c in enumerate(self.cs):
+            posk[c.k] = c.pos_corte(self.inv, lidas[j]) if self.on else c.p0
             c.sm.active(0)
         mem32[R_PIO1_IRQ] = 6
         tj = None
