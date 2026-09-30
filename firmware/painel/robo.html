@@ -1,0 +1,1376 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robô ScaraNode</title>
+<style>
+:root {
+  --bg: #f4f5f7; --card: #ffffff; --ink: #1a1d21; --muted: #626b75; --line: #dde1e6;
+  --field: #f8f9fb; --accent: #2458d6; --accent-ink: #ffffff;
+  --ok: #17803d; --ok-bg: #e5f4ea; --warn: #a15c07; --warn-bg: #fdf1dc;
+  --bad: #c0262d; --bad-bg: #fbe6e7; --off: #9aa3ad; --off-bg: #eceef1;
+  --reach: rgba(36, 88, 214, .07); --trail: #d9721b; --arm: #1a1d21;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121418; --card: #1b1e24; --ink: #e7e9ec; --muted: #9aa3ad; --line: #2c3139;
+    --field: #22262d; --accent: #6b93f5; --accent-ink: #0e1116;
+    --ok: #4cc47a; --ok-bg: #173323; --warn: #e9a94b; --warn-bg: #3a2a12;
+    --bad: #f0646b; --bad-bg: #3e1b1e; --off: #6c747e; --off-bg: #262a31;
+    --reach: rgba(107, 147, 245, .09); --trail: #f0994b; --arm: #e7e9ec;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121418; --card: #1b1e24; --ink: #e7e9ec; --muted: #9aa3ad; --line: #2c3139;
+  --field: #22262d; --accent: #6b93f5; --accent-ink: #0e1116;
+  --ok: #4cc47a; --ok-bg: #173323; --warn: #e9a94b; --warn-bg: #3a2a12;
+  --bad: #f0646b; --bad-bg: #3e1b1e; --off: #6c747e; --off-bg: #262a31;
+  --reach: rgba(107, 147, 245, .09); --trail: #f0994b; --arm: #e7e9ec;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+[hidden] { display: none !important; }
+.topo { position: sticky; top: 0; z-index: 5; background: var(--card); border-bottom: 1px solid var(--line); }
+header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 20px; }
+header h1 { font-size: 17px; margin: 0; font-weight: 650; }
+header .sub { color: var(--muted); font-size: 13px; }
+.grow { flex: 1; }
+.barra { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 8px 20px;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg); }
+.bval { display: grid; line-height: 1.2; }
+.bval .k { font-size: 11.5px; color: var(--muted); }
+.bval b { font-size: 16px; font-variant-numeric: tabular-nums; }
+nav.abas { display: flex; gap: 2px; padding: 0 14px; overflow-x: auto; }
+nav.abas button { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none;
+  padding: 10px 12px; color: var(--muted); font-weight: 600; }
+nav.abas button:hover { color: var(--ink); border-bottom-color: var(--line); }
+nav.abas button.on { color: var(--ink); border-bottom-color: var(--accent); }
+main { padding: 16px 20px 40px; display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); max-width: 1500px; margin: 0 auto; }
+main.desenho { grid-template-columns: minmax(0, 1fr) 380px; align-items: start; }
+@media (max-width: 900px) { main.desenho { grid-template-columns: 1fr; } }
+@media (max-width: 420px) { header, .barra { padding-left: 16px; padding-right: 16px; }
+  main { padding: 12px 16px 32px; grid-template-columns: 1fr; } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+  margin: 0 0 12px; font-weight: 650; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.card h3 { font-size: 13.5px; margin: 14px 0 8px; }
+.span2 { grid-column: 1 / -1; }
+button { font: inherit; border: 1px solid var(--line); background: var(--field); color: var(--ink);
+  border-radius: 7px; padding: 7px 12px; cursor: pointer; white-space: nowrap; }
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button.pri { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+button.stop { background: var(--warn-bg); color: var(--warn); border-color: var(--warn); font-weight: 650; }
+button.emerg { background: var(--bad); color: #fff; border-color: var(--bad); font-weight: 700; }
+button.jog { user-select: none; touch-action: none; min-width: 48px; }
+button.jog.ativo { background: var(--accent); color: var(--accent-ink); }
+input, select { font: inherit; color: var(--ink); background: var(--field); border: 1px solid var(--line);
+  border-radius: 7px; padding: 6px 8px; min-width: 0; width: 100%; }
+input[type=checkbox] { width: auto; }
+input:focus, select:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+label.f { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); }
+label.c { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.g2, .g3, .g4 { align-items: end; }
+@media (max-width: 520px) { .g3, .g4 { grid-template-columns: 1fr 1fr; } }
+.hint { color: var(--muted); font-size: 12.5px; margin: 8px 0 0; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 99px;
+  font-size: 12.5px; font-weight: 600; background: var(--off-bg); color: var(--off); text-transform: none; letter-spacing: 0; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.ok { background: var(--ok-bg); color: var(--ok); }
+.chip.warn { background: var(--warn-bg); color: var(--warn); }
+.chip.bad { background: var(--bad-bg); color: var(--bad); }
+.chip.acc { background: var(--field); color: var(--accent); }
+.sens { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.sen { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.sen .k { color: var(--muted); font-size: 12px; }
+.sen .v { font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.big { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.num { font-variant-numeric: tabular-nums; }
+#cv { width: 100%; height: min(72vh, 760px); display: block; border-radius: 8px; background: var(--field);
+  border: 1px solid var(--line); touch-action: none; cursor: crosshair; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+progress { width: 100%; height: 10px; accent-color: var(--accent); }
+.vazio { color: var(--muted); padding: 28px 8px; text-align: center; }
+#log { height: min(62vh, 560px); overflow: auto; font: 12.5px/1.5 ui-monospace, "Cascadia Mono", Consolas, monospace;
+  background: var(--field); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+#log div { white-space: pre-wrap; word-break: break-word; }
+#log .t { color: var(--muted); } #log .bad { color: var(--bad); } #log .ok { color: var(--ok); } #log .warn { color: var(--warn); }
+#toasts { position: fixed; right: 16px; bottom: 16px; display: grid; gap: 8px; z-index: 20; max-width: min(420px, calc(100vw - 32px)); }
+.toast { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+  border-radius: 8px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+.toast.bad { border-left-color: var(--bad); } .toast.ok { border-left-color: var(--ok); } .toast.warn { border-left-color: var(--warn); }
+#aviso { display: none; margin: 16px 20px 0; padding: 12px 14px; border-radius: 8px;
+  background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn); }
+a { color: var(--accent); }
+a.lnk { display: inline-flex; align-items: center; color: var(--ink); text-decoration: none;
+  border: 1px solid var(--line); border-radius: 7px; padding: 7px 12px; background: var(--field); }
+a.lnk:hover { border-color: var(--accent); }
+kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--line); border-bottom-width: 2px;
+  border-radius: 4px; padding: 0 4px; background: var(--field); }
+body.ocupado .livre-so { opacity: .45; pointer-events: none; }
+.sub2 { color: var(--muted); font-size: 12.5px; font-weight: 400; }
+.eixo-pos { margin-left: auto; font-size: 18px; color: var(--ink); text-transform: none; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="topo">
+<header>
+  <div>
+    <h1>Robô ScaraNode</h1>
+    <div class="sub">várias placas · J1, J2 e Z · desenho</div>
+  </div>
+  <div class="grow"></div>
+  <span id="chipPlacas" class="chip">nenhuma placa</span>
+  <button id="btnAdd" class="pri">Adicionar placa</button>
+  <button id="btnReco" hidden>Reconectar placas</button>
+  <a class="lnk" href="./" title="Painel de uma placa, com testes e gravação do firmware">Painel de uma placa</a>
+</header>
+<div class="barra">
+  <div class="bval"><span class="k">J1</span><b id="bj1">—</b></div>
+  <div class="bval"><span class="k">J2</span><b id="bj2">—</b></div>
+  <div class="bval"><span class="k">Z</span><b id="bz">—</b></div>
+  <div class="bval"><span class="k">ponta (x, y)</span><b id="bxy">—</b></div>
+  <span id="chipEstado" class="chip">parado</span>
+  <div class="grow"></div>
+  <button id="btnSoltar" class="livre-so" title="Desliga a corrente de todos os motores (a referência é perdida)">Soltar motores</button>
+  <button id="btnParar" class="stop">Parar <kbd>Espaço</kbd></button>
+  <button id="btnEmerg" class="emerg">Emergência <kbd>Esc</kbd></button>
+</div>
+<nav class="abas" aria-label="Páginas">
+  <button data-aba="desenho">Desenho</button>
+  <button data-aba="eixos">Eixos</button>
+  <button data-aba="placas">Placas</button>
+  <button data-aba="registro">Registro</button>
+</nav>
+</div>
+<div id="aviso"></div>
+
+<!-- ================= DESENHO ================= -->
+<main class="aba desenho" id="aba-desenho">
+  <section class="card">
+    <h2>Área de trabalho (vista de cima) <span class="grow"></span>
+      <span class="sub2">clique ou arraste para mover o desenho</span></h2>
+    <canvas id="cv"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--reach)"></i>alcance (limites das juntas)</span>
+      <span><i style="background:var(--ink)"></i>desenho</span>
+      <span><i style="background:var(--muted)"></i>deslocamento com a caneta levantada</span>
+      <span><i style="background:var(--trail)"></i>traço feito</span>
+      <span><i style="background:var(--bad)"></i>fora do alcance</span>
+    </div>
+  </section>
+  <div style="display:grid;gap:16px">
+    <section class="card">
+      <h2>Desenho</h2>
+      <div class="g2">
+        <label class="f">Forma
+          <select id="dForma">
+            <option value="quadrado">Quadrado</option><option value="circulo">Círculo</option>
+            <option value="estrela">Estrela</option><option value="espiral">Espiral</option>
+            <option value="coracao">Coração</option><option value="flor">Flor (rosácea)</option>
+            <option value="grade">Grade (várias linhas)</option><option value="svg">Arquivo SVG…</option>
+          </select></label>
+        <label class="f">&nbsp;<button id="btnSvg">Abrir SVG…</button></label>
+      </div>
+      <input type="file" id="svgArq" accept=".svg,image/svg+xml" hidden>
+      <p class="hint" id="dFonte">—</p>
+      <div class="g4" style="margin-top:10px">
+        <label class="f">Centro X (mm)<input type="number" id="dX" step="5"></label>
+        <label class="f">Centro Y (mm)<input type="number" id="dY" step="5"></label>
+        <label class="f">Tamanho (mm)<input type="number" id="dTam" step="5" min="1"></label>
+        <label class="f">Rotação (°)<input type="number" id="dRot" step="5"></label>
+      </div>
+      <p class="hint">X aponta para a frente do robô (J1 = 0°), Y para a esquerda. Tamanho = maior lado do desenho.</p>
+      <hr>
+      <div class="g3">
+        <label class="f">Desenhando (mm/s)<input type="number" id="dV" step="1" min="0.5"></label>
+        <label class="f">Aceleração (mm/s²)<input type="number" id="dA" step="10" min="1"></label>
+        <label class="f">Deslocamento (% da vel. das juntas)<input type="number" id="dDesl" step="10" min="5" max="100"></label>
+      </div>
+      <div class="g3" style="margin-top:10px">
+        <label class="f">Cotovelo
+          <select id="dCot"><option value="1">J2 positivo</option><option value="-1">J2 negativo</option></select></label>
+        <label class="f">Canto (mm de desvio)<input type="number" id="dDesvio" step="0.01" min="0.005"></label>
+        <label class="f">Simplificar (mm)<input type="number" id="dTol" step="0.01" min="0"></label>
+      </div>
+      <hr>
+      <label class="c"><input type="checkbox" id="dUsaZ"> Levantar a caneta com o Z entre os traços</label>
+      <div class="g3" style="margin-top:10px">
+        <label class="f">Z desenhando (mm)<input type="number" id="dZd" step="0.5"></label>
+        <label class="f">Z levantado (mm)<input type="number" id="dZu" step="0.5"></label>
+        <label class="f">Z no fim (mm)<input type="number" id="dZf" step="0.5"></label>
+      </div>
+      <p class="hint" id="dSemZ">Sem o Z, a ponta fica sempre abaixada: os deslocamentos entre traços também riscam.</p>
+    </section>
+    <section class="card">
+      <h2>Executar <span class="grow"></span><span id="chipPlano" class="chip">—</span></h2>
+      <div class="sens" id="planoInfo"></div>
+      <div class="row" style="margin-top:12px">
+        <button id="btnSim">Simular</button>
+        <select id="simVel" style="width:auto" title="Velocidade da simulação">
+          <option value="1">1×</option><option value="4">4×</option><option value="16" selected>16×</option><option value="64">64×</option></select>
+        <div class="grow"></div>
+        <button id="btnDesenhar" class="pri livre-so">Desenhar</button>
+        <button id="btnPausa" hidden>Pausar</button>
+      </div>
+      <progress id="prog" value="0" max="1" style="margin-top:12px"></progress>
+      <p class="hint" id="progTxt">Antes de desenhar: referencie os eixos (aba Eixos). A simulação não mexe nos motores.</p>
+      <hr>
+      <div class="g3">
+        <label class="f">X (mm)<input type="number" id="irX" value="350" step="5"></label>
+        <label class="f">Y (mm)<input type="number" id="irY" value="0" step="5"></label>
+        <label class="f">&nbsp;<button id="btnIrXY" class="livre-so">Levar a ponta</button></label>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- ================= EIXOS ================= -->
+<main class="aba" id="aba-eixos">
+  <section class="card span2">
+    <h2>Braço</h2>
+    <div class="g4">
+      <label class="f">J1 → J2, centro a centro (mm)<input type="number" id="L1" step="1" min="1"></label>
+      <label class="f">J2 → ponta, centro a centro (mm)<input type="number" id="L2" step="1" min="1"></label>
+      <label class="f">&nbsp;<button id="btnRefTudo" class="livre-so">Referenciar tudo</button></label>
+      <label class="f">&nbsp;<button id="btnSalvar" class="livre-so">Salvar nas placas</button></label>
+    </div>
+    <p class="hint">Cada eixo fica salvo <b>na placa em que está ligado</b> (config.json): canal, redução, limites e fim de curso;
+      o comprimento dos braços vai com o J1 e as alturas da caneta com o Z.
+      Ao conectar, o painel lê tudo de volta. As alterações são gravadas sozinhas, com os motores parados.
+      <span id="salvoTxt"></span></p>
+  </section>
+  <div id="eixosCards" style="display:contents"></div>
+</main>
+
+<!-- ================= PLACAS ================= -->
+<main class="aba" id="aba-placas">
+  <div id="placasCards" style="display:contents"></div>
+  <section class="card span2" id="placasVazio">
+    <div class="vazio">Nenhuma placa conectada. Clique em <b>Adicionar placa</b> e escolha a porta de cada uma
+      (Chrome ou Edge). Feche antes o painel de uma placa, o Thonny e o mpremote: a porta só aceita um programa.</div>
+  </section>
+</main>
+
+<!-- ================= REGISTRO ================= -->
+<main class="aba" id="aba-registro">
+  <section class="card span2">
+    <h2>Registro <span class="grow"></span><button id="btnLimpa">Limpar</button></h2>
+    <div id="log"></div>
+  </section>
+</main>
+
+<div id="svgTmp" style="position:absolute;left:-10000px;top:0;width:10px;height:10px;overflow:hidden;visibility:hidden" aria-hidden="true"></div>
+<div id="toasts"></div>
+
+<script>
+"use strict";
+// ==== núcleo (sem DOM: cinemática, planejamento e codificação das trajetórias) ====
+const DT = 0.01;                       // s por segmento da trajetória
+const RAD = Math.PI / 180;
+
+function fk(t1, t2, L1, L2) {
+  const a = t1 * RAD, b = (t1 + t2) * RAD;
+  return [L1 * Math.cos(a) + L2 * Math.cos(b), L1 * Math.sin(a) + L2 * Math.sin(b)];
+}
+// ângulos (graus) para a ponta em (x, y) com o cotovelo cot (+1/-1); null fora do alcance ou dos limites
+function ik(x, y, o) {
+  const { L1, L2, cot, lim } = o;
+  const c2 = (x * x + y * y - L1 * L1 - L2 * L2) / (2 * L1 * L2);
+  if (c2 > 1 + 1e-12 || c2 < -1 - 1e-12) return null;
+  const t2 = cot * Math.acos(Math.max(-1, Math.min(1, c2)));
+  let t1 = Math.atan2(y, x) - Math.atan2(L2 * Math.sin(t2), L1 + L2 * Math.cos(t2));
+  if (t1 > Math.PI) t1 -= 2 * Math.PI; else if (t1 <= -Math.PI) t1 += 2 * Math.PI;
+  const q = [t1 / RAD, t2 / RAD];
+  if (lim && (q[0] < lim[0][0] - 1e-9 || q[0] > lim[0][1] + 1e-9 || q[1] < lim[1][0] - 1e-9 || q[1] > lim[1][1] + 1e-9)) return null;
+  return q;
+}
+// trapézio de 0 a L (parte e chega parado): duração e posição no tempo t
+function trap(L, v, a) {
+  if (!(L > 0)) return { T: 0, s: () => 0 };
+  let ta = v / a, da = v * v / (2 * a), vp = v;
+  if (2 * da > L) { vp = Math.sqrt(L * a); ta = vp / a; da = L / 2; }
+  const tc = (L - 2 * da) / vp, T = 2 * ta + tc;
+  return { T, s: t => t <= 0 ? 0 : t >= T ? L : t < ta ? 0.5 * a * t * t : t < ta + tc ? da + vp * (t - ta) : L - 0.5 * a * (T - t) * (T - t) };
+}
+// deslocamento em espaço de juntas (as duas chegam juntas): amostras a cada DT até o fim
+function planejaJunta(q0, q1, o) {
+  const d = [q1[0] - q0[0], q1[1] - q0[1]];
+  let vs = Infinity, as = Infinity;
+  for (let i = 0; i < 2; i++) if (Math.abs(d[i]) > 1e-9) { vs = Math.min(vs, o.vj[i] / Math.abs(d[i])); as = Math.min(as, o.aj[i] / Math.abs(d[i])); }
+  if (!isFinite(vs)) return { q: [[], []], T: 0 };
+  const tp = trap(1, vs, as), M = Math.ceil(tp.T / DT - 1e-9);
+  const r = [new Float64Array(M), new Float64Array(M)];
+  for (let m = 0; m < M; m++) { const s = tp.s((m + 1) * DT); r[0][m] = q0[0] + d[0] * s; r[1][m] = q0[1] + d[1] * s; }
+  return { q: r, T: tp.T };
+}
+// traço em linha reta entre os pontos (mm), velocidade limitada pelo desenho, pelas juntas e pelos cantos
+function planejaCartesiano(pts, o) {
+  const P = [pts[0]];
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0] = P[P.length - 1], [x1, y1] = pts[i], L = Math.hypot(x1 - x0, y1 - y0);
+    if (L < 1e-6) continue;
+    const n = Math.ceil(L / 2);
+    for (let k = 1; k <= n; k++) P.push([x0 + (x1 - x0) * k / n, y0 + (y1 - y0) * k / n]);
+  }
+  const n = P.length - 1;
+  if (n < 1) return { q: [[], []], T: 0 };
+  const L = new Float64Array(n), U = [], cap = new Float64Array(n), a = o.a;
+  for (let i = 0; i < n; i++) {
+    const dx = P[i + 1][0] - P[i][0], dy = P[i + 1][1] - P[i][1];
+    L[i] = Math.hypot(dx, dy); const u = [dx / L[i], dy / L[i]]; U.push(u);
+    const mx = (P[i][0] + P[i + 1][0]) / 2, my = (P[i][1] + P[i + 1][1]) / 2, h = Math.min(0.05, L[i] / 2);
+    const qa = ik(mx - u[0] * h, my - u[1] * h, o), qb = ik(mx + u[0] * h, my + u[1] * h, o);
+    if (!qa || !qb || !ik(P[i][0], P[i][1], o) || !ik(P[i + 1][0], P[i + 1][1], o))
+      throw new Error("ponto fora do alcance em (" + mx.toFixed(1) + ", " + my.toFixed(1) + ") mm");
+    let c = o.v;
+    for (let j = 0; j < 2; j++) { const r = Math.abs(qb[j] - qa[j]) / (2 * h); if (r > 1e-9) c = Math.min(c, o.vj[j] / r); }
+    cap[i] = c;
+  }
+  const vj = new Float64Array(n + 1);
+  for (let k = 1; k < n; k++) {
+    const cosT = -(U[k - 1][0] * U[k][0] + U[k - 1][1] * U[k][1]);
+    let v;
+    if (cosT > 0.999999) v = 0;
+    else if (cosT < -0.999999) v = Infinity;
+    else { const s = Math.sqrt(0.5 * (1 - cosT)); v = Math.sqrt(a * o.desvio * s / (1 - s)); }
+    vj[k] = Math.min(v, cap[k - 1], cap[k]);
+  }
+  for (let k = n - 1; k >= 0; k--) vj[k] = Math.min(vj[k], Math.sqrt(vj[k + 1] * vj[k + 1] + 2 * a * L[k]));
+  for (let k = 0; k < n; k++) vj[k + 1] = Math.min(vj[k + 1], Math.sqrt(vj[k] * vj[k] + 2 * a * L[k]));
+  const pec = []; let T = 0;
+  for (let i = 0; i < n; i++) {
+    const vi = vj[i], vo = vj[i + 1];
+    const vp = Math.max(vi, vo, Math.min(cap[i], Math.sqrt((2 * a * L[i] + vi * vi + vo * vo) / 2)));
+    const d1 = (vp * vp - vi * vi) / (2 * a), d3 = (vp * vp - vo * vo) / (2 * a), d2 = Math.max(0, L[i] - d1 - d3);
+    const t1 = (vp - vi) / a, t2 = vp > 0 ? d2 / vp : 0, t3 = (vp - vo) / a;
+    pec.push({ t0: T, t1, t2, vi, vp, d1, d2, L: L[i] }); T += t1 + t2 + t3;
+  }
+  const M = Math.ceil(T / DT - 1e-9), r = [new Float64Array(M), new Float64Array(M)];
+  let j = 0;
+  for (let m = 0; m < M; m++) {
+    const t = Math.min(T, (m + 1) * DT);
+    while (j < n - 1 && pec[j + 1].t0 <= t) j++;
+    const p = pec[j], tt = t - p.t0;
+    let s = tt < p.t1 ? p.vi * tt + a * tt * tt / 2 : tt < p.t1 + p.t2 ? p.d1 + p.vp * (tt - p.t1)
+      : (() => { const u = tt - p.t1 - p.t2; return p.d1 + p.d2 + p.vp * u - a * u * u / 2; })();
+    s = Math.max(0, Math.min(p.L, s)) / p.L;
+    const q = ik(P[j][0] + (P[j + 1][0] - P[j][0]) * s, P[j][1] + (P[j + 1][1] - P[j][1]) * s, o);
+    if (!q) throw new Error("trajetória saiu do alcance");
+    r[0][m] = q[0]; r[1][m] = q[1];
+  }
+  return { q: r, T };
+}
+// ângulos a cada DT -> palavras do _traj (no.py): d | DIR << 20 | n << 21, com os atrasos acertados para
+// o total de ciclos de cada canal acompanhar m·DT (os dois canais andam juntos sem acumular erro)
+function codifica(q, spu, p0, freq, dmin) {
+  const Tc = Math.round(DT * freq), M = q.length, w = new Uint32Array(M);
+  let A = 0, prev = p0, dir = 1;
+  for (let m = 0; m < M; m++) {
+    const alvo = Math.round(q[m] * spu), n = alvo - prev; prev = alvo;
+    const t = (m + 1) * Tc - A;
+    if (n === 0) { const d = Math.min(Math.max(t - 9, 1), 0xFFFFF); A += d + 9; w[m] = dir * 0x100000 + d; continue; }
+    const an = Math.abs(n); dir = n > 0 ? 1 : 0;
+    if (an > 2047) throw new Error("junta rápida demais (" + an + " passos em " + DT * 1000 + " ms)");
+    const d = Math.min(0xFFFFF, Math.round(((t - 5) / an - 7) / 2));
+    if (d < dmin) throw new Error("junta rápida demais: " + Math.round(an / DT) + " passos/s");
+    A += 5 + an * (2 * d + 7);
+    w[m] = an * 0x200000 + dir * 0x100000 + d;
+  }
+  return { w, fim: prev };
+}
+// Ramer–Douglas–Peucker
+function simplifica(pts, tol) {
+  if (pts.length < 3 || !(tol > 0)) return pts;
+  const manter = new Uint8Array(pts.length); manter[0] = manter[pts.length - 1] = 1;
+  const pilha = [[0, pts.length - 1]];
+  while (pilha.length) {
+    const [i0, i1] = pilha.pop(), [ax, ay] = pts[i0], [bx, by] = pts[i1];
+    const dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy;
+    let dm = -1, im = -1;
+    for (let i = i0 + 1; i < i1; i++) {
+      const [px, py] = pts[i];
+      let t = L2 ? ((px - ax) * dx + (py - ay) * dy) / L2 : 0; t = Math.max(0, Math.min(1, t));
+      const d = Math.hypot(px - ax - t * dx, py - ay - t * dy);
+      if (d > dm) { dm = d; im = i; }
+    }
+    if (dm > tol) { manter[im] = 1; pilha.push([i0, im], [im, i1]); }
+  }
+  return pts.filter((_, i) => manter[i]);
+}
+// ordem dos traços pelo mais perto (e invertendo os abertos quando o fim está mais perto)
+function ordena(tracos, ini) {
+  const resta = tracos.slice(), out = []; let [x, y] = ini;
+  while (resta.length) {
+    let mi = 0, md = Infinity, inv = false;
+    resta.forEach((t, i) => {
+      const a = Math.hypot(t[0][0] - x, t[0][1] - y), b = Math.hypot(t[t.length - 1][0] - x, t[t.length - 1][1] - y);
+      if (a < md) { md = a; mi = i; inv = false; }
+      if (b < md) { md = b; mi = i; inv = true; }
+    });
+    let t = resta.splice(mi, 1)[0]; if (inv) t = t.slice().reverse();
+    out.push(t); [x, y] = t[t.length - 1];
+  }
+  return out;
+}
+// ==== fim do núcleo ====
+
+const $ = s => document.querySelector(s);
+const fmt = (x, d = 1) => Number(x).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const enc = new TextEncoder();
+const EIX = ["j1", "j2", "z"];
+const NOME = { j1: "J1", j2: "J2", z: "Z" };
+const UN = e => e === "z" ? "mm" : "°";
+
+// ---------- registro ----------
+function log(msg, cls = "") {
+  const el = $("#log"), d = document.createElement("div");
+  d.innerHTML = `<span class="t">${new Date().toLocaleTimeString("pt-BR")}</span> `;
+  const s = document.createElement("span"); s.className = cls; s.textContent = msg; d.appendChild(s);
+  const fim = el.scrollTop + el.clientHeight >= el.scrollHeight - 4;
+  el.appendChild(d); while (el.childElementCount > 500) el.firstChild.remove();
+  if (fim) el.scrollTop = el.scrollHeight;
+}
+function toast(msg, cls = "") {
+  const t = document.createElement("div"); t.className = "toast " + cls; t.textContent = msg;
+  $("#toasts").appendChild(t); setTimeout(() => t.remove(), 5000);
+}
+function aviso(msg) { const a = $("#aviso"); a.textContent = msg || ""; a.style.display = msg ? "block" : "none"; }
+function chip(el, txt, cls) { el.textContent = txt; el.className = "chip " + (cls || ""); }
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
+
+// ---------- estado salvo neste computador (o que é de cada placa vai para a placa) ----------
+const DEF_EIXO = {
+  j1: { k: "dm556", passos: 200, ppr: 3200, red: 14, inv: false, min: -130, max: 130, vmax: 30, amax: 60,
+        ref: "manual", lado: -1, pchave: -130, recuo: 5, vbusca: 8, pos0: 0 },
+  j2: { k: "tmc", passos: 200, ppr: 3200, red: 12, inv: false, min: -135, max: 135, vmax: 45, amax: 90,
+        ref: "fim1", lado: -1, pchave: -135, recuo: 5, vbusca: 10, pos0: 0 },
+  z:  { k: "tmc", passos: 200, ppr: 3200, fuso: 8, inv: false, min: 0, max: 100, vmax: 10, amax: 50,
+        ref: "fim1", lado: 1, pchave: 100, recuo: 3, vbusca: 4, pos0: 90 },
+};
+const CAMPOS_EIXO = Object.keys(DEF_EIXO.j1).concat(["fuso", "micro"]);
+const DEF_DES = { forma: "estrela", x: 330, y: 0, tam: 120, rot: 0, v: 20, a: 300, desl: 60, cot: 1, desvio: 0.05, tol: 0.05,
+                  usaZ: false, zd: 60, zu: 70, zf: 90, L1: 300, L2: 200 };
+const KEY = "scaranode-robo";
+const est = (() => {
+  let s = {}; try { s = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+  const eixos = {};
+  for (const e of EIX) eixos[e] = Object.assign({}, DEF_EIXO[e], { placa: null }, (s.eixos || {})[e]);
+  return { eixos, des: Object.assign({}, DEF_DES, s.des), refs: s.refs || {}, svg: s.svg || null };
+})();
+function salvaLocal() { try { localStorage.setItem(KEY, JSON.stringify(est)); } catch (e) {} }
+
+// ---------- placas (uma conexão Web Serial por placa) ----------
+const placas = [];
+class Placa {
+  constructor(port) { this.port = port; this.pend = new Map(); this.nextId = 1; this.info = null; this.st = null;
+                      this.ok = false; this.stPend = false; this.falhas = 0; this.timer = null; this.tj = false; }
+  get uid() { return this.info && this.info.uid ? this.info.uid : "?"; }
+  get nome() { return (this.info && this.info.robo && this.info.robo.nome) || ("placa " + (this.info ? this.info.placa : "?") + " · " + this.uid.slice(-4)); }
+  get novo() { return !!(this.info && this.info.uid && this.info.tjn); }         // firmware 1.13+
+  escrever(s) { return this.writer ? this.writer.write(enc.encode(s)) : Promise.reject(new Error("porta fechada")); }
+  cmd(o, timeout = 2000) {
+    if (!this.ok) return Promise.reject(new Error(this.nome + ": desconectada"));
+    const id = this.nextId++;
+    o = Object.assign({}, o, { id });
+    return new Promise((res, rej) => {
+      const t = setTimeout(() => { this.pend.delete(id); rej(new Error(this.nome + ": sem resposta (" + o.c + ")")); }, timeout);
+      this.pend.set(id, m => { clearTimeout(t); this.pend.delete(id); m.ok ? res(m) : rej(new Error(this.nome + ": " + (m.erro || "erro"))); });
+      this.escrever(JSON.stringify(o) + "\n").catch(e => { clearTimeout(t); this.pend.delete(id); rej(e); });
+    });
+  }
+  linha(l) {
+    if (l[0] !== "{") return;
+    let m; try { m = JSON.parse(l); } catch (e) { return; }
+    if (m.id != null && this.pend.has(m.id)) { this.pend.get(m.id)(m); return; }
+    if (m.ev) m.ev.forEach(x => evento(this, x));
+  }
+  async lerLoop() {
+    const dec = new TextDecoder(); let buf = "";
+    this.reader = this.port.readable.getReader();
+    try {
+      for (;;) {
+        const { value, done } = await this.reader.read(); if (done) break;
+        buf += dec.decode(value, { stream: true });
+        let i; while ((i = buf.indexOf("\n")) >= 0) { const l = buf.slice(0, i).trim(); buf = buf.slice(i + 1); if (l) this.linha(l); }
+      }
+    } catch (e) { if (this.ok) { log(this.nome + ": conexão perdida (" + e.message + ")", "bad"); toast(this.nome + ": conexão perdida", "bad"); } }
+    finally { try { this.reader.releaseLock(); } catch (e) {} if (this.ok) this.fecha(); }
+  }
+  async abre() {
+    await this.port.open({ baudRate: 115200 });
+    try { await this.port.setSignals({ dataTerminalReady: true, requestToSend: true }); } catch (e) {}
+    this.writer = this.port.writable.getWriter(); this.ok = true; this.lerLoop();
+    let r = await this.cmd({ c: "info" }, 900).catch(() => null);
+    if (!r) {
+      log("placa sem resposta: reiniciando o MicroPython…", "warn");
+      await this.escrever("\r\x03"); await sleep(400); await this.escrever("\x04"); await sleep(2800);
+      r = await this.cmd({ c: "info" }, 1500).catch(() => null);
+    }
+    if (!r) throw new Error("a placa não respondeu: grave o firmware do painel (Painel de uma placa › Firmware) e feche outros programas na porta");
+    this.info = r;
+    this.st = await this.cmd({ c: "st" }).catch(() => null);
+    this.timer = setInterval(() => this.tick(), 250);
+  }
+  async tick() {
+    if (!this.ok || this.stPend) return;
+    this.stPend = true;
+    try { const s = await this.cmd({ c: "st" }, 1500); this.falhas = 0; this.aplicaSt(s); }
+    catch (e) { if (++this.falhas === 8) { log(this.nome + ": parou de responder ao status", "bad"); toast(this.nome + " parou de responder", "bad"); } }
+    finally { this.stPend = false; }
+  }
+  aplicaSt(s) {
+    this.st = s;
+    if (s.ev) s.ev.forEach(x => evento(this, x));
+    if (s.boot && this.info.boot && s.boot !== this.info.boot) {        // reiniciou sem cair a USB (Ctrl+D)
+      log(this.nome + ": a placa reiniciou", "warn"); this.info.boot = s.boot;
+      this.cmd({ c: "info" }).then(r => { this.info = r; adotaPlaca(this); }).catch(() => {});
+    }
+    if (!s.en) for (const e of EIX) if (est.eixos[e].placa === this.uid && est.refs[e]) { delete est.refs[e]; salvaLocal(); log(NOME[e] + ": referência perdida (motor solto)", "warn"); }
+    atualizaTela();
+  }
+  async stAgora() { const s = await this.cmd({ c: "st" }, 2000); this.aplicaSt(s); return s; }
+  async fecha() {
+    this.ok = false; clearInterval(this.timer);
+    this.pend.forEach(f => f({ ok: 0, erro: "desconectada" })); this.pend.clear();
+    try { if (this.reader) await this.reader.cancel(); } catch (e) {}
+    try { if (this.writer) this.writer.releaseLock(); } catch (e) {}
+    try { await this.port.close(); } catch (e) {}
+    const i = placas.indexOf(this); if (i >= 0) placas.splice(i, 1);
+    log(this.nome + ": desconectada");
+    montaPlacas(); montaEixos(); atualizaTela();
+  }
+}
+function evento(p, x) {
+  log(p.nome + ": " + x, "warn");
+  if (/EMERG|caiu|FIM|travamento|TMC|faltaram|erro|config/.test(x)) toast(p.nome + ": " + x, "bad");
+}
+const placaPorUid = uid => placas.find(p => p.uid === uid) || null;
+const placaDe = e => placaPorUid(est.eixos[e].placa);
+
+async function conecta(port) {
+  if (placas.some(p => p.port === port)) return;
+  const p = new Placa(port);
+  try {
+    await p.abre();
+    const dup = placas.find(q => q.uid === p.uid && p.uid !== "?");
+    if (dup) { await p.fecha(); return; }
+    placas.push(p);
+    log(p.nome + " conectada · " + p.info.fw + " · placa " + p.info.placa, "ok");
+    if (!p.novo) { aviso(p.nome + " está com o firmware " + p.info.fw + ": grave o painel 1.13 ou mais novo (Painel de uma placa › Firmware) para usar o robô."); }
+    adotaPlaca(p);
+  } catch (e) {
+    try { await p.fecha(); } catch (_) {}
+    if (e.name !== "NotFoundError") { log(e.message, "bad"); toast(e.message, "bad"); }
+  }
+  montaPlacas(); montaEixos(); atualizaTela();
+}
+// placa conectada: os eixos que ela guarda passam a valer aqui
+function adotaPlaca(p) {
+  const ex = (p.info.robo && p.info.robo.eixos) || {};
+  for (const e of EIX) {
+    if (ex[e]) {
+      est.eixos[e] = Object.assign({}, DEF_EIXO[e], ex[e], { placa: p.uid });
+      if (est.eixos[e].k === "tmc" && p.info.cfg) est.eixos[e].micro = p.info.cfg.micro;
+      log(NOME[e] + ": lido da " + p.nome, "ok");
+    } else if (est.eixos[e].placa === p.uid && p.info.salvo) {
+      est.eixos[e].placa = null;            // a placa não tem mais este eixo
+    }
+  }
+  for (const e of EIX) if (est.refs[e] && est.eixos[e].placa === p.uid && est.refs[e] !== p.info.boot) delete est.refs[e];
+  const rb = p.info.robo || {};
+  if (rb.braco) Object.assign(est.des, { L1: +rb.braco.L1 || est.des.L1, L2: +rb.braco.L2 || est.des.L2 });
+  if (rb.caneta) for (const k of ["zd", "zu", "zf"]) if (rb.caneta[k] != null) est.des[k] = +rb.caneta[k];
+  if (rb.braco || rb.caneta) { mostraCamposDes(); replaneja(); }
+  salvaLocal();
+  sincronizaPlaca(p, false).catch(e => log(e.message, "bad"));
+}
+$("#btnAdd").onclick = async () => {
+  if (!("serial" in navigator)) { aviso("Este navegador não tem Web Serial. Use o Chrome ou o Edge no computador."); return; }
+  try { const port = await navigator.serial.requestPort({ filters: [{ usbVendorId: 0x2E8A }] }); await conecta(port); }
+  catch (e) { if (e.name !== "NotFoundError") toast(e.message, "bad"); }
+};
+async function reconecta() {
+  if (!navigator.serial) return;
+  const ps = (await navigator.serial.getPorts()).filter(port => !placas.some(p => p.port === port));
+  for (const port of ps) await conecta(port);
+  $("#btnReco").hidden = true;
+}
+$("#btnReco").onclick = reconecta;
+if (navigator.serial) navigator.serial.addEventListener("disconnect", e => { const p = placas.find(q => q.port === e.target || q.port === e.port); if (p) p.fecha(); });
+
+// ---------- unidades ----------
+function spr(e) {
+  const c = est.eixos[e];
+  if (c.k === "dm556") return c.ppr;
+  const p = placaDe(e), micro = p && p.info.cfg ? p.info.cfg.micro : (c.micro || 16);
+  return c.passos * micro;
+}
+function spu(e) { const c = est.eixos[e], s = spr(e) * (e === "z" ? 1 / c.fuso : c.red / 360); return c.inv ? -s : s; }
+function passos(e) {
+  const p = placaDe(e); if (!p || !p.st) return null;
+  const c = est.eixos[e];
+  if (p.st.pk) return p.st.pk[c.k];
+  return p.st.pos;
+}
+function posU(e) { const n = passos(e); return n == null ? null : n / spu(e); }
+function refOk(e) { const p = placaDe(e); return !!(p && est.refs[e] && p.info.boot === est.refs[e] && p.st && p.st.en); }
+
+// modo do driver e fins de curso que a placa precisa para os eixos ligados nela
+function eixosDa(p) { return EIX.filter(e => est.eixos[e].placa === p.uid); }
+function modoDesejado(p) {
+  const ks = [...new Set(eixosDa(p).map(e => est.eixos[e].k))];
+  if (!ks.length) return null;
+  if (ks.length === 2) return p.info.dois ? "dois" : "erro";
+  return ks[0];
+}
+function fimDesejado(p) {
+  // placa sem config salva: chaves NF (acionada = circuito aberto), o jeito seguro com fio partido
+  const f = { c: "fim", f1: 0, f2: 0, k1: p.info.fimcfg.k1 || "tmc", k2: p.info.fimcfg.k2 || "dm556", inv: p.info.salvo ? !!p.info.fimcfg.inv : true };
+  for (const e of eixosDa(p)) {
+    const c = est.eixos[e]; if (c.ref === "manual") continue;
+    const i = c.ref === "fim2" ? 2 : 1;
+    f["f" + i] = Math.sign(c.lado * spu(e)) || 1; f["k" + i] = c.k;
+  }
+  return f;
+}
+async function sincronizaPlaca(p, salvar) {
+  if (!p.ok || !p.novo) return;
+  const modo = modoDesejado(p);
+  if (modo === "erro") throw new Error(p.nome + ": dois canais só na v18");
+  const d = p.info.drv, temDM = eixosDa(p).some(e => est.eixos[e].k === "dm556");
+  // STEP do DM556 invertido por padrão (como no painel de uma placa); até a v17 o STEP é o mesmo do TMC
+  const invStep = temDM ? (p.info.salvo ? !!d.inv_step : true) : (p.info.dois ? !!d.inv_step : false);
+  if (modo && ((p.st && p.st.drv) !== modo || invStep !== !!d.inv_step)) {
+    const troca = (p.st && p.st.drv) !== modo;
+    const r = await p.cmd({ c: "drv", tipo: modo, inv_step: invStep, inv_dir: false, segura: !!d.segura });
+    p.info.drv = r.drv;
+    if (troca) { log(p.nome + ": modo " + modo + " (posições zeradas)", "warn"); for (const e of eixosDa(p)) delete est.refs[e]; }
+  }
+  const f = fimDesejado(p), fc = p.info.fimcfg;
+  if (["f1", "f2", "k1", "k2", "inv"].some(k => fc[k] !== f[k])) { const r = await p.cmd(f); p.info.fimcfg = r.fimcfg; }
+  if (salvar) {
+    const eixos = {};
+    for (const e of eixosDa(p)) { const c = Object.assign({}, est.eixos[e]); delete c.placa; delete c.micro; eixos[e] = c; }
+    const nome = (p.info.robo && p.info.robo.nome) || "", robo = { nome, eixos }, D = est.des;
+    if (eixos.j1) robo.braco = { L1: D.L1, L2: D.L2 };                 // o braço vai junto do J1
+    if (eixos.z) robo.caneta = { zd: D.zd, zu: D.zu, zf: D.zf };       // e as alturas da caneta junto do Z
+    const r = await p.cmd({ c: "salva", robo }, 5000);
+    p.info.robo = robo; p.info.salvo = r.salvo;
+  }
+}
+let tSalvar = null, pendenteSalvar = false;
+function agendaSalvar() {
+  pendenteSalvar = true; $("#salvoTxt").textContent = "(alterações ainda não gravadas)";
+  clearTimeout(tSalvar); tSalvar = setTimeout(salvaPlacas, 1500);
+}
+async function salvaPlacas() {
+  if (ocupado || placas.some(p => p.st && p.st.mov)) { tSalvar = setTimeout(salvaPlacas, 2000); return; }
+  pendenteSalvar = false;
+  let ok = true;
+  for (const p of placas) {
+    try { await sincronizaPlaca(p, true); } catch (e) { ok = false; log("salvar: " + e.message, "bad"); toast(e.message, "bad"); }
+  }
+  $("#salvoTxt").textContent = placas.length ? (ok ? "✓ gravado nas placas conectadas " + new Date().toLocaleTimeString("pt-BR") : "falhou (veja o Registro)") : "(nenhuma placa conectada: fica só neste computador)";
+  montaPlacas();
+}
+$("#btnSalvar").onclick = () => { clearTimeout(tSalvar); salvaPlacas(); };
+
+// ---------- tela: placas ----------
+function montaPlacas() {
+  const box = $("#placasCards"); box.innerHTML = "";
+  $("#placasVazio").hidden = placas.length > 0;
+  chip($("#chipPlacas"), placas.length ? placas.length + (placas.length > 1 ? " placas" : " placa") : "nenhuma placa", placas.length ? "ok" : "");
+  for (const p of placas) {
+    const i = p.info, c = i.cfg || {}, d = i.drv || {}, u = p.uid;
+    const s = document.createElement("section"); s.className = "card"; s.dataset.uid = u;
+    const ex = eixosDa(p).map(e => NOME[e] + " no " + (est.eixos[e].k === "tmc" ? "TMC2209" : "DM556")).join(" · ") || "nenhum eixo ligado nesta placa (aba Eixos)";
+    s.innerHTML = `
+      <h2><span style="color:var(--ink);text-transform:none;letter-spacing:0;font-size:15px">${esc(p.nome)}</span>
+        <span class="chip acc">${esc(i.placa)}</span><span class="chip ${p.novo ? "ok" : "bad"}">${esc(i.fw)}</span>
+        <span class="chip ${i.salvo ? "ok" : "warn"}">${i.salvo ? "config na placa" : "sem config salva"}</span>
+        <span class="grow"></span><button data-a="sai">Desconectar</button></h2>
+      <p class="hint" style="margin:0 0 10px">${esc(ex)} · id ${esc(u)}</p>
+      <div class="sens">
+        <div class="sen"><div class="k">24 V</div><div class="v" data-v="vm">—</div></div>
+        <div class="sen"><div class="k">TMC2209</div><div class="v" data-v="tmc">—</div></div>
+        <div class="sen"><div class="k">motores</div><div class="v" data-v="en">—</div></div>
+        <div class="sen"><div class="k">modo</div><div class="v" data-v="modo">—</div></div>
+        <div class="sen"><div class="k">FIM1 (GP27)</div><div class="v" data-v="f1">—</div></div>
+        <div class="sen"><div class="k">FIM2 (GP15)</div><div class="v" data-v="f2">—</div></div>
+      </div>
+      <div class="g2" style="margin-top:12px">
+        <label class="f">Nome<input data-c="nome" value="${esc((i.robo && i.robo.nome) || "")}" placeholder="${esc(p.nome)}"></label>
+        <label class="f">Fins de curso
+          <select data-c="nf"><option value="1">NF (acionado = circuito aberto)</option><option value="0">NA (acionado = fecha no GND)</option></select></label>
+      </div>
+      <h3>TMC2209</h3>
+      <div class="g4">
+        <label class="f">Rodando (A RMS)<input type="number" data-c="run" step="0.05" min="0.1" max="1.2" value="${c.run}"></label>
+        <label class="f">Parado (A RMS)<input type="number" data-c="hold" step="0.05" min="0" max="1.2" value="${c.hold}"></label>
+        <label class="f">Micropassos<select data-c="micro">${[1, 2, 4, 8, 16, 32, 64, 128, 256].map(m => `<option ${m === c.micro ? "selected" : ""}>${m}</option>`).join("")}</select></label>
+        <label class="f">Chopper<select data-c="modo"><option value="stealth">stealthChop</option><option value="spread">spreadCycle</option></select></label>
+      </div>
+      <h3>DM556 e emergência</h3>
+      <div class="g2">
+        <label class="f">STEP do DM556<select data-c="inv_step"><option value="1">invertido (padrão da placa)</option><option value="0">direto</option></select></label>
+        <label class="f">Na emergência<select data-c="segura"><option value="0">soltar os motores</option><option value="1">manter energizados (Z com fuso)</option></select></label>
+      </div>
+      <div class="row" style="margin-top:12px"><button data-a="aplica" class="livre-so">Aplicar e salvar na placa</button>
+        <button data-a="en" class="livre-so">Energizar</button><button data-a="apaga" class="livre-so">Apagar config da placa</button></div>`;
+    s.querySelector('[data-c="nf"]').value = i.fimcfg && i.fimcfg.inv ? "1" : "0";
+    s.querySelector('[data-c="modo"]').value = c.modo === "spread" ? "spread" : "stealth";
+    s.querySelector('[data-c="inv_step"]').value = d.inv_step ? "1" : "0";
+    s.querySelector('[data-c="segura"]').value = d.segura ? "1" : "0";
+    s.querySelector('[data-a="sai"]').onclick = () => p.fecha();
+    s.querySelector('[data-a="en"]').onclick = () => p.cmd({ c: "en", v: p.st && p.st.en ? 0 : 1 }).catch(e => toast(e.message, "bad"));
+    s.querySelector('[data-a="apaga"]').onclick = async () => {
+      if (!confirm("Apagar o config.json da " + p.nome + "? Na próxima partida ela volta ao padrão (modo TMC, sem eixos).")) return;
+      try { await p.cmd({ c: "salva", apaga: 1 }); p.info.salvo = false; p.info.robo = {}; toast("config apagada", "ok"); montaPlacas(); } catch (e) { toast(e.message, "bad"); }
+    };
+    s.querySelector('[data-a="aplica"]').onclick = async () => {
+      const v = k => s.querySelector(`[data-c="${k}"]`).value;
+      const run = Math.min(1.2, +v("run")), hold = Math.min(run, +v("hold"));
+      if (run > 1.0 && !confirm("Acima de 1,0 A: o TMC2209 precisa de dissipador e ventoinha. Continuar?")) return;
+      try {
+        p.info.robo = Object.assign({}, p.info.robo, { nome: v("nome").trim() });
+        const r = await p.cmd({ c: "cfg", run, hold, micro: +v("micro"), modo: v("modo") }, 4000);
+        p.info.cfg = r.cfg;
+        for (const e of eixosDa(p)) if (est.eixos[e].k === "tmc") { est.eixos[e].micro = r.cfg.micro; delete est.refs[e]; }
+        const dr = await p.cmd({ c: "drv", inv_step: v("inv_step") === "1", segura: v("segura") === "1" });
+        p.info.drv = dr.drv;
+        p.info.fimcfg = Object.assign({}, p.info.fimcfg, { inv: v("nf") === "1" });
+        await p.cmd({ c: "fim", inv: v("nf") === "1" });
+        await sincronizaPlaca(p, true);
+        toast(p.nome + ": salvo na placa", "ok"); montaPlacas(); montaEixos();
+      } catch (e) { toast(e.message, "bad"); log(e.message, "bad"); }
+    };
+    box.appendChild(s);
+  }
+  atualizaPlacas();
+}
+function atualizaPlacas() {
+  for (const p of placas) {
+    const s = document.querySelector(`#placasCards [data-uid="${p.uid}"]`); if (!s || !p.st) continue;
+    const t = p.st, set = (k, h) => { const el = s.querySelector(`[data-v="${k}"]`); if (el) el.innerHTML = h; };
+    set("vm", t.vm ? '<span class="chip ok">ok</span>' : '<span class="chip bad">ausente</span>');
+    set("tmc", t.tmci && t.tmci.on ? '<span class="chip ok">responde</span>' : '<span class="chip">—</span>');
+    set("en", t.en ? '<span class="chip ok">energizados</span>' : '<span class="chip">soltos</span>');
+    set("modo", esc(t.drv || "—"));
+    const fim = (a, r) => (a ? '<span class="chip warn">acionado</span>' : '<span class="chip">livre</span>') + ` <small class="sub2">pino ${r}</small>`;
+    set("f1", fim(t.f1, t.fr1)); set("f2", fim(t.f2, t.fr2));
+    const b = s.querySelector('[data-a="en"]'); if (b) b.textContent = t.en ? "Soltar motores" : "Energizar";
+  }
+}
+
+// ---------- tela: eixos ----------
+function montaEixos() {
+  const box = $("#eixosCards"); box.innerHTML = "";
+  for (const e of EIX) {
+    const c = est.eixos[e], z = e === "z", u = UN(e);
+    const s = document.createElement("section"); s.className = "card"; s.dataset.e = e;
+    const opPl = `<option value="">— nenhuma —</option>` + placas.map(p => `<option value="${esc(p.uid)}">${esc(p.nome)} (${esc(p.info.placa)})</option>`).join("") +
+      (c.placa && !placaPorUid(c.placa) ? `<option value="${esc(c.placa)}">placa ${esc(c.placa.slice(-4))} (desconectada)</option>` : "");
+    s.innerHTML = `
+      <h2><span style="color:var(--ink);font-size:15px;letter-spacing:0">${NOME[e]}</span><span data-v="ref" class="chip">—</span>
+        <span class="eixo-pos" data-v="pos">—</span></h2>
+      <div class="g2">
+        <label class="f">Placa<select data-c="placa">${opPl}</select></label>
+        <label class="f">Driver (canal)<select data-c="k"><option value="tmc">TMC2209 (soquete)</option><option value="dm556">DM556 (J4)</option></select></label>
+      </div>
+      <div class="g3" style="margin-top:10px">
+        <label class="f" data-so="tmc">Passos inteiros/volta<input type="number" data-c="passos" step="1" min="1"></label>
+        <label class="f" data-so="dm556">Pulsos/volta no DM556<input type="number" data-c="ppr" step="1" min="1"></label>
+        ${z ? `<label class="f">Avanço do fuso (mm/volta)<input type="number" data-c="fuso" step="0.5" min="0.1"></label>`
+            : `<label class="f">Redução (voltas do motor por volta)<input type="number" data-c="red" step="0.5" min="0.01"></label>`}
+        <label class="f">Sentido<select data-c="inv"><option value="0">normal</option><option value="1">invertido</option></select></label>
+      </div>
+      <p class="hint" data-v="res">—</p>
+      <div class="g4">
+        <label class="f">Mínimo (${u})<input type="number" data-c="min" step="1"></label>
+        <label class="f">Máximo (${u})<input type="number" data-c="max" step="1"></label>
+        <label class="f">Velocidade (${u}/s)<input type="number" data-c="vmax" step="1" min="0.1"></label>
+        <label class="f">Aceleração (${u}/s²)<input type="number" data-c="amax" step="5" min="0.1"></label>
+      </div>
+      <h3>Referência</h3>
+      <div class="g3">
+        <label class="f">Como<select data-c="ref"><option value="manual">manual (zerar aqui)</option><option value="fim1">chave no FIM1</option><option value="fim2">chave no FIM2</option></select></label>
+        <label class="f" data-so="fim">Chave no lado<select data-c="lado"><option value="-1">− (${u} negativos)</option><option value="1">+ (${u} positivos)</option></select></label>
+        <label class="f" data-so="fim">Posição da chave (${u})<input type="number" data-c="pchave" step="0.5"></label>
+        <label class="f" data-so="fim">Recuo (${u})<input type="number" data-c="recuo" step="0.5" min="0.1"></label>
+        <label class="f" data-so="fim">Velocidade de busca (${u}/s)<input type="number" data-c="vbusca" step="0.5" min="0.1"></label>
+        <label class="f" data-so="fim">Depois, ir para (${u})<input type="number" data-c="pos0" step="1"></label>
+      </div>
+      <hr>
+      <div class="row livre-so">
+        <button class="jog" data-j="-1">−</button><button class="jog" data-j="1">+</button>
+        <input type="number" data-c2="alvo" step="1" style="width:90px" value="0" title="posição (${u})">
+        <button data-a="ir">Ir</button><div class="grow"></div>
+        <button data-a="zero" title="Diz que a posição atual é o valor do campo ao lado">Definir posição</button>
+        <button data-a="ref" class="pri" data-so="fim">Referenciar</button>
+      </div>
+      <p class="hint" data-v="dica"></p>`;
+    for (const [k, v] of Object.entries(c)) {
+      const el = s.querySelector(`[data-c="${k}"]`); if (!el) continue;
+      el.value = typeof v === "boolean" ? (v ? "1" : "0") : (v == null ? "" : v);
+    }
+    s.querySelectorAll("[data-c]").forEach(el => el.onchange = () => {
+      const k = el.dataset.c;
+      let v = el.value;
+      if (k === "inv") v = v === "1"; else if (k === "lado") v = +v; else if (!["placa", "k", "ref"].includes(k)) v = +v;
+      if (k === "placa") v = v || null;
+      est.eixos[e][k] = v;
+      if (["placa", "k", "inv", "passos", "ppr", "red", "fuso"].includes(k)) delete est.refs[e];
+      salvaLocal(); mostraEixo(s, e); agendaSalvar(); desenhaTudo();
+    });
+    s.querySelectorAll("button.jog").forEach(b => jogBotao(b, e, +b.dataset.j));
+    s.querySelector('[data-a="ir"]').onclick = () => tarefa("mover " + NOME[e], () => irEixo(e, +s.querySelector('[data-c2="alvo"]').value));
+    s.querySelector('[data-a="zero"]').onclick = () => tarefa("definir " + NOME[e], () => defineEixo(e, +s.querySelector('[data-c2="alvo"]').value));
+    s.querySelector('[data-a="ref"]').onclick = () => tarefa("referenciar " + NOME[e], () => referencia(e));
+    mostraEixo(s, e);
+    box.appendChild(s);
+  }
+  atualizaEixos();
+}
+function mostraEixo(s, e) {
+  const c = est.eixos[e];
+  s.querySelectorAll('[data-so="tmc"]').forEach(x => x.hidden = c.k !== "tmc");
+  s.querySelectorAll('[data-so="dm556"]').forEach(x => x.hidden = c.k !== "dm556");
+  s.querySelectorAll('[data-so="fim"]').forEach(x => x.hidden = c.ref === "manual");
+  const p = placaDe(e), sp = Math.abs(spu(e));
+  s.querySelector('[data-v="res"]').textContent = (c.k === "tmc" ? `${c.passos} × ${p && p.info.cfg ? p.info.cfg.micro : (c.micro || 16)} micropassos` : `${c.ppr} pulsos`) +
+    ` por volta → ${fmt(sp, 2)} passos/${UN(e)} · ${fmt(c.vmax * sp, 0)} passos/s na velocidade máxima`;
+  s.querySelector('[data-v="dica"]').textContent = c.ref === "manual"
+    ? "Referência manual: solte os motores (barra de cima), ponha o eixo na posição à mão (ou pelo − / +), escreva o valor ao lado e clique em Definir posição."
+    : "Referenciar: vai até a chave, recua, aproxima devagar e vai para a posição de depois. Sem referência, o − / + andam sem limites.";
+}
+function atualizaEixos() {
+  for (const e of EIX) {
+    const s = document.querySelector(`#eixosCards [data-e="${e}"]`); if (!s) continue;
+    const v = posU(e), ok = refOk(e), p = placaDe(e);
+    s.querySelector('[data-v="pos"]').textContent = v == null ? "—" : fmt(v, e === "z" ? 2 : 2) + " " + UN(e);
+    chip(s.querySelector('[data-v="ref"]'), !p ? "sem placa" : ok ? "referenciado" : "sem referência", !p ? "" : ok ? "ok" : "warn");
+  }
+}
+function atualizaTela() {
+  for (const e of EIX) { const v = posU(e); $("#b" + e).textContent = v == null ? "—" : fmt(v, 2) + " " + UN(e) + (refOk(e) ? "" : " ?"); }
+  const q = poseAtual();
+  if (q) { const [x, y] = fk(q[0], q[1], est.des.L1, est.des.L2); $("#bxy").textContent = fmt(x, 1) + ", " + fmt(y, 1) + " mm"; }
+  else $("#bxy").textContent = "—";
+  const mov = placas.some(p => p.st && p.st.mov);
+  chip($("#chipEstado"), ocupado || (mov ? "movendo" : "parado"), ocupado || mov ? "acc" : "");
+  atualizaPlacas(); atualizaEixos();
+  if (!sim) desenhaTudo();
+}
+function poseAtual() {
+  const a = posU("j1"), b = posU("j2");
+  return a == null || b == null ? null : [a, b];
+}
+
+// ---------- movimentos de um eixo ----------
+let ocupado = null, cancelar = false;
+class Cancelado extends Error { constructor() { super("cancelado"); } }
+async function tarefa(nome, fn) {
+  if (ocupado) { toast("Espere: " + ocupado, "warn"); return; }
+  ocupado = nome; cancelar = false; document.body.classList.add("ocupado"); atualizaTela();
+  try { await fn(); } catch (e) {
+    if (!(e instanceof Cancelado)) { log(nome + ": " + e.message, "bad"); toast(e.message, "bad"); }
+    else log(nome + ": cancelado", "warn");
+  } finally { ocupado = null; document.body.classList.remove("ocupado"); atualizaTela(); }
+}
+function exigePlaca(e) {
+  const p = placaDe(e);
+  if (!p) throw new Error(NOME[e] + ": escolha a placa (aba Eixos) e conecte-a");
+  if (!p.novo) throw new Error(p.nome + ": firmware antigo, grave o painel 1.13");
+  return p;
+}
+async function esperaParar(p, maxMs = 180000) {
+  const t0 = Date.now();
+  for (;;) {
+    const s = await p.stAgora();
+    if (!s.mov) return s;
+    if (cancelar) throw new Cancelado();
+    if (Date.now() - t0 > maxMs) throw new Error("tempo esgotado esperando o motor parar");
+    await sleep(70);
+  }
+}
+const vA = e => { const c = est.eixos[e], s = Math.abs(spu(e)); return { v: c.vmax * s, a: c.amax * s }; };
+async function irEixo(e, alvo) {
+  const p = exigePlaca(e), c = est.eixos[e];
+  if (!refOk(e)) throw new Error(NOME[e] + " sem referência");
+  if (alvo < c.min || alvo > c.max) throw new Error(NOME[e] + ": " + alvo + " " + UN(e) + " fora dos limites (" + c.min + " a " + c.max + ")");
+  await p.cmd({ c: "ir", k: c.k, p: Math.round(alvo * spu(e)), ...vA(e) });
+  await esperaParar(p);
+}
+async function defineEixo(e, valor) {
+  const p = exigePlaca(e), c = est.eixos[e];
+  if (!p.st || !p.st.en) await p.cmd({ c: "en", v: 1 });
+  await p.cmd({ c: "zero", k: c.k, p: Math.round(valor * spu(e)) });
+  await p.stAgora();
+  est.refs[e] = p.info.boot; salvaLocal();
+  log(NOME[e] + " = " + valor + " " + UN(e) + " (referência manual)", "ok");
+}
+async function referencia(e) {
+  const p = exigePlaca(e), c = est.eixos[e];
+  if (c.ref === "manual") throw new Error(NOME[e] + " tem referência manual: posicione e use Definir posição");
+  await sincronizaPlaca(p, false);
+  const i = c.ref === "fim2" ? 2 : 1, s = spu(e), dp = Math.sign(c.lado * s);
+  const v = Math.abs(c.vbusca * s), a = Math.abs(c.amax * s), rec = Math.max(1, Math.round(Math.abs(c.recuo * s)));
+  let st = await p.stAgora();
+  const sai = async () => { await p.cmd({ c: "mover", k: c.k, n: -dp * rec, v, a }); st = await esperaParar(p); };
+  if (st["f" + i]) { log(NOME[e] + ": chave já acionada, recuando"); await sai(); if (st["f" + i]) throw new Error("recuou e a FIM" + i + " continua acionada (fio solto? chave NF aberta?)"); }
+  log(NOME[e] + ": procurando a FIM" + i + "…");
+  await p.cmd({ c: "jog", k: c.k, v: dp * v, a });
+  st = await esperaParar(p, 300000);
+  if (!st["f" + i]) throw new Error(NOME[e] + ": parou sem acionar a FIM" + i);
+  await sai();
+  await p.cmd({ c: "jog", k: c.k, v: dp * v / 5, a });
+  st = await esperaParar(p, 120000);
+  if (!st["f" + i]) throw new Error(NOME[e] + ": a aproximação lenta parou sem a chave");
+  await p.cmd({ c: "zero", k: c.k, p: Math.round(c.pchave * s) });
+  est.refs[e] = p.info.boot; salvaLocal();
+  log(NOME[e] + " referenciado na FIM" + i + " (" + c.pchave + " " + UN(e) + ")", "ok");
+  const p0 = Math.min(c.max, Math.max(c.min, c.pos0));
+  await irEixo(e, p0);
+}
+function jogBotao(btn, e, sinal) {
+  let ativo = false;
+  const solta = () => { if (!ativo) return; ativo = false; btn.classList.remove("ativo"); const p = placaDe(e); if (p) p.cmd({ c: "parar" }).catch(() => {}); };
+  btn.addEventListener("pointerdown", async ev => {
+    if (ocupado) return;
+    let p; try { p = exigePlaca(e); } catch (x) { toast(x.message, "bad"); return; }
+    btn.setPointerCapture(ev.pointerId); ativo = true; btn.classList.add("ativo");
+    const c = est.eixos[e], va = vA(e);
+    const o = refOk(e) ? { c: "ir", k: c.k, p: Math.round((sinal > 0 ? c.max : c.min) * spu(e)), ...va }
+                       : { c: "jog", k: c.k, v: sinal * Math.sign(spu(e)) * va.v, a: va.a };
+    try { await p.cmd(o); } catch (x) { toast(x.message, "bad"); solta(); }
+  });
+  ["pointerup", "pointercancel", "lostpointercapture"].forEach(t => btn.addEventListener(t, solta));
+  window.addEventListener("blur", solta);
+}
+$("#btnRefTudo").onclick = () => tarefa("referenciar tudo", async () => {
+  if (est.eixos.z.placa && est.eixos.z.ref !== "manual") await referencia("z");
+  for (const e of ["j2", "j1"]) {
+    if (!est.eixos[e].placa) continue;
+    if (est.eixos[e].ref !== "manual") await referencia(e);
+    else if (!refOk(e)) log(NOME[e] + ": referência manual pendente (aba Eixos › Definir posição)", "warn");
+  }
+});
+async function pararTudo() {
+  cancelar = true; pausa = false;
+  await Promise.all(placas.map(p => p.cmd({ c: "parar" }).catch(() => {})));
+}
+$("#btnParar").onclick = pararTudo;
+$("#btnEmerg").onclick = async () => {
+  cancelar = true; pausa = false;
+  await Promise.all(placas.map(p => p.cmd({ c: "emerg" }).catch(() => {})));
+  log("EMERGÊNCIA em todas as placas", "bad");
+};
+$("#btnSoltar").onclick = async () => {
+  if (!confirm("Soltar todos os motores? O braço fica livre (e o Z pode descer sozinho com o peso). A referência dos eixos é perdida.")) return;
+  await Promise.all(placas.map(p => p.cmd({ c: "en", v: 0 }).catch(e => toast(e.message, "bad"))));
+};
+document.addEventListener("keydown", e => {
+  const campo = /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
+  if (e.key === "Escape") { e.preventDefault(); $("#btnEmerg").click(); }
+  else if (e.key === " " && !campo) { e.preventDefault(); pararTudo(); }
+});
+document.addEventListener("keyup", e => { if (e.key === " " && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) e.preventDefault(); });
+
+// ---------- desenho: fontes ----------
+function forma(nome) {
+  const T = [], circ = (n, f) => Array.from({ length: n + 1 }, (_, i) => f(2 * Math.PI * i / n));
+  switch (nome) {
+    case "quadrado": T.push([[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]]); break;
+    case "circulo": T.push(circ(180, t => [Math.cos(t), Math.sin(t)])); break;
+    case "estrela": T.push(Array.from({ length: 11 }, (_, i) => { const r = i % 2 ? 0.4 : 1, t = -Math.PI / 2 + i * Math.PI / 5; return [r * Math.cos(t), r * Math.sin(t)]; })); break;
+    case "espiral": T.push(Array.from({ length: 1201 }, (_, i) => { const t = i / 1200 * 10 * Math.PI, r = 0.08 + 0.92 * i / 1200; return [r * Math.cos(t), r * Math.sin(t)]; })); break;
+    case "coracao": T.push(circ(240, t => [16 * Math.sin(t) ** 3 / 17, -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 17])); break;
+    case "flor": T.push(circ(720, t => { const r = Math.cos(4 * t); return [r * Math.cos(t), r * Math.sin(t)]; })); break;
+    case "grade": for (let i = 0; i <= 6; i++) { const v = -1 + i / 3; T.push([[-1, v], [1, v]]); T.push([[v, -1], [v, 1]]); } break;
+  }
+  return T;
+}
+// SVG -> traços (unidades do SVG, y para baixo), um traço por trecho contínuo
+function svgTracos(texto) {
+  const doc = new DOMParser().parseFromString(texto, "image/svg+xml");
+  if (doc.querySelector("parsererror") || doc.documentElement.nodeName.toLowerCase() !== "svg") throw new Error("arquivo SVG inválido");
+  const svg = document.importNode(doc.documentElement, true);
+  const box = $("#svgTmp"); box.replaceChildren(svg);
+  try {
+    const els = [...svg.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse")]
+      .filter(el => !el.closest("defs,clipPath,mask,symbol,marker,pattern"));
+    const pontos = (el, n) => {
+      const L = el.getTotalLength(), M = el.getCTM() || svg.createSVGMatrix(), out = [];
+      for (let i = 0; i <= n; i++) { const p = el.getPointAtLength(L * i / n); out.push([M.a * p.x + M.c * p.y + M.e, M.b * p.x + M.d * p.y + M.f, p.x, p.y]); }
+      return out;
+    };
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const el of els) { let L = 0; try { L = el.getTotalLength(); } catch (e) {} if (!(L > 0)) continue;
+      for (const [x, y] of pontos(el, 60)) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); } }
+    if (!isFinite(x0)) throw new Error("o SVG não tem linhas (path, line, rect, circle…); texto precisa ser convertido em curvas");
+    const S = Math.max(x1 - x0, y1 - y0) || 1, passo = S / 1500, T = [];
+    let total = 0;
+    for (const el of els) {
+      let L = 0; try { L = el.getTotalLength(); } catch (e) {} if (!(L > 0)) continue;
+      const M = el.getCTM() || { a: 1, b: 0, c: 0, d: 1 }, esc = Math.sqrt(Math.abs(M.a * M.d - M.b * M.c)) || 1;
+      const n = Math.min(40000, Math.max(8, Math.ceil(L * esc / passo)));
+      total += n; if (total > 400000) throw new Error("SVG grande demais");
+      const pts = pontos(el, n), dl = L / n;
+      let cur = [pts[0].slice(0, 2)];
+      for (let i = 1; i < pts.length; i++) {
+        if (Math.hypot(pts[i][2] - pts[i - 1][2], pts[i][3] - pts[i - 1][3]) > 2.5 * dl) { if (cur.length > 1) T.push(cur); cur = []; }
+        cur.push(pts[i].slice(0, 2));
+      }
+      if (cur.length > 1) T.push(cur);
+    }
+    return T;
+  } finally { box.replaceChildren(); }
+}
+let fonte = null;           // { nome, tracos (unidades livres, y para baixo) }
+function carregaFonte() {
+  const d = est.des;
+  try {
+    if (d.forma === "svg") {
+      if (!est.svg) { fonte = null; $("#dFonte").textContent = "Abra um arquivo SVG."; return; }
+      fonte = { nome: est.svg.nome, tracos: svgTracos(est.svg.texto) };
+    } else fonte = { nome: $("#dForma").selectedOptions[0].textContent, tracos: forma(d.forma) };
+    $("#dFonte").textContent = fonte.nome + " · " + fonte.tracos.length + (fonte.tracos.length > 1 ? " traços" : " traço");
+  } catch (e) { fonte = null; $("#dFonte").textContent = e.message; toast(e.message, "bad"); }
+}
+$("#btnSvg").onclick = () => $("#svgArq").click();
+$("#svgArq").onchange = async ev => {
+  const f = ev.target.files[0]; ev.target.value = ""; if (!f) return;
+  const texto = await f.text();
+  est.svg = texto.length < 1500000 ? { nome: f.name, texto } : null;
+  if (!est.svg) { toast("SVG grande demais (limite 1,5 MB)", "bad"); return; }
+  est.des.forma = "svg"; $("#dForma").value = "svg"; salvaLocal(); carregaFonte(); replaneja();
+};
+
+// traços da fonte na posição escolhida (mm, base do robô)
+function tracosMm() {
+  if (!fonte) return [];
+  const d = est.des;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const t of fonte.tracos) for (const [x, y] of t) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  const s = d.tam / (Math.max(x1 - x0, y1 - y0) || 1), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  const r = d.rot * RAD, cr = Math.cos(r), sr = Math.sin(r);
+  return fonte.tracos.map(t => simplifica(t.map(([x, y]) => {
+    const dir = (x - cx) * s, cima = -(y - cy) * s;             // no desenho: direita e para cima
+    const rd = dir * cr - cima * sr, rc = dir * sr + cima * cr;   // rotação no plano do desenho
+    return [d.x + rc, d.y - rd];                                 // cima -> +X (frente), direita -> -Y
+  }), d.tol)).filter(t => t.length > 1);
+}
+
+// ---------- plano ----------
+function opcoes() {
+  const d = est.des, j1 = est.eixos.j1, j2 = est.eixos.j2;
+  return { L1: d.L1, L2: d.L2, cot: +d.cot, lim: [[j1.min, j1.max], [j2.min, j2.max]], vj: [j1.vmax, j2.vmax], aj: [j1.amax, j2.amax],
+           v: d.v, a: d.a, desvio: d.desvio };
+}
+function tempoZ(de, para) { const z = est.eixos.z; return trap(Math.abs(para - de), z.vmax, z.amax).T; }
+// ops: {t: "traj", q: [q1, q2], caneta, T} | {t: "z", alvo, T}
+function planeja(q0, z0) {
+  const o = opcoes(), d = est.des, oDesl = Object.assign({}, o, { vj: o.vj.map(v => v * d.desl / 100) });
+  const usaZ = d.usaZ, ops = [], fora = [];
+  const tr = tracosMm();
+  for (const t of tr) t.forEach((p, i) => {            // vértices e o caminho entre eles, a cada 2 mm
+    if (!ik(p[0], p[1], o)) fora.push(p);
+    if (!i) return;
+    const a = t[i - 1], n = Math.floor(Math.hypot(p[0] - a[0], p[1] - a[1]) / 2);
+    for (let k = 1; k < n; k++) { const q = [a[0] + (p[0] - a[0]) * k / n, a[1] + (p[1] - a[1]) * k / n]; if (!ik(q[0], q[1], o)) fora.push(q); }
+  });
+  if (fora.length) return { ops, fora, tracos: tr, erro: fora.length + " pontos fora do alcance" };
+  let q = q0.slice(), z = z0;
+  const [x0, y0] = fk(q[0], q[1], o.L1, o.L2);
+  const tracos = ordena(tr, [x0, y0]);
+  const zOp = alvo => { if (usaZ && Math.abs(alvo - z) > 1e-6) { ops.push({ t: "z", alvo, T: tempoZ(z, alvo) }); z = alvo; } };
+  try {
+    for (const t of tracos) {
+      const qi = ik(t[0][0], t[0][1], o);
+      if (Math.hypot(qi[0] - q[0], qi[1] - q[1]) > 1e-6) {
+        zOp(d.zu);
+        const pj = planejaJunta(q, qi, oDesl);
+        if (pj.q[0].length) ops.push({ t: "traj", q: pj.q, caneta: !usaZ, T: pj.q[0].length * DT });
+      }
+      zOp(d.zd);
+      const pc = planejaCartesiano(t, o);
+      if (pc.q[0].length) ops.push({ t: "traj", q: pc.q, caneta: true, T: pc.q[0].length * DT });
+      q = ik(t[t.length - 1][0], t[t.length - 1][1], o);
+    }
+    zOp(d.zf);
+  } catch (e) { return { ops, fora, tracos, erro: e.message }; }
+  return { ops, fora, tracos, erro: null };
+}
+let plano = null;
+function replaneja() {
+  const q0 = poseAtual() || [0, 0], z0 = posU("z") ?? est.des.zu;
+  plano = planeja(q0, z0);
+  if (!sim) simUlt = null;
+  const T = plano.ops.reduce((s, o) => s + o.T, 0);
+  const L = plano.tracos.reduce((s, t) => s + t.reduce((a, p, i) => i ? a + Math.hypot(p[0] - t[i - 1][0], p[1] - t[i - 1][1]) : 0, 0), 0);
+  const nz = plano.ops.filter(o => o.t === "z").length;
+  $("#planoInfo").innerHTML = `
+    <div class="sen"><div class="k">traços</div><div class="v">${plano.tracos.length}</div></div>
+    <div class="sen"><div class="k">comprimento</div><div class="v">${fmt(L / 10, 1)} cm</div></div>
+    <div class="sen"><div class="k">tempo estimado</div><div class="v">${T >= 60 ? Math.floor(T / 60) + " min " : ""}${Math.round(T % 60)} s</div></div>
+    <div class="sen"><div class="k">movimentos do Z</div><div class="v">${nz}</div></div>`;
+  chip($("#chipPlano"), plano.erro ? plano.erro : "dentro do alcance", plano.erro ? "bad" : "ok");
+  desenhaTudo();
+}
+
+// ---------- execução ----------
+let tjId = 1, pausa = false, trilha = [], progOp = null;
+async function executaTraj(op, pXY, onProg) {
+  const k1 = est.eixos.j1.k, k2 = est.eixos.j2.k, st = await pXY.stAgora();
+  const freq = pXY.info.freq || 10000000, dmin = pXY.info.tjmin || 50;
+  const c1 = codifica(op.q[0], spu("j1"), st.pk[k1], freq, dmin), c2 = codifica(op.q[1], spu("j2"), st.pk[k2], freq, dmin);
+  const N = c1.w.length, id = tjId++, CH = 120, PRE = 150;
+  const b64 = w => { const u8 = new Uint8Array(w.buffer, w.byteOffset, w.byteLength); let s = ""; for (let i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return btoa(s); };
+  let r = await pXY.cmd({ c: "tjini", k: [k1, k2], tid: id });
+  let i = 0, iniciou = false;
+  for (;;) {
+    if (cancelar) throw new Cancelado();
+    while (i < N && r.livre >= Math.min(CH, N - i)) {
+      const m = Math.min(CH, N - i, r.livre), fim = i + m >= N, go = !iniciou && i + m >= Math.min(N, PRE);
+      r = await pXY.cmd({ c: "tj", w: [b64(c1.w.subarray(i, i + m)), b64(c2.w.subarray(i, i + m))], fim, go }, 4000);
+      i += m; iniciou = iniciou || go;
+    }
+    onProg(r.feitas / N);
+    if (i >= N && iniciou) break;
+    await sleep(120);
+    r = await pXY.cmd({ c: "tj" }, 3000);
+  }
+  for (;;) {
+    const s = await pXY.stAgora();
+    if (!s.tj) {
+      if (!s.tjf || s.tjf.tid !== id || !s.tjf.ok) throw new Error("trajetória interrompida" + (s.tjf && s.tjf.msg ? ": " + s.tjf.msg : ""));
+      return;
+    }
+    onProg(s.tj.feitas / N);
+    if (cancelar) throw new Cancelado();
+    await sleep(100);
+  }
+}
+async function moveZ(alvo) {
+  const p = exigePlaca("z"), c = est.eixos.z;
+  if (alvo < c.min || alvo > c.max) throw new Error("Z " + alvo + " mm fora dos limites");
+  await p.cmd({ c: "ir", k: c.k, p: Math.round(alvo * spu("z")), ...vA("z") });
+  await esperaParar(p);
+}
+function exigeXY() {
+  const p1 = exigePlaca("j1"), p2 = exigePlaca("j2");
+  if (p1 !== p2) throw new Error("J1 e J2 precisam estar na mesma placa (v18, modo dois) para andarem sincronizados");
+  if (est.eixos.j1.k === est.eixos.j2.k) throw new Error("J1 e J2 estão no mesmo canal: um no TMC2209 e o outro no DM556");
+  for (const e of ["j1", "j2"]) if (!refOk(e)) throw new Error(NOME[e] + " sem referência (aba Eixos)");
+  return p1;
+}
+$("#btnDesenhar").onclick = () => tarefa("desenhando", async () => {
+  const pXY = exigeXY();
+  if (est.des.usaZ) { exigePlaca("z"); if (!refOk("z")) throw new Error("Z sem referência (aba Eixos)"); }
+  replaneja();
+  if (plano.erro) throw new Error(plano.erro);
+  const ops = plano.ops, Ttot = ops.reduce((s, o) => s + o.T, 0);
+  trilha = []; simUlt = null; let feito = 0;
+  $("#btnPausa").hidden = false; $("#btnPausa").textContent = "Pausar";
+  log("desenho: " + ops.length + " movimentos, ~" + Math.round(Ttot) + " s", "ok");
+  try {
+    for (let n = 0; n < ops.length; n++) {
+      while (pausa) { $("#progTxt").textContent = "pausado entre movimentos"; await sleep(150); if (cancelar) throw new Cancelado(); }
+      if (cancelar) throw new Cancelado();
+      const op = ops[n];
+      progOp = op;
+      const prog = f => { $("#prog").value = (feito + f * op.T) / Ttot; $("#progTxt").textContent = `movimento ${n + 1} de ${ops.length} · ${Math.round(100 * (feito + f * op.T) / Ttot)}%`; };
+      if (op.t === "z") { prog(0); await moveZ(op.alvo); }
+      else await executaTraj(op, pXY, prog);
+      feito += op.T;
+    }
+    $("#prog").value = 1; $("#progTxt").textContent = "desenho terminado"; toast("Desenho terminado", "ok");
+  } finally { progOp = null; $("#btnPausa").hidden = true; pausa = false; }
+});
+$("#btnPausa").onclick = () => { pausa = !pausa; $("#btnPausa").textContent = pausa ? "Continuar" : "Pausar"; };
+$("#btnIrXY").onclick = () => tarefa("levar a ponta", async () => {
+  const pXY = exigeXY(), o = opcoes(), qi = ik(+$("#irX").value, +$("#irY").value, o);
+  if (!qi) throw new Error("ponto fora do alcance com este cotovelo");
+  const d = est.des, pj = planejaJunta(poseAtual(), qi, Object.assign({}, o, { vj: o.vj.map(v => v * d.desl / 100) }));
+  if (pj.q[0].length) await executaTraj({ q: pj.q, T: pj.T }, pXY, () => {});
+});
+
+// ---------- simulação ----------
+let sim = null, simUlt = null;           // simUlt: a última simulação fica na tela até mudar o plano
+$("#btnSim").onclick = () => {
+  if (sim) { sim = null; $("#btnSim").textContent = "Simular"; desenhaTudo(); return; }
+  replaneja();
+  if (plano.erro) { toast(plano.erro, "bad"); return; }
+  const amostras = [];                      // [q1, q2, caneta] a cada DT
+  let q = poseAtual() || [0, 0], zAlto = est.des.usaZ;
+  for (const op of plano.ops) {
+    if (op.t === "z") { zAlto = op.alvo > est.des.zd + 1e-6; for (let i = 0; i < Math.ceil(op.T / DT); i++) amostras.push([q[0], q[1], !zAlto]); continue; }
+    for (let m = 0; m < op.q[0].length; m++) { q = [op.q[0][m], op.q[1][m]]; amostras.push([q[0], q[1], op.caneta && (!est.des.usaZ || !zAlto)]); }
+  }
+  sim = { amostras, t0: performance.now(), vel: +$("#simVel").value, trilha: [] };
+  $("#btnSim").textContent = "Parar simulação";
+  const passo = () => {
+    if (!sim) return;
+    const i = Math.min(sim.amostras.length - 1, Math.floor((performance.now() - sim.t0) / 1000 * sim.vel / DT));
+    sim.i = i; desenhaTudo();
+    $("#prog").value = sim.amostras.length ? i / (sim.amostras.length - 1) : 1;
+    if (i >= sim.amostras.length - 1) { $("#btnSim").textContent = "Simular"; simUlt = sim; sim = null; desenhaTudo(); return; }
+    requestAnimationFrame(passo);
+  };
+  requestAnimationFrame(passo);
+};
+
+// ---------- desenho da tela ----------
+const cv = $("#cv");
+let alcanceCache = null, vista = null;
+function css(k) { return getComputedStyle(document.documentElement).getPropertyValue(k).trim(); }
+function montaVista() {
+  const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const R = est.des.L1 + est.des.L2, xs = [-0.8 * R, 1.08 * R], ys = [-1.08 * R, 1.08 * R];
+  const k = Math.min(w / (ys[1] - ys[0]), h / (xs[1] - xs[0]));
+  const ox = w / 2, oy = h / 2 + (xs[1] + xs[0]) / 2 * k;
+  vista = { k, ox, oy, w, h, dpr, R };
+}
+const tela = (x, y) => [vista.ox - y * vista.k, vista.oy - x * vista.k];
+const mundo = (sx, sy) => [(vista.oy - sy) / vista.k, (vista.ox - sx) / vista.k];
+function alcance() {
+  const o = opcoes(), chave = JSON.stringify([o.L1, o.L2, o.cot, o.lim, vista.w, vista.h, vista.dpr, css("--reach")]);
+  if (alcanceCache && alcanceCache.chave === chave) return alcanceCache.c;
+  const c = document.createElement("canvas"); c.width = cv.width; c.height = cv.height;
+  const g = c.getContext("2d"), px = 4 * vista.dpr;
+  g.fillStyle = css("--reach");
+  for (let sy = 0; sy < c.height; sy += px) for (let sx = 0; sx < c.width; sx += px) {
+    const [x, y] = mundo((sx + px / 2) / vista.dpr, (sy + px / 2) / vista.dpr);
+    if (ik(x, y, o)) g.fillRect(sx, sy, px, px);
+  }
+  alcanceCache = { chave, c }; return c;
+}
+function desenhaTudo() {
+  if (!cv.clientWidth || $("#aba-desenho").hidden) return;
+  montaVista();
+  const g = cv.getContext("2d"), { dpr, w, h, k } = vista;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+  g.drawImage(alcance(), 0, 0);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  // grade de 50 mm e eixos
+  g.strokeStyle = css("--line"); g.lineWidth = 1; g.beginPath();
+  for (let v = -1000; v <= 1000; v += 50) { let [a, b] = tela(v, -1000), [c, d] = tela(v, 1000); g.moveTo(a, b); g.lineTo(c, d); [a, b] = tela(-1000, v); [c, d] = tela(1000, v); g.moveTo(a, b); g.lineTo(c, d); }
+  g.stroke();
+  g.fillStyle = css("--muted"); g.font = "11px system-ui";
+  const [ax, ay] = tela(vista.R * 1.02, 0); g.fillText("+X", ax + 4, ay + 12);
+  const [bx, by] = tela(0, vista.R * 1.02); g.fillText("+Y", bx + 2, by - 4);
+  // plano
+  const p = plano;
+  if (p) {
+    g.lineWidth = 1.6; g.strokeStyle = css("--ink"); g.lineJoin = "round";
+    for (const t of p.tracos) { g.beginPath(); t.forEach((q, i) => { const [sx, sy] = tela(q[0], q[1]); i ? g.lineTo(sx, sy) : g.moveTo(sx, sy); }); g.stroke(); }
+    g.setLineDash([4, 4]); g.strokeStyle = css("--muted"); g.lineWidth = 1;
+    const o = opcoes();
+    for (const op of p.ops) if (op.t === "traj" && !op.caneta) {
+      g.beginPath(); for (let m = 0; m < op.q[0].length; m += 4) { const [x, y] = fk(op.q[0][m], op.q[1][m], o.L1, o.L2), [sx, sy] = tela(x, y); m ? g.lineTo(sx, sy) : g.moveTo(sx, sy); } g.stroke();
+    }
+    g.setLineDash([]);
+    g.fillStyle = css("--bad");
+    for (const q of p.fora.slice(0, 5000)) { const [sx, sy] = tela(q[0], q[1]); g.fillRect(sx - 1.5, sy - 1.5, 3, 3); }
+  }
+  // pose: simulação ou braço real
+  let q = null, tr = trilha;
+  const S = sim || (progOp ? null : simUlt);
+  if (S) {
+    const i = S.i || 0, o = opcoes();
+    for (let m = S.trilhaAte || 0; m <= i; m++) { const a = S.amostras[m]; if (a && a[2]) { const [x, y] = fk(a[0], a[1], o.L1, o.L2); S.trilha.push([x, y, m]); } }
+    S.trilhaAte = i + 1; q = S.amostras[i]; tr = S.trilha;
+  } else q = poseAtual();
+  if (tr.length) {
+    g.strokeStyle = css("--trail"); g.lineWidth = 2.4; g.beginPath();
+    tr.forEach((pt, i) => { const [sx, sy] = tela(pt[0], pt[1]); i && pt[2] - tr[i - 1][2] <= 2 ? g.lineTo(sx, sy) : g.moveTo(sx, sy); });
+    g.stroke();
+  }
+  const [s0x, s0y] = tela(0, 0);
+  g.fillStyle = css("--muted"); g.beginPath(); g.arc(s0x, s0y, Math.max(6, 30 * k), 0, 2 * Math.PI); g.fill();
+  if (q) {
+    const o = opcoes(), a = q[0] * RAD, e1 = [o.L1 * Math.cos(a), o.L1 * Math.sin(a)], pn = fk(q[0], q[1], o.L1, o.L2);
+    const [ex, ey] = tela(e1[0], e1[1]), [px, py] = tela(pn[0], pn[1]);
+    g.strokeStyle = css("--arm"); g.globalAlpha = 0.55; g.lineCap = "round";
+    g.lineWidth = Math.max(5, 40 * k); g.beginPath(); g.moveTo(s0x, s0y); g.lineTo(ex, ey); g.stroke();
+    g.lineWidth = Math.max(4, 28 * k); g.beginPath(); g.moveTo(ex, ey); g.lineTo(px, py); g.stroke();
+    g.globalAlpha = 1; g.fillStyle = css("--accent"); g.beginPath(); g.arc(px, py, 4, 0, 2 * Math.PI); g.fill();
+    g.fillStyle = css("--card"); g.beginPath(); g.arc(ex, ey, Math.max(3, 8 * k), 0, 2 * Math.PI); g.fill();
+  }
+  // trilha do desenho real: posição da ponta a cada status com a caneta abaixada
+  if (!S && progOp && progOp.t === "traj" && progOp.caneta && q) {
+    const pn = fk(q[0], q[1], est.des.L1, est.des.L2), n = trilha.length;
+    const ult = trilha[n - 1];
+    if (!ult || Math.hypot(ult[0] - pn[0], ult[1] - pn[1]) > 0.2) trilha.push([pn[0], pn[1], ult && ult[3] === progOp ? ult[2] + 1 : (ult ? ult[2] + 10 : 0), progOp]);
+  }
+}
+window.addEventListener("resize", () => { alcanceCache = null; desenhaTudo(); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { alcanceCache = null; desenhaTudo(); });
+let arrasta = false;
+cv.addEventListener("pointerdown", e => { if (ocupado || sim) return; arrasta = true; cv.setPointerCapture(e.pointerId); moveCentro(e); });
+cv.addEventListener("pointermove", e => { if (arrasta) moveCentro(e); });
+cv.addEventListener("pointerup", () => { if (arrasta) { arrasta = false; salvaLocal(); replaneja(); } });
+function moveCentro(e) {
+  const r = cv.getBoundingClientRect(), [x, y] = mundo(e.clientX - r.left, e.clientY - r.top);
+  est.des.x = Math.round(x); est.des.y = Math.round(y); $("#dX").value = est.des.x; $("#dY").value = est.des.y;
+  replaneja();
+}
+
+// ---------- campos do desenho e do braço ----------
+const CAMPOS_DES = { dForma: "forma", dX: "x", dY: "y", dTam: "tam", dRot: "rot", dV: "v", dA: "a", dDesl: "desl", dCot: "cot",
+                     dDesvio: "desvio", dTol: "tol", dUsaZ: "usaZ", dZd: "zd", dZu: "zu", dZf: "zf", L1: "L1", L2: "L2" };
+function mostraCamposDes() {
+  for (const [id, k] of Object.entries(CAMPOS_DES)) { const el = document.getElementById(id); if (el.type === "checkbox") el.checked = !!est.des[k]; else el.value = est.des[k]; }
+  $("#dSemZ").hidden = !!est.des.usaZ;
+}
+for (const [id, k] of Object.entries(CAMPOS_DES)) {
+  const el = document.getElementById(id);
+  el.onchange = () => {
+    est.des[k] = el.type === "checkbox" ? el.checked : (id === "dForma" ? el.value : +el.value);
+    salvaLocal();
+    if (id === "dForma") { if (el.value === "svg" && !est.svg) $("#svgArq").click(); carregaFonte(); }
+    if (id === "dUsaZ") $("#dSemZ").hidden = el.checked;
+    if (["L1", "L2", "dZd", "dZu", "dZf"].includes(id)) { alcanceCache = null; agendaSalvar(); }
+    replaneja();
+  };
+}
+mostraCamposDes();
+
+// ---------- abas ----------
+const ABAS = ["desenho", "eixos", "placas", "registro"];
+function mostraAba(a) {
+  if (!ABAS.includes(a)) a = "desenho";
+  for (const x of ABAS) $("#aba-" + x).hidden = x !== a;
+  document.querySelectorAll("nav.abas button").forEach(b => b.classList.toggle("on", b.dataset.aba === a));
+  if (location.hash !== "#" + a) history.replaceState(null, "", "#" + a);
+  if (a === "desenho") { alcanceCache = null; desenhaTudo(); }
+}
+document.querySelectorAll("nav.abas button").forEach(b => b.onclick = () => mostraAba(b.dataset.aba));
+window.addEventListener("hashchange", () => mostraAba(location.hash.slice(1)));
+$("#btnLimpa").onclick = () => { $("#log").innerHTML = ""; };
+
+// ---------- início ----------
+mostraAba(location.hash.slice(1) || "desenho");
+carregaFonte(); montaPlacas(); montaEixos(); replaneja();
+if (!("serial" in navigator)) aviso("Este navegador não tem Web Serial. Abra esta página no Chrome ou no Edge (computador).");
+else navigator.serial.getPorts().then(ps => {
+  if (!ps.length) return;
+  $("#btnReco").hidden = false; $("#btnReco").textContent = "Reconectar " + ps.length + (ps.length > 1 ? " placas" : " placa");
+  reconecta();
+});
+log("pronto. Adicione as placas (uma por vez) e confira a aba Eixos.");
+</script>
+</body>
+</html>

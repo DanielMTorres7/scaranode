@@ -12,6 +12,7 @@ por servidor nenhum.
 | `index.html` | o painel (arquivo único, sem dependências) |
 | `no.py` | firmware MicroPython: servidor JSON pela USB, passos pela PIO + DMA |
 | `main.py` | boot: deixa os drivers soltos e chama `no.rodar()` |
+| `robo.html` | robô: várias placas ao mesmo tempo (J1, J2, Z), referência e desenho de SVG |
 
 ## Gravar o firmware
 
@@ -43,6 +44,30 @@ publicada, **Gravar firmware do site**. Para publicar a sua versão para todos, 
 
 Comuns: EN do TMC GP0, 24 V GP1, ENA do DM556 GP8, FIM1 GP27, FIM2 GP15, NTC GP29, LED GP16.
 Revisão nova: uma linha na tabela `PLACAS` do `no.py` e uma opção no seletor do `index.html`.
+
+## Robô (várias placas)
+
+**Abrir:** <https://danielmtorres7.github.io/scaranode/robo.html> (ou o botão **Robô** no painel). Uma conexão
+por placa: **Adicionar placa** para cada uma; na próxima vez o navegador reconecta sozinho.
+
+- **Eixos:** cada eixo (J1, J2, Z) diz em que placa e em que driver está ligado, a redução (ou o avanço do fuso),
+  o sentido, os limites, a velocidade e como é referenciado (manual ou por fim de curso). J1 e J2 precisam estar
+  na mesma placa v18, um no TMC2209 e o outro no DM556: a placa entra no modo **dois**.
+- **Tudo fica salvo na placa** (`config.json`, comando `salva`): driver, correntes, fins de curso e os eixos
+  ligados nela; o comprimento do braço vai com o J1 e as alturas da caneta com o Z. A placa já liga
+  configurada (motores soltos) e o painel lê tudo de volta ao conectar, em qualquer computador.
+- **Desenho:** formas prontas ou um arquivo SVG (linhas, curvas, retângulos, círculos; texto precisa virar
+  curva), posição e tamanho na área de trabalho, velocidade. **Simular** mostra o movimento sem mexer nos
+  motores; **Desenhar** manda a trajetória.
+
+Como a trajetória anda: o painel faz a cinemática inversa e planeja a velocidade (reduz nos cantos e onde as
+juntas ficariam rápidas demais), divide em segmentos de 10 ms e manda os passos de cada segmento para a placa
+(`tjini`/`tj`). Na placa, cada canal tem a sua SM da PIO lendo um anel de 512 segmentos por DMA; as duas partem
+no mesmo ciclo e o painel acerta os atrasos para os dois canais não se afastarem mais que ~1 µs. Se a USB
+atrasar e os dados acabarem, a SM para no fim do que chegou e a posição continua exata.
+
+O painel de uma placa troca o modo do driver para o que estiver escolhido nele: depois de usá-lo numa placa do
+robô, reinicie a placa (ela volta ao que está no `config.json`).
 
 ## Publicar uma versão nova
 

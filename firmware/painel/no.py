@@ -4,6 +4,8 @@
 # O fim de curso que bloqueia o sentido do movimento é lido pela própria PIO a cada passo: a parada
 # não depende do laço em Python (GC, USB, leitura do TMC); a varredura em Python fica de reserva.
 # A revisão da placa vem do placa.py (REV = "v17"), gravado pelo painel; sem ele, v17.
+# config.json (comando "salva"): driver, TMC, fins de curso e o bloco "robo" do painel (eixos ligados nesta
+# placa, reduções, limites, referência). Lido na partida: a placa já liga configurada, com os motores soltos.
 # Pinos comuns: EN GP0 · VSENSE GP1 · ENA do DM556 GP8 (alto = habilitado) · FIM1 GP27 · FIM2 GP15 · NTC GP29
 # v18 também tem o NTC2 (motor do DM556) no GP26.
 # v14–v17: UART GP5 (fio até o pino 4 do módulo) · STEP GP6 · DIR GP7, que vão ao mesmo tempo para o
@@ -13,11 +15,16 @@
 # Modo "dm556": o TMC fica desabilitado (EN alto), o GP8 liga/solta o DM556 e o STEP do DM556 pode sair
 # invertido (!gpio6 no Klipper). Modo "tmc": GP8 baixo, o DM556 não segue os passos.
 # Modo "ambos" (só até a v17): os dois habilitados recebendo os mesmos pulsos (para comparar motores/drivers).
-import sys, time, math, array, json, select, uctypes, micropython, gc
-from machine import Pin, ADC, mem32
+# Modo "dois" (v18): TMC e DM556 habilitados, cada um no seu motor. jog/mover/ir/zero escolhem o canal
+# pelo "k" ("tmc" ou "dm556"); cada canal guarda a sua posição e cada fim de curso pertence a um canal (k1, k2).
+# Trajetória (tjini/tj): segmentos sincronizados em um ou nos dois canais, mandados aos poucos pelo painel
+# (robô desenhando). Cada canal tem a sua SM (PIO1 SM1/SM2) lendo um anel de palavras por DMA (canais 9/10);
+# as duas SMs partem no mesmo ciclo e o painel calcula os atrasos para os dois canais andarem juntos.
+import sys, os, time, math, array, json, select, uctypes, micropython, gc, struct, binascii
+from machine import Pin, ADC, mem32, unique_id
 from rp2 import PIO, StateMachine, asm_pio
 
-FW = "painel 1.12"
+FW = "painel 1.13"
 try:
     from placa import REV
 except ImportError:
@@ -26,9 +33,13 @@ PLACAS = {           # UART, STEP e DIR do TMC, STEP e DIR do DM556
     "v17": (5, 6, 7, 6, 7),
     "v18": (2, 4, 5, 6, 7),
 }
+CANAIS = ("tmc", "dm556")
 REV_OK = REV in PLACAS
+UID = binascii.hexlify(unique_id()).decode()
+BOOT = binascii.hexlify(os.urandom(4)).decode()            # muda a cada partida: o painel sabe se a placa reiniciou
 PIN_UART, PIN_STEP_TMC, PIN_DIR_TMC, PIN_STEP_DM, PIN_DIR_DM = PLACAS[REV if REV_OK else "v17"]
 COMUM = PIN_STEP_TMC == PIN_STEP_DM     # STEP/DIR compartilhados: permite o modo "ambos"
+PINOS = {"tmc": (PIN_STEP_TMC, PIN_DIR_TMC), "dm556": (PIN_STEP_DM, PIN_DIR_DM)}
 PIN_EN, PIN_VS, PIN_ENA = 0, 1, 8
 PIN_FIM1, PIN_FIM2 = 27, 15
 PIN_NTC, PIN_NTC2 = 29, (26 if REV == "v18" else None)
@@ -133,6 +144,48 @@ def _passos():
 
 I_PASSO, I_FIM, I_TRAVA, I_SEGUE = 3, 9, 11, 12      # posições das instruções no _passos
 J_PIN, J_D1 = 6 << 5, 1 << 8                          # jmp: condição "pin" e 1 ciclo de atraso
+
+
+# Trajetória: uma palavra por segmento = d (bits 0-19) | DIR (bit 20) | n passos (bits 21-31).
+# n > 0: DIR, depois n passos de período 2d+7 ciclos (baixo d+5, alto d+2): 5 + n(2d+7) ciclos.
+# n = 0: espera, d+9 ciclos. n = 0 e d = 0: sentinela, a SM levanta o irq (1 ou 2) e para ali.
+# O anel sempre termina num sentinela: faltou palavra = a SM para no fim do que chegou.
+@asm_pio(set_init=PIO.OUT_LOW, out_init=PIO.OUT_LOW, out_shiftdir=PIO.SHIFT_RIGHT)
+def _traj():
+    wrap_target()
+    label("topo")
+    pull()
+    out(isr, 20)
+    out(pins, 1)
+    out(x, 11)
+    jmp(x_dec, "passo")
+    mov(y, isr)
+    jmp(not_y, "para")
+    label("espera")
+    jmp(y_dec, "espera")
+    jmp("topo")
+    label("passo")
+    mov(y, isr)
+    label("baixo")
+    jmp(y_dec, "baixo")
+    set(pins, 1)
+    mov(y, isr)
+    label("alto")
+    jmp(y_dec, "alto")
+    set(pins, 0)
+    jmp(x_dec, "passo")
+    wrap()
+    label("para")
+    irq(block, rel(0))
+
+
+T_PASSO, T_ALTO, T_PARA = 9, 12, 16       # posições no _traj: início do passo, depois do set(pins, 1), sentinela
+TJ_N = 512                  # palavras por anel e por canal (5 s com segmentos de 10 ms)
+TJ_MARGEM = 16              # palavras já lidas que não são sobrescritas (a contagem no corte ainda as usa)
+TJ_DMIN = 50                # d mínimo: pulso alto >= 5 us e DIR >= 5 us antes do 1º passo (DM556)
+TJ_TC = 0x3FFFFFFF          # TRANS_COUNT do DMA ("infinito"; inteiro curto, sem alocar)
+TJ_SM = (5, 6)              # PIO1 SM1 e SM2
+TJ_DMA = (9, 10)
 
 
 # ---------- TMC2209 ----------
@@ -245,6 +298,7 @@ adc_t = ADC(4)
 cfg = {"run": 0.8, "hold": 0.4, "micro": 16, "modo": "stealth", "vthr": 0,
        "intpol": True, "hdelay": 8, "tpd": 20, "shaft": False}    # shaft inverte só o motor do TMC
 fimcfg = {"f1": 0, "f2": 0, "inv": False,     # f: 0 só mostra, -1 bloqueia o -, 1 bloqueia o +, 2 os dois
+          "k1": "tmc", "k2": "dm556",            # canal de cada fim de curso (só no modo dois)
           "r25": 100000, "beta": 3950,           # NTC1; o pull-up R3 da placa é 100k
           "r25_2": 100000, "beta2": 3950}        # NTC2 (v18); pull-up R15 de 100k
 drv = {"tipo": "tmc", "inv_step": False, "inv_dir": False,
@@ -268,7 +322,13 @@ sg_baixos = 0
 sg_ult = 0
 sm = None
 fim_pio = 0                            # FIM (1/2) que a PIO vigia no movimento atual; 0 = nenhum
-pos = 0
+canal = "tmc"                          # canal do gerador de passos (SM0): "tmc" ou "dm556"
+pos = 0                                # posição do canal da SM0
+posk = {"tmc": 0, "dm556": 0}          # posição de cada canal (a do canal da SM0 fica em pos)
+tj = None                              # trajetória em andamento (Traj)
+tj_mem = None                          # anéis da trajetória, alocados uma vez
+robo = {}                              # dados do painel do robô, só guardados no config.json
+ARQ_CFG = "config.json"
 mov = None
 vact = 0
 eventos = []
@@ -382,10 +442,10 @@ def _inv_step():
 
 
 def _pinos():
-    """STEP/DIR do driver escolhido. Na v18 cada driver tem os seus: os do outro ficam parados em
+    """STEP/DIR do canal da SM0. Na v18 cada driver tem os seus: os do outro ficam parados em
     nível baixo. Chamar com a SM parada e, se o STEP mudou, recriar a SM (_sm_novo) em seguida."""
     global dirp, pin_step
-    ps, pd = (PIN_STEP_DM, PIN_DIR_DM) if drv["tipo"] == "dm556" else (PIN_STEP_TMC, PIN_DIR_TMC)
+    ps, pd = PINOS[canal]
     for p in (PIN_STEP_TMC, PIN_DIR_TMC, PIN_STEP_DM, PIN_DIR_DM):
         if p != ps and p != pd:
             Pin(p, Pin.OUT, value=0)
@@ -402,7 +462,7 @@ def _fim_pio(d):
     o = prog_ini
     a, b, fim_pio = J_D1 | (o + I_SEGUE), o + I_TRAVA, 0
     for i, k in ((0, "f1"), (1, "f2")):
-        if fimcfg[k] and (fimcfg[k] == d or fimcfg[k] == 2):
+        if fimcfg[k] and (fimcfg[k] == d or fimcfg[k] == 2) and _fim_meu(i, canal):
             if fimcfg["inv"]:                   # acionado = nível alto
                 a, b = J_PIN | (o + I_TRAVA), o + I_SEGUE
             else:                               # acionado = nível baixo (chave para o GND)
@@ -678,11 +738,50 @@ def _agora():
 
 
 def _usa_tmc():
-    return drv["tipo"] in ("tmc", "ambos")
+    return drv["tipo"] in ("tmc", "ambos", "dois")
 
 
 def _usa_dm():
-    return drv["tipo"] in ("dm556", "ambos")
+    return drv["tipo"] in ("dm556", "ambos", "dois")
+
+
+def _canal_de(tipo):
+    return "dm556" if tipo == "dm556" else "tmc"
+
+
+def _troca_canal(k):
+    """modo dois: passa a SM0 (jog/mover/ir) para o canal k, guardando a posição do outro"""
+    global canal, pos
+    if k == canal:
+        return
+    _livre()
+    posk[canal] = pos
+    canal = k
+    pos = posk[k]
+    _pinos()
+    _sm_novo()
+
+
+def _usa_k(m):
+    """canal pedido pelo comando ("k"): no modo dois troca a SM0 para ele; nos outros, tem que ser o ativo"""
+    k = m.get("k")
+    if k is None or k == canal:
+        return
+    if k not in CANAIS:
+        raise ValueError("canal inválido: %s" % k)
+    if drv["tipo"] == "dois":
+        _troca_canal(k)
+    elif drv["tipo"] != "ambos":
+        raise ValueError("canal %s desligado no modo %s" % (k, drv["tipo"]))
+
+
+def _pos_k():
+    """posição de cada canal agora"""
+    if tj:
+        return tj.posicoes()
+    d = dict(posk)
+    d[canal] = _agora()[0]
+    return d
 
 
 def _energizado():
@@ -757,9 +856,14 @@ def _fim(i):
     return v == 1 if fimcfg["inv"] else v == 0
 
 
+def _fim_meu(i, k):
+    """o FIM i (0/1) vale para o canal k? Só no modo dois cada chave tem dono"""
+    return drv["tipo"] != "dois" or fimcfg[("k1", "k2")[i]] == k
+
+
 def _fim_bloqueia(d):
     for i, k in ((0, "f1"), (1, "f2")):
-        if fimcfg[k] and (fimcfg[k] == d or fimcfg[k] == 2) and _fim(i):
+        if fimcfg[k] and (fimcfg[k] == d or fimcfg[k] == 2) and _fim_meu(i, canal) and _fim(i):
             return i + 1
     return 0
 
@@ -801,7 +905,7 @@ def _vigia():
 def _vigia_sg():
     """lê o SG_RESULT a cada ~2 ms durante o movimento; True se parou por travamento"""
     global sg_min, sg_baixos, sg_ult, t_trava
-    if not (_usa_tmc() and tmc and tmc.addr is not None) or cfg["modo"] == "spread":
+    if not (_usa_tmc() and canal == "tmc" and tmc and tmc.addr is not None) or cfg["modo"] == "spread":
         return False
     agora = time.ticks_us()
     if time.ticks_diff(agora, sg_ult) < 2000:
@@ -828,6 +932,386 @@ def _vigia_sg():
     return False
 
 
+# ---------- trajetória (dois canais sincronizados) ----------
+
+R_DMA_ABORT = 0x50000444
+R_PIO1_CTRL_SET = 0x50302000
+R_PIO1_FLEVEL = 0x5030000C
+TJ_RING = (4 * TJ_N).bit_length() - 1     # log2 do anel em bytes, para o RING_SIZE do DMA
+tj_ult = None                             # resultado da última trajetória: {"tid", "ok", "msg"}
+
+
+@micropython.viper
+def _tj_corta_v(pinos: int, sms: int):
+    """desliga as SMs da trajetória com os STEP baixos (sem pulso pela metade); espera no máximo ~30 ms"""
+    pio = ptr32(uint(0x50300000))
+    pset = ptr32(uint(0x50302000))
+    pclr = ptr32(uint(0x50303000))
+    k = 4000000
+    while True:
+        while (pio[15] & pinos) and k > 0:    # DBG_PADOUT
+            k -= 1
+        pclr[0] = sms                         # CTRL: desliga as SMs juntas
+        if k <= 0 or (pio[15] & pinos) == 0:
+            break
+        pset[0] = sms                         # um pulso subiu entre o teste e o desligar: deixa terminar
+
+
+def _tj_mem():
+    """anéis alinhados ao próprio tamanho (o DMA dá a volta pelos bits baixos do endereço)"""
+    global tj_mem
+    if tj_mem is None:
+        gc.collect()
+        nb = 4 * TJ_N
+        m = []
+        for _ in TJ_SM:
+            bruto = bytearray(2 * nb)
+            a = (uctypes.addressof(bruto) + nb - 1) & ~(nb - 1)
+            anel = uctypes.struct(a, {"w": (uctypes.ARRAY | 0, uctypes.UINT32 | TJ_N)}).w
+            m.append((bruto, a, anel, array.array("i", range(TJ_N))))
+        tj_mem = m
+    return tj_mem
+
+
+class _Canal:
+    """um canal da trajetória: SM (PIO1 SM1/SM2), DMA em anel e posição depois de cada palavra"""
+
+    def __init__(self, k, i, mem):
+        self.k = k
+        _, self.addr, self.anel, self.pr = mem
+        self.i = i + 1                                    # número da SM dentro da PIO1
+        self.ch = TJ_DMA[i]
+        d = 0x50000000 + self.ch * 0x40
+        self.r_read, self.r_write, self.r_tc, self.r_trig, self.r_al1 = d, d + 4, d + 8, d + 0xC, d + 0x10
+        self.r_txf = 0x50300010 + 4 * self.i
+        self.v_ctrl = (1 | (2 << 2) | (1 << 4) | (TJ_RING << 6) | (self.ch << 11)
+                       | ((DREQ_PIO1_TX0 + self.i) << 15))
+        self.r_addr = 0x503000D4 + 0x18 * self.i          # SMn_ADDR
+        ps, pd = PINOS[k]
+        self.step = ps
+        self.sm = StateMachine(TJ_SM[i], _traj, freq=FREQ, set_base=Pin(ps), out_base=Pin(pd))
+        self.ini = mem32[self.r_addr] & 0x1F              # SM parada no pull = início do programa
+        self.p0 = posk[k]
+        self.anel[0] = 0                                  # começa no sentinela
+        mem32[self.r_al1] = 0
+        mem32[self.r_read] = self.addr
+        mem32[self.r_write] = self.r_txf
+        mem32[self.r_tc] = TJ_TC
+
+    def lidas(self):
+        """palavras que o DMA já passou para a FIFO"""
+        return TJ_TC - mem32[self.r_tc]
+
+    def fifo(self):
+        return (mem32[R_PIO1_FLEVEL] >> (8 * self.i)) & 15
+
+    def feitas(self):
+        """palavras terminadas (com a SM rodando: estimativa)"""
+        return max(0, self.lidas() - self.fifo() - 1)
+
+    def pos_est(self):
+        n = self.feitas()
+        return self.pr[(n - 1) & (TJ_N - 1)] if n else self.p0
+
+    def pos_corte(self, inv):
+        """posição exata com a SM e o DMA parados"""
+        lidas, fl = self.lidas(), self.fifo()
+        pc = (mem32[self.r_addr] & 0x1F) - self.ini
+        n_ok = lidas - fl - (0 if pc == 0 else 1)         # no pull: a palavra atual nem saiu da FIFO
+        parc = 0
+        if T_PASSO <= pc < T_PARA:
+            w = self.anel[n_ok & (TJ_N - 1)]
+            self.sm.exec("mov(isr, x)")
+            self.sm.exec("push(noblock)")
+            parc = (w >> 21) - self.sm.get() - (1 if pc < T_ALTO else 0)
+            if not ((w ^ inv) >> 20) & 1:              # DIR lógico (sem a inversão do inv_dir)
+                parc = -parc
+        p = self.pr[(n_ok - 1) & (TJ_N - 1)] if n_ok > 0 else self.p0
+        return p + parc
+
+
+class Traj:
+    def __init__(self, ks, ident):
+        mem = _tj_mem()
+        self.cs = [_Canal(k, i, mem[i]) for i, k in enumerate(ks)]
+        self.id = ident
+        self.esc = 0              # palavras escritas: a próxima entra no lugar do sentinela
+        self.fim = False          # o painel já mandou a última palavra
+        self.on = False
+        self.inv = (1 << 20) if drv["inv_dir"] else 0
+        self.t_meio = None
+        self.pinos = self.sms = 0
+        for c in self.cs:
+            self.pinos |= 1 << c.step
+            self.sms |= 1 << c.i
+        self.tmc = any(c.k == "tmc" for c in self.cs) and _usa_tmc()
+
+    def livre(self):
+        lidas = min(c.lidas() for c in self.cs) if self.on else 0
+        return max(0, TJ_N - TJ_MARGEM - 1 - (self.esc - lidas))
+
+    def resumo(self):
+        f = min(c.feitas() for c in self.cs) if self.on else 0
+        return {"tid": self.id, "on": self.on, "feitas": min(f, self.esc), "esc": self.esc,
+                "livre": self.livre(), "fim": self.fim}
+
+    def posicoes(self):
+        d = dict(posk)
+        for c in self.cs:
+            d[c.k] = c.pos_est() if self.on else c.p0
+        return d
+
+    def acrescenta(self, ws):
+        """ws: bytes de cada canal, palavras de 32 bits little-endian, o mesmo número em todos"""
+        if self.fim:
+            raise ValueError("trajetória já recebeu o fim")
+        if len(ws) != len(self.cs):
+            raise ValueError("trajetória com %d canais" % len(self.cs))
+        m = len(ws[0]) // 4
+        if any(len(b) != 4 * m for b in ws):
+            raise ValueError("trajetória: canais com número de palavras diferente")
+        if m == 0:
+            return
+        if m > self.livre():
+            raise ValueError("trajetória: anel cheio (%d livres)" % self.livre())
+        vals = [struct.unpack("<%dI" % m, b) for b in ws]
+        for a in vals:            # confere tudo antes de escrever: um erro no meio não estraga o anel
+            for w in a:
+                d = w & 0xFFFFF
+                if (w >> 21 and d < TJ_DMIN) or d == 0:
+                    raise ValueError("trajetória: palavra inválida 0x%08X (passo rápido demais?)" % w)
+        e0, N1, inv = self.esc, TJ_N - 1, self.inv
+        for c, a in zip(self.cs, vals):
+            anel, pr = c.anel, c.pr
+            p = pr[(e0 - 1) & N1] if e0 else c.p0
+            anel[(e0 + m) & N1] = 0                       # o sentinela novo antes de tirar o velho
+            for j in range(m):
+                w = a[j]
+                n = w >> 21
+                if n:
+                    p += n if w & 0x100000 else -n
+                pr[(e0 + j) & N1] = p
+                if j:
+                    anel[(e0 + j) & N1] = w ^ inv
+        for c, a in zip(self.cs, vals):                   # por último, e juntos, os sentinelas velhos
+            c.anel[e0 & N1] = a[0] ^ inv
+        self.esc = e0 + m
+
+    def acionado(self):
+        """fim de curso configurado (f1/f2 != 0) acionado num canal desta trajetória"""
+        ks = [c.k for c in self.cs]
+        for i, f in ((0, "f1"), (1, "f2")):
+            if fimcfg[f] and _fim(i) and (drv["tipo"] != "dois" or fimcfg[("k1", "k2")[i]] in ks):
+                return i + 1
+        return 0
+
+    def comeca(self):
+        if self.on:
+            return
+        if not self.esc:
+            raise ValueError("trajetória vazia")
+        f = self.acionado()
+        if f:
+            raise ValueError("FIM%d acionado: trajetória não começa" % f)
+        if self.tmc and not vs.value():
+            raise ValueError("sem 24 V")
+        if not _energizado():
+            _energiza(True)
+        mem32[R_PIO1_IRQ] = 6                             # limpa os irq 1 e 2 (sentinelas)
+        for c in self.cs:
+            mem32[c.r_trig] = c.v_ctrl                    # o DMA enche as FIFOs
+        time.sleep_us(20)
+        mem32[R_PIO1_CTRL_SET] = self.sms | (self.sms << 8)   # liga as SMs e zera os divisores no mesmo ciclo
+        self.on = True
+
+    def vigia(self):
+        global t_trava, t_erro
+        if not self.on:
+            return
+        irq = mem32[R_PIO1_IRQ]
+        paradas = 0
+        for c in self.cs:
+            if irq & (1 << c.i):
+                paradas += 1
+        if paradas:
+            if paradas == len(self.cs):
+                if self.fim and min(c.feitas() for c in self.cs) >= self.esc:
+                    self.corta(None, True)
+                else:
+                    t_erro = time.ticks_ms()
+                    self.corta("trajetória: faltaram dados (USB atrasou), parada no fim do que chegou")
+            elif not self.fim:
+                t_erro = time.ticks_ms()
+                self.corta("trajetória: faltaram dados (USB atrasou), parada no fim do que chegou")
+            elif self.t_meio is None:
+                self.t_meio = time.ticks_ms()
+            elif time.ticks_diff(time.ticks_ms(), self.t_meio) > 100:
+                t_erro = time.ticks_ms()
+                self.corta("trajetória: canais terminaram fora de sincronia")
+            return
+        f = self.acionado()
+        if f:
+            t_trava = time.ticks_ms()
+            self.corta("FIM%d acionado: trajetória cortada" % f)
+        elif self.tmc and not vs.value():
+            t_erro = time.ticks_ms()
+            self.corta("24 V caiu durante a trajetória: parada imediata")
+
+    def corta(self, msg=None, ok=False):
+        """para (ou termina) a trajetória, acerta as posições e devolve o STEP à SM0"""
+        global tj, pos, tj_ult
+        if self.on:
+            _tj_corta_v(self.pinos, self.sms)
+        m = 0
+        for c in self.cs:
+            mem32[c.r_al1] = 0
+            m |= 1 << c.ch
+        mem32[R_DMA_ABORT] = m
+        while mem32[R_DMA_ABORT] & m:
+            pass
+        for c in self.cs:
+            posk[c.k] = c.pos_corte(self.inv) if self.on else c.p0
+            c.sm.active(0)
+        mem32[R_PIO1_IRQ] = 6
+        tj = None
+        pos = posk[canal]
+        _pinos()
+        _sm_novo()
+        if msg:
+            ev(msg)
+        tj_ult = {"tid": self.id, "ok": ok, "msg": msg or ""}
+
+
+def _tj_solta():
+    """sem contar posição: SMs e DMA da trajetória desligados (saída do firmware, erro no corte)"""
+    global tj
+    if tj is None:
+        return
+    _tj_corta_v(tj.pinos, tj.sms)
+    m = 0
+    for c in tj.cs:
+        mem32[c.r_al1] = 0
+        m |= 1 << c.ch
+    mem32[R_DMA_ABORT] = m
+    tj = None
+
+
+def _carrega_cfg():
+    """config.json -> drv/cfg/fimcfg/sgcfg/robo, antes de montar os pinos; valores ruins ficam no padrão"""
+    global robo, rampa_s, canal
+    try:
+        with open(ARQ_CFG) as f:
+            d = json.load(f)
+    except OSError:
+        return
+    except ValueError:
+        ev("config.json ilegível: configuração padrão")
+        return
+    try:
+        for alvo, k in ((cfg, "cfg"), (fimcfg, "fimcfg"), (sgcfg, "sgcfg")):
+            for c, v in d.get(k, {}).items():
+                if c not in alvo:
+                    continue
+                num = (int, float)
+                if type(v) == type(alvo[c]) or (type(alvo[c]) in num and type(v) in num):
+                    alvo[c] = v
+        if cfg["micro"] not in MRES or cfg["modo"] not in ("stealth", "spread", "auto"):
+            cfg["micro"], cfg["modo"] = 16, "stealth"
+        cfg["run"] = min(float(cfg["run"]), IMAX_RUN)
+        for k in ("k1", "k2"):
+            if fimcfg[k] not in CANAIS:
+                fimcfg[k] = "tmc"
+        dv = d.get("drv", {})
+        tipo = dv.get("tipo", "tmc")
+        if tipo in ("tmc", "dm556") or (tipo == "dois" and not COMUM) or (tipo == "ambos" and COMUM):
+            drv["tipo"] = tipo
+            canal = _canal_de(tipo)
+        for k in ("inv_step", "inv_dir", "segura"):
+            if k in dv:
+                drv[k] = bool(dv[k])
+        rampa_s = bool(d.get("rampa_s", False))
+        robo = d.get("robo") or {}
+    except Exception as e:
+        ev("config.json: %s" % e)
+
+
+def c_salva(m):
+    """grava a configuração atual (e o bloco "robo", se vier) no config.json; "apaga": volta ao padrão"""
+    global robo
+    _livre()                            # gravar o flash para o Python por alguns ms
+    if m.get("apaga"):
+        try:
+            os.remove(ARQ_CFG)
+        except OSError:
+            pass
+        robo = {}
+        return {"salvo": False}
+    if "robo" in m:
+        robo = m["robo"] or {}
+    s = json.dumps({"v": 1, "drv": drv, "cfg": cfg, "fimcfg": fimcfg, "sgcfg": sgcfg, "rampa_s": rampa_s,
+                    "robo": robo})
+    with open(ARQ_CFG + ".tmp", "w") as f:
+        f.write(s)
+    try:
+        os.remove(ARQ_CFG)
+    except OSError:
+        pass
+    os.rename(ARQ_CFG + ".tmp", ARQ_CFG)
+    return {"salvo": True, "bytes": len(s)}
+
+
+def _tem_cfg():
+    try:
+        os.stat(ARQ_CFG)
+        return True
+    except OSError:
+        return False
+
+
+def c_tjini(m):
+    """prepara uma trajetória nos canais k (ordem dos dados no tj), tid = número dado pelo painel; não mexe no motor"""
+    global tj
+    if tj and not tj.on:
+        tj.corta()                         # a anterior nem começou: descarta
+    _livre()
+    if vact:
+        raise ValueError("pare o giro por UART (VACTUAL) antes")
+    ks = m.get("k") or [canal]
+    if not 1 <= len(ks) <= 2 or len(set(ks)) != len(ks) or any(k not in CANAIS for k in ks):
+        raise ValueError("canais inválidos: %s" % ks)
+    if drv["tipo"] != "dois":
+        if len(ks) != 1:
+            raise ValueError("dois canais ao mesmo tempo só no modo dois (v18)")
+        if ks[0] != canal and drv["tipo"] != "ambos":
+            raise ValueError("canal %s desligado no modo %s" % (ks[0], drv["tipo"]))
+        ks = [canal]
+    posk[canal] = pos
+    sm.active(0)                           # SM0 ociosa no pull: a trajetória assume os pinos
+    try:
+        tj = Traj(ks, m.get("tid"))
+        _inv_step()
+    except Exception:
+        tj = None
+        _pinos()
+        _sm_novo()
+        raise
+    return tj.resumo()
+
+
+def c_tj(m):
+    """acrescenta palavras ("w": base64 por canal), "fim": última remessa, "go": começa"""
+    if tj is None:
+        raise ValueError("sem trajetória (tjini)")
+    ws = m.get("w")
+    if ws:
+        tj.acrescenta([binascii.a2b_base64(b) for b in ws])
+    if m.get("fim"):
+        tj.fim = True
+    if m.get("go"):
+        tj.comeca()
+    return tj.resumo()
+
+
 # ---------- sensores ----------
 
 def _ntc(adc=adc_ntc, r25="r25", beta="beta"):
@@ -847,11 +1331,14 @@ def _trp():
 def _livre():
     if mov:
         raise ValueError("motor em movimento")
+    if tj:
+        raise ValueError("trajetória em andamento")
 
 
 def c_info(m):
     return {"fw": FW, "placa": REV, "ambos": COMUM, "cfg": cfg, "fimcfg": fimcfg, "drv": drv, "sgcfg": sgcfg, "tmc": _tmc_resumo(),
-            "tem_ntc2": adc_ntc2 is not None, "pos": pos, "vmax": VMAX, "rampa_s": rampa_s, "imax": IMAX_RUN}
+            "tem_ntc2": adc_ntc2 is not None, "pos": pos, "vmax": VMAX, "rampa_s": rampa_s, "imax": IMAX_RUN,
+            "uid": UID, "boot": BOOT, "robo": robo, "salvo": _tem_cfg(), "dois": not COMUM, "k": canal, "pk": _pos_k(), "tjn": TJ_N, "tjmin": TJ_DMIN, "freq": FREQ}
 
 
 def c_rampa(m):
@@ -891,33 +1378,37 @@ def c_sg(m):
 
 
 def c_drv(m):
-    global pos, vact
+    global pos, vact, canal
     _livre()
     tipo = m.get("tipo", drv["tipo"])
-    if tipo not in ("tmc", "dm556", "ambos"):
+    if tipo not in ("tmc", "dm556", "ambos", "dois"):
         raise ValueError("driver inválido")
     if tipo == "ambos" and not COMUM:
         raise ValueError("modo Ambos só nas placas até a v17 (STEP/DIR compartilhados)")
+    if tipo == "dois" and COMUM:
+        raise ValueError("modo Dois só na v18 (STEP/DIR separados para cada driver)")
+    velho_k = canal
     if tipo != drv["tipo"]:
-        pos = 0
-    if tipo != "tmc":
+        pos = posk["tmc"] = posk["dm556"] = 0
+        if tipo != "dois":
+            canal = _canal_de(tipo)
+    if tipo not in ("tmc", "dois"):
         if vact and tmc and tmc.addr is not None:
             tmc.escreve(VACTUAL, 0)
         vact = 0
     if tipo != drv["tipo"]:
         en.value(1)                    # troca de driver: os dois soltos até o próximo movimento
         ena.value(0)
-    troca = tipo != drv["tipo"]
     drv["tipo"] = tipo
     for k in ("inv_step", "inv_dir", "segura"):
         if k in m:
             drv[k] = bool(m[k])
-    if troca and not COMUM:
+    if canal != velho_k and not COMUM:
         _pinos()
         _sm_novo()                     # o STEP mudou de pino (também reaplica a inversão)
     else:
         _inv_step()
-    return {"drv": drv, "pos": pos}
+    return {"drv": drv, "pos": pos, "k": canal, "pk": _pos_k()}
 
 
 def c_cfg(m):
@@ -934,8 +1425,11 @@ def c_cfg(m):
     if novo["modo"] not in ("stealth", "spread", "auto"):
         raise ValueError("modo inválido")
     cfg.update(novo)
-    if cfg["micro"] != velho:
-        pos = int(round(pos * cfg["micro"] / velho))
+    if cfg["micro"] != velho:          # a resolução muda só para o motor do TMC
+        if canal == "tmc":
+            pos = int(round(pos * cfg["micro"] / velho))
+        else:
+            posk["tmc"] = int(round(posk["tmc"] * cfg["micro"] / velho))
     if tmc and tmc.addr is not None and vs.value():
         aplica_cfg()
     else:
@@ -949,6 +1443,8 @@ def c_en(m):
         tmc_falha = False
         _energiza(True)
     else:
+        if tj:
+            tj.corta("trajetória cortada: motores soltos")
         abortar()
         _energiza(False)
     return {}
@@ -976,14 +1472,17 @@ def _mover(n, v, a):
 
 
 def c_mover(m):
+    _usa_k(m)
     return _mover(int(m["n"]), m["v"], m["a"])
 
 
 def c_ir(m):
+    _usa_k(m)
     return _mover(int(m["p"]) - pos, m["v"], m["a"])
 
 
 def c_jog(m):
+    _usa_k(m)
     _livre()
     if vact:
         raise ValueError("pare o giro por UART (VACTUAL) antes")
@@ -1012,6 +1511,8 @@ def c_parar(m):
     if vact and tmc and tmc.addr is not None:
         vact = 0
         tmc.escreve(VACTUAL, 0)
+    if tj:                             # a trajetória não tem desaceleração guardada: corta no passo
+        tj.corta("trajetória parada")
     parar()
     return {}
 
@@ -1019,6 +1520,8 @@ def c_parar(m):
 def c_emerg(m):
     global vact, t_erro
     t_erro = time.ticks_ms()
+    if tj:
+        tj.corta("EMERGÊNCIA: trajetória cortada")
     if drv["segura"]:
         abortar("EMERGÊNCIA: pulsos cortados, motor mantido energizado")
     else:
@@ -1032,10 +1535,18 @@ def c_emerg(m):
 
 
 def c_zero(m):
+    """zera (ou define) a posição do canal k, sem trocar a SM0 de canal"""
     global pos
     _livre()
-    pos = int(m.get("p", 0))
-    return {"pos": pos}
+    k = m.get("k", canal)
+    if k not in CANAIS:
+        raise ValueError("canal inválido: %s" % k)
+    p = int(m.get("p", 0))
+    if k == canal:
+        pos = p
+    else:
+        posk[k] = p
+    return {"pos": pos, "pk": _pos_k()}
 
 
 def _fim_algum():
@@ -1093,6 +1604,11 @@ def c_fim(m):
             fimcfg[k] = max(-1, min(2, int(m[k])))
     if "inv" in m:
         fimcfg["inv"] = bool(m["inv"])
+    for k in ("k1", "k2"):
+        if k in m:
+            if m[k] not in CANAIS:
+                raise ValueError("canal inválido: %s" % m[k])
+            fimcfg[k] = m[k]
     for k in ("r25", "beta", "r25_2", "beta2"):
         if k in m and float(m[k]) > 0:
             fimcfg[k] = float(m[k])
@@ -1103,7 +1619,8 @@ def c_st(m):
     global ult_busca
     p, v = _agora()
     ntc, ntcr = _ntc()
-    d = {"pos": p, "v": v, "mov": mov.tipo if mov else ("vact" if vact else ""), "drv": drv["tipo"],
+    d = {"pos": p, "v": v, "mov": mov.tipo if mov else ("tj" if tj else "vact" if vact else ""), "drv": drv["tipo"],
+         "k": canal, "pk": _pos_k(), "boot": BOOT,
          "en": 1 if _energizado() else 0, "vm": vs.value(), "f1": int(_fim(0)), "f2": int(_fim(1)),
          "fr1": fim[0].value(), "fr2": fim[1].value(), "ntc": ntc, "ntcr": ntcr, "trp": _trp(), "vact": vact}
     if adc_ntc2 is not None:
@@ -1130,6 +1647,9 @@ def c_st(m):
     d["tmc"] = t
     d["tmci"] = _tmc_resumo()
     d["sgmin"] = sg_min
+    if tj:
+        d["tj"] = tj.resumo()
+    d["tjf"] = tj_ult
     d["quente"] = tmc_quente
     d["falha"] = tmc_falha
     if eventos:
@@ -1149,7 +1669,7 @@ def c_reg(m):
 
 CMD = {"info": c_info, "cfg": c_cfg, "en": c_en, "mover": c_mover, "ir": c_ir, "jog": c_jog,
        "parar": c_parar, "emerg": c_emerg, "drv": c_drv, "sg": c_sg, "sgzera": c_sgzera, "irun": c_irun, "rampa": c_rampa, "zero": c_zero, "vact": c_vact, "fim": c_fim,
-       "st": c_st, "reg": c_reg, "ping": lambda m: {}}
+       "st": c_st, "reg": c_reg, "salva": c_salva, "tjini": c_tjini, "tj": c_tj, "ping": lambda m: {}}
 
 
 def _vigia_tmc():
@@ -1213,6 +1733,8 @@ def _led_tick():
         return _led(255, 0, 0) if agora % 2000 < 1000 else _led(0, 0, 0)
     if mov:                                                   # movendo: ciano; parando: amarelo
         return _led(0, 170, 255) if mov.tipo != "parando" else _led(255, 170, 0)
+    if tj and tj.on:
+        return _led(0, 170, 255)
     if vact:
         return _led(0, 170, 255)
     if time.ticks_diff(agora, ult_rx) > 3000:                 # sem painel: azul "respirando"
@@ -1237,7 +1759,7 @@ def _trata(s):
     print(json.dumps(r))
 
 
-LINHA_MAX = 1024
+LINHA_MAX = 4096          # as remessas da trajetória (tj) passam de 1 kB
 
 
 def _erro_interno(e):
@@ -1245,18 +1767,26 @@ def _erro_interno(e):
     t_erro = time.ticks_ms()
     msg = "erro interno (%s: %s): movimento cortado" % (type(e).__name__, e)
     try:
-        if mov:
+        if tj:
+            tj.corta(msg)
+        elif mov:
             abortar(msg)
         else:
             ev(msg)
     except Exception:
+        era_tj = tj is not None
+        _tj_solta()
         _troca(0, 0, prog_ini, RES)        # sem conseguir contar: corta assim mesmo
         mov = None
+        if era_tj:                         # devolve STEP/DIR à SM0
+            _pinos()
+            _sm_novo()
         ev(msg + "; posição perdida")
 
 
 def rodar():
     global ult_tmc_chk, led_chk
+    _carrega_cfg()
     _pinos()
     _sm_novo()
     try:
@@ -1285,6 +1815,8 @@ def rodar():
                         linha = []
                         ev("linha com mais de %d caracteres descartada" % LINHA_MAX)
                 _vigia()
+                if tj:
+                    tj.vigia()
                 _vigia_vact()
                 agora = time.ticks_ms()
                 if time.ticks_diff(agora, ult_tmc_chk) > 500:
@@ -1296,6 +1828,7 @@ def rodar():
             except Exception as e:         # nada derruba o laço: corta o movimento e segue atendendo
                 _erro_interno(e)
     finally:
+        _tj_solta()
         _troca(0, 0, prog_ini, RES)        # corta passos e DMA juntos, com o STEP baixo
         if sm:
             sm.active(0)
