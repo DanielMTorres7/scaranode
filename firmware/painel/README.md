@@ -56,6 +56,8 @@ por placa: **Adicionar placa** para cada uma; na próxima vez o navegador recone
 - **Tudo fica salvo na placa** (`config.json`, comando `salva`): driver, correntes, fins de curso e os eixos
   ligados nela; o comprimento do braço vai com o J1 e as alturas da caneta com o Z. A placa já liga
   configurada (motores soltos) e o painel lê tudo de volta ao conectar, em qualquer computador.
+- **Firmware:** na aba **Placas**, cada placa mostra a versão dela e a do site; **Atualizar** grava a última
+  versão com a revisão que a própria placa informa (v17 ou v18). O `config.json` não é tocado.
 - **Desenho:** formas prontas ou um arquivo SVG (linhas, curvas, retângulos, círculos; texto precisa virar
   curva), posição e tamanho na área de trabalho, velocidade. **Simular** mostra o movimento sem mexer nos
   motores; **Desenhar** manda a trajetória.

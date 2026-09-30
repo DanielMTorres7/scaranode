@@ -473,9 +473,11 @@ function salvaLocal() { try { localStorage.setItem(KEY, JSON.stringify(est)); } 
 // ---------- placas (uma conexão Web Serial por placa) ----------
 const placas = [];
 class Placa {
+  static n = 0;
   constructor(port) { this.port = port; this.pend = new Map(); this.nextId = 1; this.info = null; this.st = null;
-                      this.ok = false; this.stPend = false; this.falhas = 0; this.timer = null; this.tj = false; }
-  get uid() { return this.info && this.info.uid ? this.info.uid : "?"; }
+                      this.ok = false; this.stPend = false; this.falhas = 0; this.timer = null; this.tj = false;
+                      this.tmp = "porta" + (++Placa.n); }
+  get uid() { return this.info && this.info.uid ? this.info.uid : this.tmp; }
   get nome() { return (this.info && this.info.robo && this.info.robo.nome) || ("placa " + (this.info ? this.info.placa : "?") + " · " + this.uid.slice(-4)); }
   get novo() { return !!(this.info && this.info.uid && this.info.tjn); }         // firmware 1.13+
   escrever(s) { return this.writer ? this.writer.write(enc.encode(s)) : Promise.reject(new Error("porta fechada")); }
@@ -502,6 +504,7 @@ class Placa {
       for (;;) {
         const { value, done } = await this.reader.read(); if (done) break;
         buf += dec.decode(value, { stream: true });
+        if (this.rawSink) { this.rawSink(buf); buf = ""; continue; }      // gravando firmware: raw REPL
         let i; while ((i = buf.indexOf("\n")) >= 0) { const l = buf.slice(0, i).trim(); buf = buf.slice(i + 1); if (l) this.linha(l); }
       }
     } catch (e) { if (this.ok) { log(this.nome + ": conexão perdida (" + e.message + ")", "bad"); toast(this.nome + ": conexão perdida", "bad"); } }
@@ -539,6 +542,79 @@ class Placa {
     if (!s.en) for (const e of EIX) if (est.eixos[e].placa === this.uid && est.refs[e]) { delete est.refs[e]; salvaLocal(); log(NOME[e] + ": referência perdida (motor solto)", "warn"); }
     atualizaTela();
   }
+  // ---- firmware pelo raw REPL (como o mpremote / o painel de uma placa) ----
+  rxEspera(teste, ms, oque) {
+    return new Promise((res, rej) => {
+      const t = setTimeout(() => { this.rxAviso = null; rej(new Error("a placa não respondeu (" + oque + ")")); }, ms);
+      this.rxAviso = () => { const r = teste(this.rx); if (r != null) { clearTimeout(t); this.rxAviso = null; res(r); } };
+      this.rxAviso();
+    });
+  }
+  async rawEntra() {
+    for (let i = 0; i < 3; i++) {
+      await this.escrever("\r\x03"); await sleep(400 + 300 * i);   // um Ctrl+C por vez: o 2º cortaria o finally que solta o motor
+      this.rx = ""; await this.escrever("\x01");
+      if (await this.rxEspera(s => /raw REPL; CTRL-B to exit\r?\n>/.test(s) || null, 1500, "raw REPL").catch(() => false)) return;
+    }
+    throw new Error("a placa não entrou no raw REPL");
+  }
+  async rawExec(code, ms = 5000) {
+    this.rx = "";
+    const b = enc.encode(code);
+    for (let i = 0; i < b.length; i += 256) await this.writer.write(b.subarray(i, i + 256));
+    await this.escrever("\x04");
+    const [out, err] = await this.rxEspera(s => {
+      const k = s.indexOf("OK"); if (k < 0) return null;
+      const q = s.slice(k + 2).split("\x04");
+      return q.length >= 3 && q[2].includes(">") ? [q[0], q[1]] : null;
+    }, ms, "executar");
+    if (err.trim()) throw new Error("placa: " + err.trim().split("\n").pop());
+    return out;
+  }
+  // grava main.py/no.py e o placa.py com a revisão que a própria placa informa; o config.json fica
+  async gravaFirmware(arqs, prog) {
+    const rev = this.info.placa;
+    arqs = arqs.filter(a => a.nome !== "placa.py").concat([{ nome: "placa.py", dados: enc.encode(`REV = "${rev}"\n`) }]);
+    clearInterval(this.timer); this.timer = null;
+    this.pend.forEach(f => f({ ok: 0, erro: "gravando firmware" })); this.pend.clear();
+    this.rx = "";
+    this.rawSink = t => { this.rx += t; if (this.rxAviso) this.rxAviso(); };
+    let erro = null;
+    try {
+      log(this.nome + ": entrando no raw REPL…");
+      await this.rawEntra();
+      await this.rawExec(RAW_INI);
+      const total = arqs.reduce((n, a) => n + a.dados.length, 0) || 1; let feito = 0;
+      for (const a of arqs) {
+        await this.rawExec(`f=open('${a.nome}.tmp','wb')\nw=f.write\n`);
+        for (let i = 0; i < a.dados.length; i += 1536) {
+          let code = "";
+          for (let j = i; j < Math.min(i + 1536, a.dados.length); j += 384) code += `w(d('${b64u8(a.dados.subarray(j, j + 384))}'))\n`;
+          await this.rawExec(code);
+          feito += Math.min(1536, a.dados.length - i); prog(feito / total);
+        }
+        await this.rawExec("f.close()\n");
+        const [tam, hash] = (await this.rawExec(`_h('${a.nome}.tmp')\n`)).trim().split(/\s+/);
+        const esperado = await sha256hex(a.dados);
+        if (+tam !== a.dados.length) throw new Error(`${a.nome}: gravou ${tam} bytes, esperava ${a.dados.length}`);
+        if (esperado && hash !== "-" && hash !== esperado) throw new Error(`${a.nome}: SHA-256 não confere`);
+        log(`${this.nome}: ${a.nome} conferido`, "ok");
+      }
+      // tudo conferido: só agora troca os arquivos
+      await this.rawExec(arqs.map(a => `try:\n os.remove('${a.nome}')\nexcept OSError:\n pass\nos.rename('${a.nome}.tmp','${a.nome}')\n`).join(""));
+    } catch (e) { erro = e; }
+    try {
+      await this.escrever("\x02"); await sleep(200);           // sai do raw REPL
+      this.rawSink = null; this.rx = "";
+      await this.escrever("\x04"); await sleep(2800);          // soft reset: roda o main.py
+      this.info = await this.cmd({ c: "info" }, 2500);
+      this.st = await this.cmd({ c: "st" }).catch(() => null);
+    } finally {
+      this.rawSink = null;
+      if (this.ok && !this.timer) this.timer = setInterval(() => this.tick(), 250);
+    }
+    if (erro) throw new Error(erro.message + " (a placa continua com o firmware anterior)");
+  }
   async stAgora() { const s = await this.cmd({ c: "st" }, 2000); this.aplicaSt(s); return s; }
   async fecha() {
     this.ok = false; clearInterval(this.timer);
@@ -563,11 +639,12 @@ async function conecta(port) {
   const p = new Placa(port);
   try {
     await p.abre();
-    const dup = placas.find(q => q.uid === p.uid && p.uid !== "?");
+    const dup = placas.find(q => q.uid === p.uid);
     if (dup) { await p.fecha(); return; }
     placas.push(p);
     log(p.nome + " conectada · " + p.info.fw + " · placa " + p.info.placa, "ok");
-    if (!p.novo) { aviso(p.nome + " está com o firmware " + p.info.fw + ": grave o painel 1.13 ou mais novo (Painel de uma placa › Firmware) para usar o robô."); }
+    if (!p.novo) aviso(p.nome + " está com o firmware " + p.info.fw + ": atualize na aba Placas (Firmware › Atualizar) para usar o robô.");
+    avisaFw();
     adotaPlaca(p);
   } catch (e) {
     try { await p.fecha(); } catch (_) {}
@@ -608,6 +685,80 @@ async function reconecta() {
 }
 $("#btnReco").onclick = reconecta;
 if (navigator.serial) navigator.serial.addEventListener("disconnect", e => { const p = placas.find(q => q.port === e.target || q.port === e.port); if (p) p.fecha(); });
+
+// ---------- firmware do site ----------
+const FW_ARQS = ["main.py", "no.py"];          // publicados ao lado desta página
+let fwSite = null;
+const fwVersao = dados => { const m = new TextDecoder().decode(dados).match(/^FW\s*=\s*"([^"]+)"/m); return m ? m[1] : null; };
+const fwNum = v => (String(v || "").match(/(\d+)\.(\d+)/) || []).slice(1).map(Number);
+function fwMaisNovo(a, b) { const x = fwNum(a), y = fwNum(b); if (!x.length || !y.length) return a === b ? 0 : 1; return x[0] - y[0] || x[1] - y[1]; }
+function b64u8(u8) { let t = ""; for (let i = 0; i < u8.length; i++) t += String.fromCharCode(u8[i]); return btoa(t); }
+async function sha256hex(d) {
+  if (!(window.crypto && crypto.subtle)) return null;
+  return Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", d)), x => x.toString(16).padStart(2, "0")).join("");
+}
+// na placa: imprime "tamanho sha256" do arquivo (sha256 "-" sem hashlib)
+const RAW_INI = `import os,binascii
+d=binascii.a2b_base64
+def _h(n):
+ try:
+  import hashlib
+  h=hashlib.sha256();f=open(n,'rb')
+  while 1:
+   c=f.read(1024)
+   if not c:break
+   h.update(c)
+  f.close();x=binascii.hexlify(h.digest()).decode()
+ except ImportError:
+  x='-'
+ print(os.stat(n)[6],x)
+`;
+async function carregaFwSite() {
+  if (location.protocol === "file:") return;          // aberta do disco: "Gravar arquivos do computador"
+  try {
+    const arqs = [];
+    for (const nome of FW_ARQS) {
+      const r = await fetch(nome, { cache: "no-cache" });
+      if (!r.ok) throw new Error(nome + ": HTTP " + r.status);
+      arqs.push({ nome, dados: new Uint8Array(await r.arrayBuffer()) });
+    }
+    const fw = fwVersao(arqs[1].dados);
+    if (!fw) throw new Error('no.py sem a linha FW = "…"');
+    fwSite = { fw, arquivos: arqs };
+    montaPlacas();
+    avisaFw();
+  } catch (e) { log("firmware do site: " + e.message, "warn"); }
+}
+const fwAvisadas = new Set();
+function avisaFw() {
+  if (!fwSite) return;
+  const velhas = placas.filter(p => fwMaisNovo(fwSite.fw, p.info.fw) > 0 && !fwAvisadas.has(p.uid));
+  velhas.forEach(p => fwAvisadas.add(p.uid));
+  if (velhas.length) toast("Firmware " + fwSite.fw + " disponível para " + velhas.map(p => p.nome).join(", ") + " (aba Placas)", "warn");
+}
+async function atualizaFirmware(p, arqs, origem) {
+  if (ocupado) { toast("Espere: " + ocupado, "warn"); return; }
+  if (p.st && (p.st.mov || p.st.tj)) { toast("Pare os motores antes", "warn"); return; }
+  if (!confirm(`Gravar ${origem} na ${p.nome} (placa ${p.info.placa || "?"})?\n\nOs motores desta placa são soltos, ela reinicia no fim e ` +
+               "os eixos dela perdem a referência. A configuração salva na placa (config.json) continua.")) return;
+  if (!["v17", "v18"].includes(p.info.placa)) {
+    const r = (prompt("Esta placa não informa a revisão (firmware antigo). Digite v17 (v14 a v17) ou v18:", "v17") || "").trim();
+    if (!["v17", "v18"].includes(r)) return;
+    p.info.placa = r;
+  }
+  const card = document.querySelector(`#placasCards [data-uid="${p.uid}"]`), pr = card && card.querySelector("progress");
+  if (pr) { pr.hidden = false; pr.value = 0; }
+  await tarefa("gravando firmware na " + p.nome, async () => {
+    const antes = p.info.fw;
+    await p.gravaFirmware(arqs, f => { if (pr) pr.value = f; });
+    for (const e of eixosDa(p)) delete est.refs[e];
+    salvaLocal();
+    log(`${p.nome}: firmware ${antes} → ${p.info.fw}`, "ok"); toast(p.nome + ": firmware " + p.info.fw + " gravado", "ok");
+    if (placas.every(q => q.novo)) aviso("");
+    adotaPlaca(p);
+  });
+  montaPlacas(); montaEixos();
+}
 
 // ---------- unidades ----------
 function spr(e) {
@@ -697,7 +848,7 @@ function montaPlacas() {
     const ex = eixosDa(p).map(e => NOME[e] + " no " + (est.eixos[e].k === "tmc" ? "TMC2209" : "DM556")).join(" · ") || "nenhum eixo ligado nesta placa (aba Eixos)";
     s.innerHTML = `
       <h2><span style="color:var(--ink);text-transform:none;letter-spacing:0;font-size:15px">${esc(p.nome)}</span>
-        <span class="chip acc">${esc(i.placa)}</span><span class="chip ${p.novo ? "ok" : "bad"}">${esc(i.fw)}</span>
+        <span class="chip acc">${esc(i.placa)}</span><span class="chip ${!p.novo ? "bad" : fwSite && fwMaisNovo(fwSite.fw, i.fw) > 0 ? "warn" : "ok"}">${esc(i.fw)}</span>
         <span class="chip ${i.salvo ? "ok" : "warn"}">${i.salvo ? "config na placa" : "sem config salva"}</span>
         <span class="grow"></span><button data-a="sai">Desconectar</button></h2>
       <p class="hint" style="margin:0 0 10px">${esc(ex)} · id ${esc(u)}</p>
@@ -726,6 +877,11 @@ function montaPlacas() {
         <label class="f">STEP do DM556<select data-c="inv_step"><option value="1">invertido (padrão da placa)</option><option value="0">direto</option></select></label>
         <label class="f">Na emergência<select data-c="segura"><option value="0">soltar os motores</option><option value="1">manter energizados (Z com fuso)</option></select></label>
       </div>
+      <h3>Firmware</h3>
+      <div class="row"><span class="sub2" data-v="fw"></span><div class="grow"></div>
+        <button data-a="fwsite" class="livre-so" hidden></button>
+        <button data-a="fwarq" class="livre-so">Gravar arquivos do computador…</button></div>
+      <progress hidden value="0" max="1" style="margin-top:8px"></progress>
       <div class="row" style="margin-top:12px"><button data-a="aplica" class="livre-so">Aplicar e salvar na placa</button>
         <button data-a="en" class="livre-so">Energizar</button><button data-a="apaga" class="livre-so">Apagar config da placa</button></div>`;
     s.querySelector('[data-c="nf"]').value = i.fimcfg && i.fimcfg.inv ? "1" : "0";
@@ -733,6 +889,26 @@ function montaPlacas() {
     s.querySelector('[data-c="inv_step"]').value = d.inv_step ? "1" : "0";
     s.querySelector('[data-c="segura"]').value = d.segura ? "1" : "0";
     s.querySelector('[data-a="sai"]').onclick = () => p.fecha();
+    const bfw = s.querySelector('[data-a="fwsite"]'), cmp = fwSite ? fwMaisNovo(fwSite.fw, i.fw) : null;
+    s.querySelector('[data-v="fw"]').textContent = "na placa: " + i.fw + " · revisão " + i.placa +
+      (fwSite ? " · no site: " + fwSite.fw + (cmp > 0 ? " (mais nova)" : cmp === 0 ? " (atualizada)" : "")
+              : location.protocol === "file:" ? " · página aberta do disco: grave pelos arquivos do computador" : "");
+    if (fwSite) {
+      bfw.hidden = false; bfw.className = "livre-so" + (cmp > 0 ? " pri" : "");
+      bfw.textContent = cmp > 0 ? "Atualizar para " + fwSite.fw : "Regravar " + fwSite.fw;
+      bfw.onclick = () => atualizaFirmware(p, fwSite.arquivos, "o firmware " + fwSite.fw + " do site");
+    }
+    s.querySelector('[data-a="fwarq"]').onclick = () => {
+      const inp = document.createElement("input"); inp.type = "file"; inp.multiple = true; inp.accept = ".py";
+      inp.onchange = async () => {
+        const fs = [...inp.files]; if (!fs.length) return;
+        if (fs.some(f => !/^[\w.-]+\.py$/.test(f.name))) { toast("Escolha só arquivos .py (main.py, no.py)", "bad"); return; }
+        const arqs = await Promise.all(fs.map(async f => ({ nome: f.name, dados: new Uint8Array(await f.arrayBuffer()) })));
+        const no = arqs.find(a => a.nome === "no.py");
+        atualizaFirmware(p, arqs, arqs.map(a => a.nome).join(" + ") + (no && fwVersao(no.dados) ? " (" + fwVersao(no.dados) + ")" : "") + " do computador");
+      };
+      inp.click();
+    };
     s.querySelector('[data-a="en"]').onclick = () => p.cmd({ c: "en", v: p.st && p.st.en ? 0 : 1 }).catch(e => toast(e.message, "bad"));
     s.querySelector('[data-a="apaga"]').onclick = async () => {
       if (!confirm("Apagar o config.json da " + p.nome + "? Na próxima partida ela volta ao padrão (modo TMC, sem eixos).")) return;
@@ -891,7 +1067,7 @@ async function tarefa(nome, fn) {
 function exigePlaca(e) {
   const p = placaDe(e);
   if (!p) throw new Error(NOME[e] + ": escolha a placa (aba Eixos) e conecte-a");
-  if (!p.novo) throw new Error(p.nome + ": firmware antigo, grave o painel 1.13");
+  if (!p.novo) throw new Error(p.nome + ": firmware antigo, atualize na aba Placas");
   return p;
 }
 async function esperaParar(p, maxMs = 180000) {
@@ -1363,7 +1539,7 @@ $("#btnLimpa").onclick = () => { $("#log").innerHTML = ""; };
 
 // ---------- início ----------
 mostraAba(location.hash.slice(1) || "desenho");
-carregaFonte(); montaPlacas(); montaEixos(); replaneja();
+carregaFonte(); montaPlacas(); montaEixos(); replaneja(); carregaFwSite();
 if (!("serial" in navigator)) aviso("Este navegador não tem Web Serial. Abra esta página no Chrome ou no Edge (computador).");
 else navigator.serial.getPorts().then(ps => {
   if (!ps.length) return;
