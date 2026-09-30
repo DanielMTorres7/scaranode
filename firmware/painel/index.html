@@ -983,12 +983,13 @@ function comparaFw(avisar) {
   }
 }
 
+// aberta do disco (file://) o Chrome não deixa ler o no.py ao lado: busca no site publicado
+const FW_BASE = location.protocol === "file:" ? "https://danielmtorres7.github.io/scaranode/" : "";
 async function carregaFwSite() {
-  if (location.protocol === "file:") { $("#fwSite").textContent = "— (página aberta do disco: use os arquivos do computador)"; return; }
   try {
     const arqs = [];
     for (const nome of FW_ARQS) {
-      const r = await fetch(nome, { cache: "no-cache" });
+      const r = await fetch(FW_BASE + nome, { cache: "no-cache" });
       if (!r.ok) throw new Error(nome + ": HTTP " + r.status);
       arqs.push({ nome, dados: new Uint8Array(await r.arrayBuffer()) });
     }

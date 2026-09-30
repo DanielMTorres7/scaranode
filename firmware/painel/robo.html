@@ -713,12 +713,13 @@ def _h(n):
   x='-'
  print(os.stat(n)[6],x)
 `;
+// aberta do disco (file://) o Chrome não deixa ler o no.py ao lado: busca no site publicado
+const FW_BASE = location.protocol === "file:" ? "https://danielmtorres7.github.io/scaranode/" : "";
 async function carregaFwSite() {
-  if (location.protocol === "file:") return;          // aberta do disco: "Gravar arquivos do computador"
   try {
     const arqs = [];
     for (const nome of FW_ARQS) {
-      const r = await fetch(nome, { cache: "no-cache" });
+      const r = await fetch(FW_BASE + nome, { cache: "no-cache" });
       if (!r.ok) throw new Error(nome + ": HTTP " + r.status);
       arqs.push({ nome, dados: new Uint8Array(await r.arrayBuffer()) });
     }
@@ -892,7 +893,7 @@ function montaPlacas() {
     const bfw = s.querySelector('[data-a="fwsite"]'), cmp = fwSite ? fwMaisNovo(fwSite.fw, i.fw) : null;
     s.querySelector('[data-v="fw"]').textContent = "na placa: " + i.fw + " · revisão " + i.placa +
       (fwSite ? " · no site: " + fwSite.fw + (cmp > 0 ? " (mais nova)" : cmp === 0 ? " (atualizada)" : "")
-              : location.protocol === "file:" ? " · página aberta do disco: grave pelos arquivos do computador" : "");
+              : " · firmware do site não encontrado (sem internet?): grave pelos arquivos do computador");
     if (fwSite) {
       bfw.hidden = false; bfw.className = "livre-so" + (cmp > 0 ? " pri" : "");
       bfw.textContent = cmp > 0 ? "Atualizar para " + fwSite.fw : "Regravar " + fwSite.fw;
