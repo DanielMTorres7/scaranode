@@ -24,7 +24,7 @@ import sys, os, time, math, array, json, select, uctypes, micropython, gc, struc
 from machine import Pin, ADC, mem32, unique_id
 from rp2 import PIO, StateMachine, asm_pio
 
-FW = "painel 1.14"
+FW = "painel 1.15"
 try:
     from placa import REV
 except ImportError:
@@ -1799,7 +1799,13 @@ def rodar():
         ev("TMC: %s" % e)
     pl = select.poll()
     pl.register(sys.stdin, select.POLLIN)
-    linha = []
+    # linha num buffer fixo, alocado uma vez: montada numa lista, cada linha longa (bloco tj) pedia um bloco
+    # contíguo de 4-8 kB ao crescer, e com o heap fragmentado dava MemoryError no meio do desenho
+    entrada = sys.stdin.buffer
+    linha = bytearray(LINHA_MAX)
+    mv = memoryview(linha)
+    um = bytearray(1)
+    n = 0
     _led_ini()
     print(json.dumps({"ev": ["pronto: %s · placa %s" % (FW, REV)]}))
     if not REV_OK:
@@ -1808,15 +1814,17 @@ def rodar():
         while True:
             try:
                 while pl.poll(0):
-                    ch = sys.stdin.read(1)
-                    if ch in "\r\n":
-                        if linha:
-                            _trata("".join(linha))
-                            linha = []
-                    elif len(linha) < LINHA_MAX:
-                        linha.append(ch)
-                    else:                  # lixo na serial sem fim de linha: não deixa a memória crescer
-                        linha = []
+                    entrada.readinto(um)
+                    c = um[0]
+                    if c == 10 or c == 13:
+                        if n:
+                            k, n = n, 0
+                            _trata(mv[:k])      # json.loads lê direto do buffer, sem copiar
+                    elif n < LINHA_MAX:
+                        linha[n] = c
+                        n += 1
+                    else:                  # lixo na serial sem fim de linha: descarta
+                        n = 0
                         ev("linha com mais de %d caracteres descartada" % LINHA_MAX)
                 _vigia()
                 if tj:
