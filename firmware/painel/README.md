@@ -20,7 +20,7 @@ A placa precisa de **MicroPython** no RP2040-Zero (segure BOOT, ligue a USB e co
 [micropython.org](https://micropython.org/download/RPI_PICO/) para o drive `RPI-RP2`).
 Depois, no painel, na aba **Firmware**:
 
-1. escolha a **revisão da placa** (v14–v17 ou v18): ela vai num `placa.py` (`REV = "v17"`) e decide os pinos;
+1. confira a **revisão da placa** (só a v18): ela vai num `placa.py` (`REV = "v18"`) e decide os pinos;
 2. clique em **Gravar firmware do site**.
 
 O painel solta o motor, para o firmware e grava `main.py`, `no.py` e `placa.py` pelo raw REPL (como o
@@ -33,14 +33,15 @@ Na aba **Firmware**, **Editar o firmware**: baixe `no.py`, `main.py` e `placa.py
 **Gravar arquivos do computador…** (um ou mais `.py`; só os escolhidos são trocados). Para voltar à versão
 publicada, **Gravar firmware do site**. Para publicar a sua versão para todos, faça o commit aqui (veja abaixo).
 
-## Pinos por revisão
+## Pinos (v18)
 
-| | v14–v17 | v18 |
-|---|---|---|
-| STEP / DIR do TMC2209 | GP6 / GP7 (compartilhados) | GP4 / GP5 |
-| STEP / DIR do DM556 | GP6 / GP7 (compartilhados) | GP6 / GP7 |
-| UART do TMC2209 | GP5 | GP2 |
-| Modo "Ambos" (mesmos pulsos nos dois drivers) | sim | não |
+| | v18 |
+|---|---|
+| STEP / DIR do TMC2209 | GP4 / GP5 |
+| STEP / DIR do DM556 | GP6 / GP7 |
+| UART do TMC2209 | GP2 |
+
+As páginas não oferecem mais as placas até a v17 (STEP/DIR compartilhados, modo "Ambos"); o `no.py` ainda tem a pinagem delas.
 
 Comuns: EN do TMC GP0, 24 V GP1, ENA do DM556 GP8, FIM1 GP27, FIM2 GP15, NTC GP29, LED GP16.
 Revisão nova: uma linha na tabela `PLACAS` do `no.py` e uma opção no seletor do `index.html`.
@@ -57,7 +58,7 @@ por placa: **Adicionar placa** para cada uma; na próxima vez o navegador recone
   ligados nela; o comprimento do braço vai com o J1 e as alturas da caneta com o Z. A placa já liga
   configurada (motores soltos) e o painel lê tudo de volta ao conectar, em qualquer computador.
 - **Firmware:** na aba **Placas**, cada placa mostra a versão dela e a do site; **Atualizar** grava a última
-  versão com a revisão que a própria placa informa (v17 ou v18). O `config.json` não é tocado.
+  versão com a revisão que a própria placa informa (v18). O `config.json` não é tocado.
 - **Desenho:** formas prontas ou um arquivo SVG (linhas, curvas, retângulos, círculos; texto precisa virar
   curva), posição e tamanho na área de trabalho, velocidade. **Simular** mostra o movimento sem mexer nos
   motores; **Desenhar** manda a trajetória.

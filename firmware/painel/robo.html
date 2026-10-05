@@ -742,10 +742,9 @@ async function atualizaFirmware(p, arqs, origem) {
   if (p.st && (p.st.mov || p.st.tj)) { toast("Pare os motores antes", "warn"); return; }
   if (!confirm(`Gravar ${origem} na ${p.nome} (placa ${p.info.placa || "?"})?\n\nOs motores desta placa são soltos, ela reinicia no fim e ` +
                "os eixos dela perdem a referência. A configuração salva na placa (config.json) continua.")) return;
-  if (!["v17", "v18"].includes(p.info.placa)) {
-    const r = (prompt("Esta placa não informa a revisão (firmware antigo). Digite v17 (v14 a v17) ou v18:", "v17") || "").trim();
-    if (!["v17", "v18"].includes(r)) return;
-    p.info.placa = r;
+  if (p.info.placa !== "v18") {
+    if (!confirm(`Esta placa informa a revisão ${p.info.placa || "? (firmware antigo)"}; o painel só grava a v18. Gravar como v18?`)) return;
+    p.info.placa = "v18";
   }
   const card = document.querySelector(`#placasCards [data-uid="${p.uid}"]`), pr = card && card.querySelector("progress");
   if (pr) { pr.hidden = false; pr.value = 0; }
@@ -801,7 +800,7 @@ async function sincronizaPlaca(p, salvar) {
   const modo = modoDesejado(p);
   if (modo === "erro") throw new Error(p.nome + ": dois canais só na v18");
   const d = p.info.drv, temDM = eixosDa(p).some(e => est.eixos[e].k === "dm556");
-  // STEP do DM556 invertido por padrão (como no painel de uma placa); até a v17 o STEP é o mesmo do TMC
+  // STEP do DM556 invertido por padrão (como no painel de uma placa)
   const invStep = temDM ? (p.info.salvo ? !!d.inv_step : true) : (p.info.dois ? !!d.inv_step : false);
   if (modo && ((p.st && p.st.drv) !== modo || invStep !== !!d.inv_step)) {
     const troca = (p.st && p.st.drv) !== modo;

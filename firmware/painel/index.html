@@ -127,7 +127,7 @@ canvas { width: 100%; height: 150px; display: block; }
   background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn); }
 .off-when-disc { transition: opacity .2s; }
 body.desconectado .off-when-disc { opacity: .5; pointer-events: none; }
-body:not(.modo-dm):not(.modo-ambos) .so-dm, body.modo-dm .so-tmc { display: none !important; }
+body:not(.modo-dm) .so-dm, body.modo-dm .so-tmc { display: none !important; }
 .calgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
 .calgrid h3 { font-size: 14px; margin: 0 0 8px; }
 #calRes { margin: 14px 0 0; max-height: 240px; overflow: auto; white-space: pre-wrap; background: var(--field);
@@ -186,7 +186,7 @@ kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--li
   </div>
   <div class="grow"></div>
   <label class="row" style="gap:6px"><span class="sub">Driver</span>
-    <select id="drvSel"><option value="tmc">TMC2209 (motor no J6)</option><option value="dm556">DM556 (pelo J4)</option><option value="ambos">Ambos (comparar)</option></select></label>
+    <select id="drvSel"><option value="tmc">TMC2209 (motor no J6)</option><option value="dm556">DM556 (pelo J4)</option></select></label>
   <span id="chipCon" class="chip">desconectado</span>
   <span id="chipVM" class="chip">24 V</span>
   <span id="chipTMC" class="chip so-tmc">TMC</span>
@@ -304,7 +304,7 @@ kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--li
       <tr><td><i class="led" style="--c:#ff2020" data-p="rapido"></i></td><td>vermelho piscando rápido</td><td>erro: emergência, 24 V caiu, TMC superaqueceu ou curto (6 s; na falha do TMC até reconfigurar)</td></tr>
       <tr><td><i class="led" style="--c:#ff30ff" data-p="duplo"></i></td><td>magenta, 2 piscadas</td><td>parou por fim de curso ou travamento (StallGuard)</td></tr>
       <tr><td><i class="led" style="--c:#ff7a00" data-p="lento"></i></td><td>laranja piscando</td><td>TMC acima de 120 °C (corrente já reduzida)</td></tr>
-      <tr><td><i class="led" style="--c:#ffb000" data-p="curto"></i></td><td>amarelo, piscada curta</td><td>sem 24 V no J5 (modo TMC ou Ambos)</td></tr>
+      <tr><td><i class="led" style="--c:#ffb000" data-p="curto"></i></td><td>amarelo, piscada curta</td><td>sem 24 V no J5 (modo TMC)</td></tr>
       <tr><td><i class="led" style="--c:#ff2020" data-p="meio"></i></td><td>vermelho lento</td><td>tem 24 V, mas o TMC não responde pelo UART</td></tr>
       <tr><td><i class="led" style="--c:#00aaff"></i></td><td>ciano</td><td>girando (amarelo fixo: desacelerando)</td></tr>
       <tr><td><i class="led" style="--c:#20e020"></i></td><td>verde</td><td>parado e energizado</td></tr>
@@ -463,7 +463,6 @@ kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--li
         <select id="dmInvDir"><option value="0">normal</option><option value="1">invertido</option></select></label>
     </div>
     <div class="row" style="margin-top:12px"><button id="btnDM" class="pri">Aplicar</button></div>
-    <p class="hint" id="ambosAviso" style="display:none; color: var(--warn)"></p>
     <p class="hint">Use o mesmo número de pulsos por volta das chaves do DM556 (tabela na lateral do driver). J1 do SCARA: 260:20 = redução 13.</p>
     <hr>
     <dl class="kv">
@@ -588,7 +587,6 @@ kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--li
     <div class="row" style="margin-top:10px">
       <label class="row" style="gap:6px">Revisão da placa
         <select id="fwRev">
-          <option value="v17">v14–v17 · STEP/DIR compartilhados, UART no GP5</option>
           <option value="v18">v18 · TMC e DM556 independentes, UART no GP2</option>
         </select></label>
     </div>
@@ -596,8 +594,8 @@ kbd { font: 11.5px ui-monospace, Consolas, monospace; border: 1px solid var(--li
       <button id="btnFwSite" class="pri" disabled>Gravar firmware do site</button>
       <progress id="fwProg" max="1" value="0" hidden style="flex:1; min-width:120px"></progress>
     </div>
-    <p class="hint">A revisão escolhida vai num placa.py (REV = "v17") e decide os pinos que o no.py usa; errar a revisão
-      manda os passos para os pinos errados. O modo Ambos só existe até a v17.</p>
+    <p class="hint">A revisão escolhida vai num placa.py (REV = "v18") e decide os pinos que o no.py usa; errar a revisão
+      manda os passos para os pinos errados.</p>
     <p class="hint">Solta o motor, para o firmware e grava main.py, no.py e placa.py pela USB (raw REPL, como o mpremote).
       Cada arquivo vai para um .tmp e só substitui o antigo depois de conferido (tamanho e SHA-256); se algo falhar
       no meio, a placa continua com o firmware anterior. Funciona também com a placa sem o firmware do painel,
@@ -648,9 +646,10 @@ const fmt = (x, d = 2) => Number(x).toLocaleString("pt-BR", { minimumFractionDig
 // ---------- preferências locais ----------
 const PREF_KEY = "scaranode-painel";
 const pref = Object.assign({ fullsteps: 200, red: 1, unid: "volta", rpm: 60, acel: 4, r25: 100000, beta: 3950, r25_2: 100000, beta2: 3950,
-  drv: "tmc", tmcInvDir: false, placa: "v17", dmPpr: 3200, dmRed: 1, dmInvStep: true, dmInvDir: false,
+  drv: "tmc", tmcInvDir: false, placa: "v18", dmPpr: 3200, dmRed: 1, dmInvStep: true, dmInvDir: false,
   sgOn: false, sgLim: 50, sgVmin: 60, sgN: 2, segura: false, cMm: 0, rampa: false, motorI: 1.7 },
   (() => { try { return JSON.parse(localStorage.getItem(PREF_KEY)) || {}; } catch (e) { return {}; } })());
+if (pref.drv === "ambos") pref.drv = "tmc";                  // modo das placas até a v17, que saíram
 if (!pref.ntcFix) { pref.r25 = 100000; pref.ntcFix = 1; }   // o padrão antigo (10k) estava errado
 function salvaPref() { try { localStorage.setItem(PREF_KEY, JSON.stringify(pref)); } catch (e) {} }
 $("#fullsteps").value = pref.fullsteps; $("#red").value = pref.red; $("#unid").value = pref.unid;
@@ -664,21 +663,9 @@ $("#segura").checked = !!pref.segura; $("#cMm").value = pref.cMm;
 $("#rampa").value = pref.rampa ? "1" : "0"; $("#motorI").value = pref.motorI;
 $("#sgOn").value = pref.sgOn ? "1" : "0"; $("#sgLim").value = pref.sgLim; $("#sgVmin").value = pref.sgVmin; $("#sgN").value = pref.sgN;
 const ehDM = () => pref.drv === "dm556";
-const usaDM = () => pref.drv !== "tmc";                            // DM556 ou ambos
 function aplicaModo() {
   document.body.classList.toggle("modo-dm", ehDM());
-  document.body.classList.toggle("modo-ambos", pref.drv === "ambos");
   $("#drvSel").value = pref.drv; hist.length = 0;
-  avisoAmbos();
-}
-function avisoAmbos() {
-  const el = document.getElementById("ambosAviso");
-  if (!el) return;
-  const tmcPpr = pref.fullsteps * micro;
-  el.textContent = pref.drv !== "ambos" ? "" : (pref.dmPpr === tmcPpr
-    ? "Comparando: os dois recebem os mesmos pulsos, " + tmcPpr + " por volta nos dois."
-    : "Atenção: o TMC está em " + tmcPpr + " pulsos/volta e o DM556 em " + pref.dmPpr + ". Iguale para os dois motores darem a mesma volta.");
-  el.style.display = el.textContent ? "" : "none";
 }
 
 let micro = 16;
@@ -847,7 +834,7 @@ async function desconectar() {
 const FW_ARQS = ["main.py", "no.py"];          // servidos ao lado desta página no site
 const REPO = "https://github.com/DanielMTorres7/scaranode";
 let fwSite = null, fwPlaca = null, revPlaca = null, gravando = false;
-const REVS = { v17: "v14–v17", v18: "v18" };
+const REVS = { v18: "v18" };
 let rawSink = null, rx = "", rxAviso = null;
 
 function rxEspera(teste, ms, oque) {
@@ -1025,6 +1012,7 @@ $("#btnAjuda").onclick = () => { pref.bvFechado = false; salvaPref(); $("#bemVin
 $("#btnBvFw").onclick = () => mostraAba("firmware");
 $("#btnBvCon").onclick = () => conectar();
 
+if (!REVS[pref.placa]) pref.placa = "v18";            // preferência salva de uma revisão que saiu
 $("#fwRev").value = pref.placa;
 $("#fwRev").onchange = () => { pref.placa = $("#fwRev").value; salvaPref(); comparaFw(false); };
 $("#btnFwSite").onclick = () => fwSite && gravaFirmware(fwSite.arquivos, "firmware do site " + fwSite.fw);
@@ -1043,13 +1031,7 @@ $("#fwArq").onchange = async e => {
 let ultimo = null;
 function aplicaInfo(r) {
   const c = r.cfg;
-  const ambos = r.ambos !== false;                  // firmware antigo não informa: placa até a v17
   document.querySelectorAll(".so-ntc2").forEach(e => e.hidden = !r.tem_ntc2);
-  $("#drvSel").querySelector('option[value="ambos"]').disabled = !ambos;
-  if (!ambos && pref.drv === "ambos") {
-    pref.drv = "tmc"; salvaPref(); aplicaModo();
-    log("esta placa (" + r.placa + ") não tem o modo Ambos: voltando para TMC2209", "warn");
-  }
   micro = c.micro;
   $("#run").value = c.run; $("#hold").value = c.hold; $("#micro").value = c.micro; $("#modo").value = c.modo;
   $("#intpol").value = c.intpol ? "1" : "0"; $("#hdelay").value = c.hdelay; $("#tpd").value = c.tpd;
@@ -1255,7 +1237,7 @@ $("#btnCfg").onclick = async () => {
     intpol: $("#intpol").value === "1", hdelay: +$("#hdelay").value, tpd: +$("#tpd").value, shaft: pref.tmcInvDir
   }, 4000);
   if (r) {
-    micro = r.cfg.micro; mostraTmcInfo(r.tmc); avisoAmbos(); enviaSg(true);
+    micro = r.cfg.micro; mostraTmcInfo(r.tmc); enviaSg(true);
     $("#cfgRes").textContent = r.tmc.on ? "gravado e confirmado pelo driver" : "TMC não respondeu: fica salvo e é gravado quando ele voltar";
   }
 };
@@ -1283,8 +1265,8 @@ $("#btnSg").onclick = () => {
 };
 
 function enviaDriver(silencio) {
-  return acao({ c: "drv", tipo: pref.drv, inv_step: usaDM() ? pref.dmInvStep : false,
-                inv_dir: usaDM() ? pref.dmInvDir : false, segura: !!pref.segura }, 2500, silencio);
+  return acao({ c: "drv", tipo: pref.drv, inv_step: ehDM() ? pref.dmInvStep : false,
+                inv_dir: ehDM() ? pref.dmInvDir : false, segura: !!pref.segura }, 2500, silencio);
 }
 $("#drvSel").onchange = async () => {
   const antes = pref.drv;
@@ -1292,19 +1274,18 @@ $("#drvSel").onchange = async () => {
   if (conectado) {
     const r = await enviaDriver(false);
     if (!r) { pref.drv = antes; aplicaModo(); return; }
-    log({ tmc: "modo TMC2209: DM556 solto (posição zerada)", dm556: "modo DM556: TMC desabilitado, passos pelo J4 (posição zerada)",
-          ambos: "modo ambos: TMC e DM556 habilitados com os mesmos pulsos (posição zerada)" }[pref.drv], "ok");
+    log({ tmc: "modo TMC2209: DM556 solto (posição zerada)", dm556: "modo DM556: TMC desabilitado, passos pelo J4 (posição zerada)" }[pref.drv], "ok");
   }
   salvaPref(); aplicaModo();
   if (ultimo) atualiza(ultimo);
 };
-// sentido do motor do TMC pelo bit shaft (UART): independe do pino DIR, que é comum aos dois drivers
+// sentido do motor do TMC pelo bit shaft (UART): independe do pino DIR
 $("#tmcInvDir").onchange = () => { pref.tmcInvDir = $("#tmcInvDir").value === "1"; salvaPref(); if (conectado) acao({ c: "cfg", shaft: pref.tmcInvDir }, 4000); };
 $("#btnDM").onclick = () => {
   pref.dmPpr = Math.max(1, Math.round(+$("#dmPpr").value) || 3200);
   pref.dmRed = Math.max(0.001, +$("#dmRed").value || 1);
   pref.dmInvStep = $("#dmInvStep").value === "1"; pref.dmInvDir = $("#dmInvDir").value === "1";
-  salvaPref(); avisoAmbos(); if (ultimo) atualiza(ultimo);
+  salvaPref(); if (ultimo) atualiza(ultimo);
   if (conectado) enviaDriver(false);
 };
 $("#btnVact").onclick = () => acao({ c: "vact", v: +$("#vactRpm").value / 60 * spr() });
@@ -1388,7 +1369,7 @@ async function rodaRotina(nome, fn) {
 }
 $("#btnCancelar").onclick = () => { cancelar = true; };
 function exigeTMC() {
-  if (pref.drv === "dm556") throw new Error("precisa do TMC (o DM556 não tem StallGuard): troque o driver para TMC2209 ou Ambos");
+  if (pref.drv === "dm556") throw new Error("precisa do TMC (o DM556 não tem StallGuard): troque o driver para TMC2209");
   if ($("#modo").value !== "stealth") throw new Error("o StallGuard só mede em stealthChop: ponha o modo do chopper em stealthChop e aplique");
 }
 const restauraSg = () => enviaSg(true);
